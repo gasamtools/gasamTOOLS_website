@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-
+document.getElementById('gasam-footer-year').textContent = new Date().getFullYear();
 
 function validatePassword() {
   const password = document.getElementById("floatingPassword");
