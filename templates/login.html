@@ -1,15 +1,15 @@
 {% include "header.html" %}
 
 <main class="form-signin w-100 m-auto">
-  <form>
+  <form action="{{ url_for('login') }}" method="post">
     <h1 class="h3 mb-3 fw-normal gasam-h1">𒉣𒈨𒋳</h1>
 
     <div class="form-floating">
-      <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
+      <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com" name="email">
       <label for="floatingInput">Email address</label>
     </div>
     <div class="form-floating">
-      <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
+      <input type="password" class="form-control" id="floatingPassword" placeholder="Password" name="password">
       <label for="floatingPassword">Password</label>
     </div>
 
@@ -21,6 +21,15 @@
     </div>
     <button class="btn btn-primary w-100 py-2 btn-dark" type="submit">Sign in</button>
   </form>
+  {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li style="color: #FF0000">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+  {% endwith %}
 </main>
 
 {% include "footer.html" %}
