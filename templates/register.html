@@ -1,0 +1,42 @@
+{% include "header.html" %}
+
+<main class="form-signup w-100 m-auto">
+  <form action="{{ url_for('register') }}" method="post">
+    <h1 class="h3 mb-3 fw-normal gasam-h1">𒉣𒈨𒋳</h1>
+    <div class="form-floating">
+      <input type="text" class="form-control" id="floatingName" placeholder="Your name" name="name" required>
+      <label for="floatingInput">Name</label>
+    </div>
+    <div class="form-floating">
+      <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com" name="email" required>
+      <label for="floatingInput">Email address</label>
+    </div>
+    <div class="form-floating password-container">
+      <input type="password" class="form-control" id="floatingPassword" placeholder="Password" name="password" required >
+        <span class="toggle-password" id="togglePassword">
+          <i class="fa fa-eye"></i>
+        </span>
+        <label for="floatingPassword">Password</label>
+    </div>
+    <div class="form-floating">
+      <input type="password" class="form-control" id="floatingRepeatPassword" placeholder="Repeat Password" name="repeat_password" required oninput="validatePassword()">
+        <span class="toggle-password" id="toggleRepeatPassword">
+          <i class="fa fa-eye"></i>
+        </span>
+        <label for="floatingRepeatPassword">Repeat Password</label>
+    </div>
+    <button class="btn btn-primary w-100 py-2 btn-dark" type="submit">Sign up</button>
+  </form>
+  {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li style="color: #FF0000">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+  {% endwith %}
+</main>
+
+{% include "footer.html" %}
+

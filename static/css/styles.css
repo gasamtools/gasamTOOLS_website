@@ -3,16 +3,34 @@ body {
   height: 100%;
 }
 
-.form-signin {
+.gasam-h1 {
+  text-align: center;
+  color: #000;
+  font-size: 40px;
+}
+
+.gasam-brand {
+  color: #000;
+}
+
+
+.form-signin,
+.form-signup {
   max-width: 330px;
   padding: 1rem;
 }
 
-.form-signin .form-floating:focus-within {
+.form-signin .form-floating:focus-within ,
+.form-signup .form-floating:focus-within {
   z-index: 2;
 }
 
-.form-signin input[type="email"] {
+.password-container {
+  position: relative;
+}
+
+.form-signin input[type="email"] ,
+.form-signup input[type="email"] {
   margin-bottom: -1px;
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
@@ -24,12 +42,26 @@ body {
   border-top-right-radius: 0;
 }
 
-.gasam-h1 {
-  text-align: center;
-  color: #000;
-  font-size: 40px;
+.form-signup input[type="password"] {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
 }
 
-.gasam-brand {
-  color: #000;
+.form-signup button[type="submit"] {
+  margin-top: 10px;
 }
+
+
+.toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #333;
+}
+
+.toggle-password i {
+  font-size: 18px;
+}
+

@@ -92,14 +92,17 @@ def register():
 
         name = request.form['name']
         email = request.form['email']
+        password = request.form['password']
+        repeat_password = request.form['repeat_password']
 
         user = User.query.filter_by(email=email).first()
         if user:
             flash('This email is already registered. Please login.')
             return redirect(url_for('login'))
-
+        elif password != repeat_password:
+            flash("Passwords do not match")
         else:
-            hashed_password = generate_password_hash(request.form['password'], method='pbkdf2:sha256', salt_length=8)
+            hashed_password = generate_password_hash(password, method='pbkdf2:sha256', salt_length=8)
 
             new_user = User(name=name,
                             email=email,
@@ -110,7 +113,7 @@ def register():
             db.session.commit()
             login_user(new_user)
 
-            return render_template("home.html")
+            return redirect(url_for('home'))
     return render_template("register.html")
 
 
