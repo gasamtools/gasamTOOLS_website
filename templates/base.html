@@ -1,0 +1,52 @@
+<div class="d-flex gasam-main-container">
+
+  <!-- Sidebar -->
+  <div class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark sidebar" style="width: 200px;">
+    <hr>
+    <ul class="nav nav-pills flex-column mb-auto gasam-sidebar">
+      {% for app in user_apps %}
+      <li class="nav-item">
+        <a href="{{url_for('access_app', app_name=app.app_url) }}"
+           class="nav-link text-white {% if app_name and app_name==app.app_url: %} active {% endif %}"
+           aria-current="page"
+           id="{{ app.app_url }}">
+          <p class="gasam-app-name" title="{{ app.subtitle }}">{{ app.title }}</p>
+        </a>
+      </li>
+      {% endfor %}
+      <!--
+      <li>
+        <a href="#" class="nav-link text-white">
+          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#speedometer2"></use></svg>
+          Dashboard
+        </a>
+      </li>
+      <li>
+        <a href="#" class="nav-link text-white">
+          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#table"></use></svg>
+          Orders
+        </a>
+      </li>
+      <li>
+        <a href="#" class="nav-link text-white">
+          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>
+          Products
+        </a>
+      </li>
+      <li>
+        <a href="#" class="nav-link text-white">
+          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
+          Customers
+        </a>
+      </li>
+      -->
+    </ul>
+    <hr>
+    <div class="small text-center text-muted fst-italic">&copy; GASAM TOOLS <span id="gasam-footer-year"></span></div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="flex-grow-1 p-3 content d-flex flex-column gasam-main-window">
+    {% block content %} {% endblock %}
+  </div>
+</div>

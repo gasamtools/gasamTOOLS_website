@@ -1,52 +1,20 @@
 {% include "header.html" %}
 
-<div class="d-flex gasam-main-container">
-  <!-- Sidebar -->
-  <div class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark sidebar" style="width: 200px;">
-    <hr>
-    <ul class="nav nav-pills flex-column mb-auto gasam-sidebar">
-      <li class="nav-item">
-        <a href="#" class="nav-link active" aria-current="page">
-          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#home"></use></svg>
-          Home
-        </a>
-      </li>
-      <li>
-        <a href="#" class="nav-link text-white">
-          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#speedometer2"></use></svg>
-          Dashboard
-        </a>
-      </li>
-      <li>
-        <a href="#" class="nav-link text-white">
-          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#table"></use></svg>
-          Orders
-        </a>
-      </li>
-      <li>
-        <a href="#" class="nav-link text-white">
-          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>
-          Products
-        </a>
-      </li>
-      <li>
-        <a href="#" class="nav-link text-white">
-          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
-          Customers
-        </a>
-      </li>
-    </ul>
-    <hr>
-    <div class="small text-center text-muted fst-italic">&copy; GASAM TOOLS <span id="gasam-footer-year"></span></div>
-  </div>
-
-  <!-- Main Content -->
-  <div class="flex-grow-1 p-3 content d-flex flex-column gasam-main-window">
+{% if user_approved: %}
+  {% extends "base.html" %}
+    {% block content %}
     <!-- Your content goes here -->
-    <h1>Main Content Area</h1>
-    <p>This div will fill the rest of the right side of the page.</p>
-  </div>
-</div>
+    <div class="container">
+        <h1 class="text-center mt-5">𒉣𒈨𒋳</h1>
+        <p class="text-center mt-5">You account is in good standing.</p>
+        <p class="text-center">Pick a tool on the left.</p>
+    </div>
+    {% endblock %}
 
+{% else: %}
+    <div class="container">
+      <p class="text-center">Your account is pending approval. You will receive email with confirmation.</p>
+    </div>
+{% endif %}
 
 {% include "footer.html" %}

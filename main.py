@@ -24,7 +24,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DB_URI", "sqlite:///user
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
 
-
 # CREATE TABLE IN DB
 # Association table for the many-to-many relationship
 user_app_association = db.Table(
@@ -117,17 +116,47 @@ def register():
     return render_template("register.html")
 
 
-@app.route('/home')
-@login_required
-def home():
-    return render_template("home.html")
-
-
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('login'))
+
+
+@app.route('/home')
+@login_required
+def home():
+    print(current_user.apps)
+    for app in current_user.apps:
+        print(app.app_url)
+
+    return render_template("home.html",
+                           user_approved=current_user.approved,
+                           user_apps=current_user.apps)
+
+
+@app.route("/app/<app_name>", methods=["GET", "POST"])
+@login_required
+def access_app(app_name):
+    # app1 = GasamApp(title="User Management", subtitle="For admin only", app_url="user_management")
+    # current_user.apps.append(app1)
+    # db.session.commit()
+
+    # print(current_user.apps)
+    for app in current_user.apps:
+        print(app.app_url)
+
+    html_file_path = os.path.join('apps', app_name, f'{app_name}.html')
+    with open(html_file_path, 'r') as file:
+        html_content = file.read()
+
+    if current_user.approved:
+        return render_template("app.html",
+                               app_html=html_content,
+                               user_apps=current_user.apps,
+                               app_name=app_name)
+    else:
+        return redirect(url_for('home'))
 
 
 if __name__ == "__main__":
