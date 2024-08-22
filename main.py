@@ -171,8 +171,8 @@ def access_app(app_name):
     except ImportError:
         return f"Error: No {app_name}.py found for {app_name}", 404
 
-    if hasattr(app_manager, 'custom_logic'):
-        app_data = app_manager.custom_logic(current_user, db, User, GasamApp, returned_data)
+    if hasattr(app_manager, 'app_logic'):
+        app_data = app_manager.app_logic(current_user, db, User, GasamApp, returned_data)
     else:
         app_data = {}
 

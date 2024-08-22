@@ -1,5 +1,5 @@
 
-def custom_logic(current_user, db, User, GasamApp, returned_data):
+def app_logic(current_user, db, User, GasamApp, returned_data):
 
     if returned_data:
         user_to_update = User.query.get(int(returned_data['user_id']))  # Get user with id=2

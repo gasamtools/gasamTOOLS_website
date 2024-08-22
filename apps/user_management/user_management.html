@@ -22,10 +22,10 @@
                                         <input type="hidden" name="user_id" value="{{row['id']}}">
                                         {% if row['approved'] %}
                                             <input type="hidden" name="status" value="disapprove">
-                                            <button type="submit" class="btn btn-primary">Disapprove</button>
+                                            <button type="submit" class="btn btn-secondary">Disapprove</button>
                                         {% else %}
                                             <input type="hidden" name="status" value="approve">
-                                            <button type="submit" class="btn btn-primary">Approve</button>
+                                            <button type="submit" class="btn btn-secondary">Approve</button>
                                         {% endif %}
                                     </form>
                                     {% endif %}
