@@ -1,1 +1,43 @@
-<p>User Management</p>
+<div class="container mt-5">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    {% if app_data %}
+                        {# Extract the headers from the first dictionary #}
+                        {% for header in app_data[0].keys() %}
+                            <th>{{ header }}</th>
+                        {% endfor %}
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in app_data %}
+                    <tr>
+                        {% for value in row.values() %}
+                            {% if loop.index == 4 %} <!-- Check if it's the third row -->
+                                <td>
+                                    <p>{{ value }}</p>
+                                    {% if row['role'] != 'admin' %}
+                                    <form action="{{ url_for('access_app', app_name='user_management') }}" method="post">
+                                        <input type="hidden" name="user_id" value="{{row['id']}}">
+                                        {% if row['approved'] %}
+                                            <input type="hidden" name="status" value="disapprove">
+                                            <button type="submit" class="btn btn-primary">Disapprove</button>
+                                        {% else %}
+                                            <input type="hidden" name="status" value="approve">
+                                            <button type="submit" class="btn btn-primary">Approve</button>
+                                        {% endif %}
+                                    </form>
+                                    {% endif %}
+                                </td>
+                            {% else %}
+                                <td>{{ value }}</td>
+                            {% endif %}
+                        {% endfor %}
+
+
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
