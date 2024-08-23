@@ -89,9 +89,11 @@ def login():
                 flash('Invalid username or password.')
         return render_template("login.html")
 
+
 @app.route('/login')
 def login_redirect():
     return redirect(url_for('login'))
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -137,7 +139,7 @@ def logout():
 @app.route('/home')
 @login_required
 def home():
-    # app1 = GasamApp(title="User Management", subtitle="For admin only", app_url="user_management")
+    # app1 = GasamApp(title="App Management", subtitle="For admin only", app_url="app_management")
     # current_user.apps.append(app1)
     # current_user.approved = True
     # current_user.role = 'admin'
@@ -151,20 +153,15 @@ def home():
 @app.route("/app/<app_name>", methods=["GET", "POST"])
 @login_required
 def access_app(app_name):
-
     if request.method == "POST":
-        returned_data = request.form
+        return_data = request.form
     else:
-        returned_data = False
-
-
-
+        return_data = False
 
     html_file_path = os.path.join('apps', app_name, f'{app_name}.html')
     with open(html_file_path, 'r') as file:
         html_content = file.read()
 
-    # Dynamically load the user_manager.py module
     try:
         module_name = f"apps.{app_name}.{app_name}"
         app_manager = importlib.import_module(module_name)
@@ -172,13 +169,13 @@ def access_app(app_name):
         return f"Error: No {app_name}.py found for {app_name}", 404
 
     if hasattr(app_manager, 'app_logic'):
-        app_data = app_manager.app_logic(current_user, db, User, GasamApp, returned_data)
+        send_data = app_manager.app_logic(current_user, db, User, GasamApp, return_data)
     else:
-        app_data = {}
+        send_data = {}
 
     if current_user.approved:
 
-        rendered_html_content = render_template_string(html_content, app_data=app_data)
+        rendered_html_content = render_template_string(html_content, send_data=send_data)
 
         return render_template("app.html",
                                app_html=rendered_html_content,

@@ -1,35 +1,138 @@
-<div class="container mt-5">
+<div class="container mt-5 table-responsive">
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    {% if app_data %}
+                    {% if send_data['user_data'] %}
                         {# Extract the headers from the first dictionary #}
-                        {% for header in app_data[0].keys() %}
+                        {% for header in send_data['user_data'][0].keys() %}
                             <th>{{ header }}</th>
                         {% endfor %}
                     {% endif %}
                 </tr>
             </thead>
             <tbody>
-                {% for row in app_data %}
+                {% for row in send_data['user_data'] %}
                     <tr>
                         {% for value in row.values() %}
-                            {% if loop.index == 4 %} <!-- Check if it's the third row -->
+                            {% if loop.index == 3 %} <!-- Check if it's the third row -->
+                                <td>
+                                    <form action="{{ url_for('access_app', app_name='user_management') }}" method="post">
+                                        <input type="hidden" name="user_id" value="{{row['id']}}">
+                                        <input type="hidden" name="target" value="email">
+                                        <input type="email" name="email" value="{{ value }}">
+                                        <button type="submit" class="btn btn-secondary mt-2">Change</button>
+                                    </form>
+                                </td>
+                            {% elif loop.index == 4 %} <!-- Check if it's the third row -->
+                                <td>
+                                    <form action="{{ url_for('access_app', app_name='user_management') }}" method="post">
+                                        <input type="hidden" name="user_id" value="{{row['id']}}">
+                                        <input type="hidden" name="target" value="name">
+                                        <input type="text" name="name" value="{{ value }}">
+                                        <button type="submit" class="btn btn-secondary mt-2">Change</button>
+                                    </form>
+                                </td>
+                            {% elif loop.index == 5 %} <!-- Check if it's the third row -->
                                 <td>
                                     <p>{{ value }}</p>
                                     {% if row['role'] != 'admin' %}
                                     <form action="{{ url_for('access_app', app_name='user_management') }}" method="post">
                                         <input type="hidden" name="user_id" value="{{row['id']}}">
+                                        <input type="hidden" name="target" value="approved">
                                         {% if row['approved'] %}
                                             <input type="hidden" name="status" value="disapprove">
-                                            <button type="submit" class="btn btn-secondary">Disapprove</button>
+                                            <button type="submit" class="btn btn-secondary mt-2">Disapprove</button>
                                         {% else %}
                                             <input type="hidden" name="status" value="approve">
-                                            <button type="submit" class="btn btn-secondary">Approve</button>
+                                            <button type="submit" class="btn btn-secondary mt-2">Approve</button>
                                         {% endif %}
                                     </form>
                                     {% endif %}
                                 </td>
+                            {% elif loop.index == 6 %} <!-- Check if it's the third row -->
+                                <td>
+                                    {% if row['role'] != 'admin' %}
+                                    <form action="{{ url_for('access_app', app_name='user_management') }}" method="post">
+                                        <input type="hidden" name="user_id" value="{{row['id']}}">
+                                        <input type="hidden" name="target" value="role">
+                                        <select name="role" class="form-select gasam role-select" id="gasam-role-select" aria-label="Select Role">
+                                            {% for role in send_data['user_roles'] %}
+                                                {% if role == value %}
+                                                    <option value="{{ role }}" selected>{{ role }}</option>
+                                                {% else %}
+                                                    <option value="{{ role }}">{{ role }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                        <button type="submit" class="btn btn-secondary mt-2">Change</button>
+                                    </form>
+                                    {% else %}
+                                    <p>{{ value }}</p>
+                                    {% endif %}
+                                </td>
+                            {% elif loop.index == 2 %} <!-- Check if it's the third row -->
+                                <td>
+                                    <div class="container gasam user_apps-div">
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <form action="{{ url_for('access_app', app_name='user_management') }}" method="post">
+                                                    <input type="hidden" name="user_id" value="{{row['id']}}">
+                                                    <input type="hidden" name="target" value="user_apps">
+                                                    <select name="user_apps_available"
+                                                            class="form-select gasam user_apps-select available"
+                                                            id="gasam-user_apps-available-select"
+                                                            aria-label="Select Available Apps">
+                                                        <option value="" selected>-available apps-</option>
+                                                        {% for app in send_data['available_apps'] %}
+
+                                                            {% if app not in value %}
+                                                                <option value="{{ app.id }}">{{ app.app_url }}</option>
+                                                            {% endif %}
+
+                                                        {% endfor %}
+                                                    </select>
+                                                    <button type="submit" class="btn btn-success mt-2 mb-4 gasam user_apps-bttn">Add App</button>
+                                                </form>
+                                            </div>
+                                            <div class="col-6">
+                                                <form action="{{ url_for('access_app', app_name='user_management') }}" method="post">
+                                                    <input type="hidden" name="user_id" value="{{row['id']}}">
+                                                    <input type="hidden" name="target" value="user_apps">
+                                                    <select name="user_apps_added"
+                                                            class="form-select gasam user_apps-select added"
+                                                            id="gasam-user_apps-added-select"
+                                                            aria-label="Select Added Apps">
+
+                                                        {% if not value %}
+                                                            <option value="" selected>-no added apps-</option>
+                                                        {% else %}
+                                                            {% for app in value %}
+                                                                <option value="{{ app.id }}">{{ app.app_url }}</option>
+                                                            {% endfor %}
+                                                        {% endif %}
+                                                    </select>
+                                                    {% if not value %}
+                                                        <button type="submit" class="btn btn-secondary mt-2 mb-4 gasam user_apps-bttn" disabled>Remove App</button>
+                                                    {% else %}
+                                                        <button type="submit" class="btn btn-danger mt-2 mb-4 gasam user_apps-bttn">Remove App</button>
+                                                    {% endif %}
+                                                </form>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            {% if not value %}
+                                                <p>No added apps</p>
+                                            {% else %}
+                                                {% for app in value %}
+                                                    <div class="col-12 gasam user_apps-div">
+                                                        <a class="col-12 btn btn-light mt-2" href="{{url_for('access_app', app_name=app.app_url) }}">{{ app.title }}</a>
+                                                    </div>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </td>
+
                             {% else %}
                                 <td>{{ value }}</td>
                             {% endif %}
