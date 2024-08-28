@@ -1,5 +1,5 @@
+import os
 available_roles = ['admin', 'manager', 'contributor', 'subscriber', None]
-
 
 def app_logic(current_user, db, User, GasamApp, return_data):
 
@@ -38,7 +38,13 @@ def app_logic(current_user, db, User, GasamApp, return_data):
                                  'role': user.role,
                                 } for user in users],
                   'user_roles': available_roles,
-                  'available_apps': available_apps
-                  }
+                  'available_apps': available_apps,
+                 }
 
     return send_data
+
+def json_logic(current_user, db, User, GasamApp, json_data):
+
+    send_json_data = json_data
+
+    return send_json_data

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, url_for, redirect, flash, send_from_directory, render_template_string
+from flask import Flask, render_template, request, url_for, redirect, flash, jsonify, send_from_directory, render_template_string
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
@@ -68,6 +68,8 @@ def load_user(user_id):
 
 with app.app_context():
     db.create_all()
+
+
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -149,8 +151,12 @@ def home():
                            user_approved=current_user.approved,
                            user_apps=current_user.apps)
 
+@app.route('/<path:appname>/js/<path:filename>')
+def serve_app_js(appname,filename):
+    return send_from_directory(f'apps/{appname}/js', filename)
 
-@app.route("/app/<app_name>", methods=["GET", "POST"])
+
+@app.route("/app/<app_name>", methods=["GET", "POST", "PUT"])
 @login_required
 def access_app(app_name):
     if request.method == "POST":
@@ -159,8 +165,13 @@ def access_app(app_name):
         return_data = False
 
     html_file_path = os.path.join('apps', app_name, f'{app_name}.html')
+    js_file_path = os.path.join('apps', app_name, 'js', '_registry.html')
+
     with open(html_file_path, 'r') as file:
         html_content = file.read()
+
+    with open(js_file_path, 'r') as file:
+        js_html_content = file.read()
 
     try:
         module_name = f"apps.{app_name}.{app_name}"
@@ -175,12 +186,22 @@ def access_app(app_name):
 
     if current_user.approved:
 
-        rendered_html_content = render_template_string(html_content, send_data=send_data)
+        if request.method == 'PUT':
+            json_data = request.get_json()
+            if hasattr(app_manager, 'json_logic'):
+                send_json_data = app_manager.json_logic(current_user, db, User, GasamApp, json_data)
+            else:
+                send_json_data = {}
 
-        return render_template("app.html",
-                               app_html=rendered_html_content,
-                               user_apps=current_user.apps,
-                               app_name=app_name)
+            return jsonify(send_json_data)
+        else:
+            rendered_html_content = render_template_string(html_content, send_data=send_data)
+            rendered_js_content = render_template_string(js_html_content, send_data='')
+            return render_template("app.html",
+                                   app_html=rendered_html_content,
+                                   user_apps=current_user.apps,
+                                   app_name=app_name,
+                                   app_js=rendered_js_content)
     else:
         return redirect(url_for('home'))
 
