@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, url_for, redirect, flash, jsonify, send_from_directory, render_template_string
+from flask import Flask, render_template, request, url_for, redirect, flash, jsonify, send_from_directory
+from flask import render_template_string, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
@@ -6,9 +7,14 @@ from sqlalchemy import Integer, String, Text, Boolean
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 import os
 import importlib
+from flask_wtf.csrf import CSRFProtect
+
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secret-key-goes-here'
+app.config['SECRET_KEY'] = 'M*=jhHtR8!c@:CE5#WZ.@@EBIDzR[Ic^<E]w({5D8#L5Q_Y>u4gH9'
+
+# Initialize CSRF protection
+csrf = CSRFProtect(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -79,6 +85,8 @@ def login():
     else:
         if request.method == 'POST':
 
+            # CSRF token validation is automatically handled
+
             email = request.form['email']
             password = request.form['password']
 
@@ -136,6 +144,31 @@ def register():
 def logout():
     logout_user()
     return redirect(url_for('login'))
+
+
+@app.route('/profile', methods=["GET", "POST", "PUT"])
+@login_required
+def profile():
+
+    if request.method == 'PUT':
+        json_data = request.get_json()
+
+        if check_password_hash(current_user.password, json_data['user_password']):
+            json_data['correct_password'] = True
+
+            current_user.name = json_data['user_name']
+            db.session.commit()  # Commit the changes to the database
+        else:
+            json_data['correct_password'] = False
+
+        return jsonify(json_data)
+    else:
+        return render_template("profile.html",
+                           user_approved=current_user.approved,
+                           user_apps=current_user.apps,
+                           user_name=current_user.name,
+                           user_role=current_user.role
+                           )
 
 
 @app.route('/home')

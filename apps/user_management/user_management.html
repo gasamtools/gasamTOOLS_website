@@ -1,3 +1,4 @@
+
 <div class="container mt-5 table-responsive">
         <table class="table table-bordered">
             <thead>
@@ -21,6 +22,7 @@
                             {% if loop.index == 3 %} <!-- Check if it's the third row -->
                                 <td>
                                     <form class="gasam form email user-{{row['id']}}">
+
                                         <input type="hidden" name="user_id" value="{{row['id']}}">
                                         <input type="hidden" name="target" value="email">
                                         <input type="email" name="email" value="{{ value }}">

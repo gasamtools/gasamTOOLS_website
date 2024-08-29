@@ -5,6 +5,10 @@ document.addEventListener("DOMContentLoaded", () => {
     for (var i = 0; i < forms.length; i++) {
         forms[i].addEventListener('submit', function(event) {
             event.preventDefault(); // Prevent the form from submitting the traditional way
+
+            // Get CSRF token from meta tag
+            var csrfToken = $('meta[name="csrf-token"]').attr('content');
+
             const formData = new FormData(this);
             const formObject = {'js_function': 'update_form'};
             formData.forEach((value, key) => {
@@ -33,7 +37,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 fetch(GASAM_apps_app_management_scripts_URL, {
                     method: 'PUT',
                     headers: {
-                        'Content-Type': 'application/json' // Ensure the server knows to expect JSON
+                        'Content-Type': 'application/json' ,
+                        'X-CSRFToken': csrfToken  // Include the CSRF token in the headers
                     },
                     body: JSON.stringify(formObject)
                 })

@@ -2,6 +2,7 @@
 
 <main class="form-signin w-100 m-auto">
   <form action="{{ url_for('login') }}" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"> <!-- CSRF token hidden input -->
     <h1 class="h3 mb-3 fw-normal gasam h1">𒉣𒈨𒋳</h1>
 
     <div class="form-floating">

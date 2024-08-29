@@ -1,0 +1,56 @@
+{% include "header.html" %}
+
+{% if user_approved: %}
+  {% extends "base.html" %}
+    {% block content %}
+    <div class="container mt-5">
+        <div class="container">
+            <div class="row">
+                <label class="col-6 mt-3 text-center" for="gasamProfileUserName">User Name</label>
+                <input class='col-4 mt-3 gasam profile userName' id='gasamProfileUserName' type="text" value="{{ user_name }}" />
+            </div>
+            <div class="row">
+                <label class="col-6 mt-3 text-center" for="gasamProfileUserRole">User Role</label>
+                <input class='col-4 mt-3 gasam profile userRole' id='gasamProfileUserRole' type="text" value="{{ user_role }}" disabled/>
+            </div>
+            <!-- Button to trigger the modal -->
+            <br>
+            <div class="d-flex justify-content-center">
+                <button type="button" class="btn btn-primary mt-5" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                    Save Changes
+                </button>
+            </div>
+        </div>
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Type password to save changes</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="form-floating password-container">
+                      <input type="password" class="form-control" id="profilePassword" placeholder="Password" name="password" required >
+                        <span class="toggle-password" id="togglePassword">
+                          <i class="fa fa-eye"></i>
+                        </span>
+                        <label for="profilePassword">Password</label>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" id="gasamProfileSaveChangesBttn">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% endblock %}
+
+{% else: %}
+    <div class="container">
+      <p class="text-center">Your account is pending approval. You will receive email with confirmation.</p>
+    </div>
+{% endif %}
+
+{% include "footer.html" %}
