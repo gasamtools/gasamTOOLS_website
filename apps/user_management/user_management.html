@@ -12,47 +12,51 @@
             </thead>
             <tbody>
                 {% for row in send_data['user_data'] %}
-                    <tr>
+                    {% if row['approved'] %}
+                    <tr class="gasam user_management user-{{row['id']}}">
+                    {% else %}
+                    <tr class="gasam user_management user-{{row['id']}} not-approved">
+                    {% endif %}
                         {% for value in row.values() %}
                             {% if loop.index == 3 %} <!-- Check if it's the third row -->
                                 <td>
-                                    <form action="{{ url_for('access_app', app_name='user_management') }}" method="post">
+                                    <form class="gasam form email user-{{row['id']}}">
                                         <input type="hidden" name="user_id" value="{{row['id']}}">
                                         <input type="hidden" name="target" value="email">
                                         <input type="email" name="email" value="{{ value }}">
-                                        <button type="submit" class="btn btn-secondary mt-2">Change</button>
+                                        <button type="submit" class="btn btn-secondary mt-2 gasam email user-{{row['id']}}">Change</button>
                                     </form>
                                 </td>
                             {% elif loop.index == 4 %} <!-- Check if it's the third row -->
                                 <td>
-                                    <form action="{{ url_for('access_app', app_name='user_management') }}" method="post">
+                                    <form class="gasam form name user-{{row['id']}}">
                                         <input type="hidden" name="user_id" value="{{row['id']}}">
                                         <input type="hidden" name="target" value="name">
                                         <input type="text" name="name" value="{{ value }}">
-                                        <button type="submit" class="btn btn-secondary mt-2">Change</button>
+                                        <button type="submit" class="btn btn-secondary mt-2 gasam name user-{{row['id']}}">Change</button>
                                     </form>
                                 </td>
-                            {% elif loop.index == 5 %} <!-- Check if it's the third row -->
+                            {% elif loop.index == 6 %} <!-- Check if it's the third row -->
                                 <td>
-                                    <p>{{ value }}</p>
+                                    <p class="gasam p status approved user-{{row['id']}}">{{ value }}</p>
                                     {% if row['role'] != 'admin' %}
-                                    <form action="{{ url_for('access_app', app_name='user_management') }}" method="post">
+                                    <form class="gasam form approved user-{{row['id']}}">
                                         <input type="hidden" name="user_id" value="{{row['id']}}">
                                         <input type="hidden" name="target" value="approved">
                                         {% if row['approved'] %}
-                                            <input type="hidden" name="status" value="disapprove">
-                                            <button type="submit" class="btn btn-secondary mt-2">Disapprove</button>
+                                            <input class="gasam input status approved user-{{row['id']}}" type="hidden" name="status" value="disapprove">
+                                            <button type="submit" class="btn btn-secondary mt-2 gasam approved user-{{row['id']}}">Disapprove</button>
                                         {% else %}
-                                            <input type="hidden" name="status" value="approve">
-                                            <button type="submit" class="btn btn-secondary mt-2">Approve</button>
+                                            <input class="gasam input status approved user-{{row['id']}}" type="hidden" name="status" value="approve">
+                                            <button type="submit" class="btn btn-secondary mt-2 gasam approved user-{{row['id']}}">Approve</button>
                                         {% endif %}
                                     </form>
                                     {% endif %}
                                 </td>
-                            {% elif loop.index == 6 %} <!-- Check if it's the third row -->
+                            {% elif loop.index == 5 %} <!-- Check if it's the third row -->
                                 <td>
                                     {% if row['role'] != 'admin' %}
-                                    <form action="{{ url_for('access_app', app_name='user_management') }}" method="post">
+                                    <form class="gasam form role user-{{row['id']}}">
                                         <input type="hidden" name="user_id" value="{{row['id']}}">
                                         <input type="hidden" name="target" value="role">
                                         <select name="role" class="form-select gasam role-select" id="gasam-role-select" aria-label="Select Role">
@@ -64,7 +68,7 @@
                                                 {% endif %}
                                             {% endfor %}
                                         </select>
-                                        <button type="submit" class="btn btn-secondary mt-2">Change</button>
+                                        <button type="submit" class="btn btn-secondary mt-2 gasam role user-{{row['id']}}">Change</button>
                                     </form>
                                     {% else %}
                                     <p>{{ value }}</p>
@@ -75,11 +79,11 @@
                                     <div class="container gasam user_apps-div">
                                         <div class="row">
                                             <div class="col-6">
-                                                <form action="{{ url_for('access_app', app_name='user_management') }}" method="post">
+                                                <form class="gasam form available user_apps user-{{row['id']}}">
                                                     <input type="hidden" name="user_id" value="{{row['id']}}">
                                                     <input type="hidden" name="target" value="user_apps">
                                                     <select name="user_apps_available"
-                                                            class="form-select gasam user_apps-select available"
+                                                            class="form-select gasam user_apps-select available user-{{row['id']}}"
                                                             id="gasam-user_apps-available-select"
                                                             aria-label="Select Available Apps">
                                                         <option value="" selected>-available apps-</option>
@@ -91,15 +95,15 @@
 
                                                         {% endfor %}
                                                     </select>
-                                                    <button type="submit" class="btn btn-success mt-2 mb-4 gasam user_apps-bttn">Add App</button>
+                                                    <button type="submit" class="btn btn-success mt-2 mb-4 gasam user_apps-bttn available user_apps user-{{row['id']}}">Add App</button>
                                                 </form>
                                             </div>
                                             <div class="col-6">
-                                                <form action="{{ url_for('access_app', app_name='user_management') }}" method="post">
+                                                <form class="gasam form added user_apps user-{{row['id']}}">
                                                     <input type="hidden" name="user_id" value="{{row['id']}}">
                                                     <input type="hidden" name="target" value="user_apps">
                                                     <select name="user_apps_added"
-                                                            class="form-select gasam user_apps-select added"
+                                                            class="form-select gasam user_apps-select added user-{{row['id']}}"
                                                             id="gasam-user_apps-added-select"
                                                             aria-label="Select Added Apps">
 
@@ -112,14 +116,14 @@
                                                         {% endif %}
                                                     </select>
                                                     {% if not value %}
-                                                        <button type="submit" class="btn btn-secondary mt-2 mb-4 gasam user_apps-bttn" disabled>Remove App</button>
+                                                        <button type="submit" class="btn btn-secondary mt-2 mb-4 gasam user_apps-bttn added user_apps user-{{row['id']}}" disabled>Remove App</button>
                                                     {% else %}
-                                                        <button type="submit" class="btn btn-danger mt-2 mb-4 gasam user_apps-bttn">Remove App</button>
+                                                        <button type="submit" class="btn btn-danger mt-2 mb-4 gasam user_apps-bttn added user_apps user-{{row['id']}}">Remove App</button>
                                                     {% endif %}
                                                 </form>
                                             </div>
                                         </div>
-                                        <div class="row">
+                                        <div class="row gasam user_apps user-{{row['id']}}">
                                             {% if not value %}
                                                 <p>No added apps</p>
                                             {% else %}
@@ -132,7 +136,16 @@
                                         </div>
                                     </div>
                                 </td>
-
+                            {% elif loop.index == 7 %} <!-- Check if it's the third row -->
+                                <td>
+                                    {% if row['role'] != 'admin' %}
+                                    <form class="gasam form delete_user user-{{row['id']}}">
+                                        <input type="hidden" name="user_id" value="{{row['id']}}">
+                                        <input type="hidden" name="target" value="delete_user">
+                                        <button type="submit" class="btn btn-danger mt-2 gasam delete_user user-{{row['id']}}">Delete User</button>
+                                    </form>
+                                    {% endif %}
+                                </td>
                             {% else %}
                                 <td>{{ value }}</td>
                             {% endif %}
@@ -144,10 +157,5 @@
             </tbody>
         </table>
     </div>
-
-<form id="myForm">
-    <input type="hidden" name="target" value="user_apps">
-    <button type="submit">Submit</button>
-</form>
 
 

@@ -1,0 +1,45 @@
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.gasam.role-select,
+.gasam.user_apps-select {
+  width: 150px;
+}
+
+.gasam.user_apps-select,
+.gasam.user_apps-bttn {
+  width: 250px;
+}
+
+.gasam.user_apps-div {
+    width: 530px;
+}
+
+.gasam.btn-loading {
+    position: relative;
+    cursor: not-allowed;
+}
+
+.gasam.btn-loading .spinner-border {
+    width: 1rem;
+    height: 1rem;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -0.5rem;
+    margin-left: -0.5rem;
+}
+
+.highlight-border {
+    border-color: #f00;
+}
+
+tr.gasam.user_management.not-approved {
+  background-color: #821f28;
+}
+
+button.gasam.delete_user {
+  width: 120px;
+}

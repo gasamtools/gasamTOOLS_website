@@ -1,0 +1,9 @@
+{% if not user_apps %}
+    <p>No added apps</p>
+{% else %}
+    {% for app in user_apps %}
+        <div class="col-12 gasam user_apps-div">
+            <a class="col-12 btn btn-light mt-2" href="{{url_for('access_app', app_name=app['app_url']) }}">{{ app['app_title'] }}</a>
+        </div>
+    {% endfor %}
+{% endif %}

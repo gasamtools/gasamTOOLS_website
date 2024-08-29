@@ -155,6 +155,10 @@ def home():
 def serve_app_js(appname,filename):
     return send_from_directory(f'apps/{appname}/js', filename)
 
+@app.route('/<path:appname>/css/<path:filename>')
+def serve_app_css(appname,filename):
+    return send_from_directory(f'apps/{appname}/css', filename)
+
 
 @app.route("/app/<app_name>", methods=["GET", "POST", "PUT"])
 @login_required
@@ -166,12 +170,16 @@ def access_app(app_name):
 
     html_file_path = os.path.join('apps', app_name, f'{app_name}.html')
     js_file_path = os.path.join('apps', app_name, 'js', '_registry.html')
+    css_file_path = os.path.join('apps', app_name, 'css', '_registry.html')
 
     with open(html_file_path, 'r') as file:
         html_content = file.read()
 
     with open(js_file_path, 'r') as file:
         js_html_content = file.read()
+
+    with open(css_file_path, 'r') as file:
+        css_html_content = file.read()
 
     try:
         module_name = f"apps.{app_name}.{app_name}"
@@ -197,11 +205,14 @@ def access_app(app_name):
         else:
             rendered_html_content = render_template_string(html_content, send_data=send_data)
             rendered_js_content = render_template_string(js_html_content, send_data='')
+            rendered_css_content = render_template_string(css_html_content, send_data='')
             return render_template("app.html",
                                    app_html=rendered_html_content,
                                    user_apps=current_user.apps,
                                    app_name=app_name,
-                                   app_js=rendered_js_content)
+                                   app_js=rendered_js_content,
+                                   app_css=rendered_css_content
+                                   )
     else:
         return redirect(url_for('home'))
 

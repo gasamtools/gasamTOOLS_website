@@ -12,6 +12,8 @@
           rel="stylesheet"
           href="{{ url_for('static', filename='css/styles.css')}}"
       />
+
+      {{ app_css | safe }}
     </head>
     <header class="mb-auto" >
       <nav class="navbar bg-body-tertiary fixed-top navbar-expand-lg">
