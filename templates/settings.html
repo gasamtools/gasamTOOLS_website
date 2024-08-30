@@ -6,17 +6,34 @@
     <div class="container mt-5">
         <div class="container">
             <div class="row">
-                <label class="col-6 mt-3 text-center" for="gasamProfileUserName">User Name</label>
-                <input class='col-4 mt-3 gasam profile userName' id='gasamProfileUserName' type="text" value="{{ user_name }}" />
+                <label class="col-12 col-md-6 mt-3 text-center" for="gasamProfileUserEmail">User Email</label>
+                <div class="col-12 col-md-6 position-relative p-0 mt-3">
+                    <input class="form-control" id='gasamProfileUserEmail' type="text" value="{{ user_email }}" autocomplete="off" />
+
+                </div>
             </div>
             <div class="row">
-                <label class="col-6 mt-3 text-center" for="gasamProfileUserRole">User Role</label>
-                <input class='col-4 mt-3 gasam profile userRole' id='gasamProfileUserRole' type="text" value="{{ user_role }}" disabled/>
+                <label class="col-12 col-md-6 mt-3 text-center" for="gasamSettingsUserPassword">Set New Password</label>
+                <div class="col-12 col-md-6 position-relative p-0 mt-3">
+                    <input type="password" class="form-control" id="gasamSettingsUserPassword" placeholder="Password" name="password" required oninput="proceedBttnControl('gasamSettingsUserPassword', 'gasamSettingsUserRepeatPassword')">
+                    <span class="toggle-password position-absolute" id="gasamTogglePassword" style="top: 50%; right: 10px; transform: translateY(-50%); cursor: pointer;">
+                        <i class="fa fa-eye"></i>
+                    </span>
+                </div>
+            </div>
+            <div class="row">
+                <label class="col-12 col-md-6 mt-3 text-center" for="gasamSettingsUserRepeatPassword">Repeat New Password</label>
+                <div class="col-12 col-md-6 position-relative p-0 mt-3">
+                    <input type="password" class="form-control" id="gasamSettingsUserRepeatPassword" placeholder="Repeat Password" name="repeat_password" required oninput="validatePassword('gasamSettingsUserPassword', 'gasamSettingsUserRepeatPassword')">
+                    <span class="toggle-password" id="gasamToggleRepeatPassword">
+                     <i class="fa fa-eye"></i>
+                    </span>
+                </div>
             </div>
             <!-- Button to trigger the modal -->
             <br>
             <div class="d-flex justify-content-center">
-                <button type="button" class="btn btn-primary mt-5" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                <button type="button" class="btn btn-primary mt-5" data-bs-toggle="modal" data-bs-target="#exampleModal" id="gasamProceedBttn">
                     Save Changes
                 </button>
             </div>
@@ -30,15 +47,15 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="form-floating password-container">
-                      <input type="password" class="form-control" id="profilePassword" placeholder="Password" name="password" required >
+                      <input type="password" class="form-control" id="settingsPassword" placeholder="Password" name="password" required >
                         <span class="toggle-password" id="togglePassword">
                           <i class="fa fa-eye"></i>
                         </span>
-                        <label for="profilePassword">Password</label>
+                        <label for="settingsPassword">Password</label>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary" id="gasamProfileSaveChangesBttn">Save changes</button>
+                        <button type="submit" class="btn btn-primary" id="gasamSettingsSaveChangesBttn">Save changes</button>
                     </div>
                 </div>
             </div>

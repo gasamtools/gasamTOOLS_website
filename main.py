@@ -171,6 +171,34 @@ def profile():
                            )
 
 
+@app.route('/settings', methods=["GET", "POST", "PUT"])
+@login_required
+def settings():
+
+    if request.method == 'PUT':
+        json_data = request.get_json()
+
+        if check_password_hash(current_user.password, json_data['user_password']):
+            json_data['correct_password'] = True
+
+            current_user.email = json_data['user_email']
+            if json_data['user_new_password'] != '':
+                hashed_password = generate_password_hash(json_data['user_new_password'], method='pbkdf2:sha256', salt_length=8)
+                current_user.password = hashed_password
+
+            db.session.commit()  # Commit the changes to the database
+        else:
+            json_data['correct_password'] = False
+
+        return jsonify(json_data)
+    else:
+        return render_template("settings.html",
+                           user_approved=current_user.approved,
+                           user_apps=current_user.apps,
+                           user_email=current_user.email,
+                           )
+
+
 @app.route('/home')
 @login_required
 def home():
