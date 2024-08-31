@@ -46,6 +46,7 @@
                         <form class="gasam app_management change_app_data form delete_app app-{{row['id']}}" autocomplete="off">
                             <input type="hidden" name="app_id" value="{{row['id']}}">
                             <input type="hidden" name="target" value="delete_app">
+                            <input type="hidden" name="delete_db_table" value="app_morse_code_db">
                             {% if row['app_url'] != 'user_management' and row['app_url'] != 'app_management' %}
                             <button type="submit" class="btn btn-danger mt-2 gasam app_management change_app_data delete_app app-{{row['id']}}">Delete</button>
                             {% endif %}

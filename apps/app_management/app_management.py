@@ -1,9 +1,4 @@
-# app1 = GasamApp(title="User Management", subtitle="For admin only", app_url="user_management")
-# current_user.apps.append(app1)
-# current_user.approved = True
-# current_user.role = 'admin'
-# db.session.commit()
-
+from sqlalchemy import text
 
 def register_subpages():
     app_subpages = [
@@ -29,6 +24,7 @@ def app_logic(current_user, db, User, GasamApp, page, return_data):
                 }
                 for app in apps
             ],
+            'delete_db_table': 'app_morse_code_db'
         }
     elif page == 'register_app':
         send_data = {'test': 'register_app'}
@@ -62,6 +58,8 @@ def js_function_app_management_change_app_data(current_user, db, User, GasamApp,
             app_to_update.app_url = json_data['app_url']
         elif json_data['target'] == 'delete_app':
             db.session.delete(app_to_update)
+            if 'delete_db_table' in json_data:
+                db.session.execute(text(f'DROP TABLE {json_data["delete_db_table"]}'))
 
         db.session.commit()  # Commit the changes to the database
     return json_data
