@@ -47,9 +47,6 @@ class GasamApp(db.Model):
     app_url = db.Column(db.String(250), unique=True)
     users = relationship("User", secondary=user_app_association, back_populates="apps")
 
-from apps.morse_code_generator import init_app_morse_code_generator
-init_app_morse_code_generator(db, app)
-
 with app.app_context():
     db.create_all()
 
@@ -231,6 +228,9 @@ def access_app(app_name):
 
     if hasattr(app_manager, 'app_logic'):
         send_data = app_manager.app_logic(current_user, db, User, GasamApp, app_name, return_data)
+        if 'db_init' in send_data:
+            plugin_db_func = send_data['db_init']
+            plugin_db_func(db, app)
     else:
         send_data = {}
 
