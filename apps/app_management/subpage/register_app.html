@@ -1,0 +1,21 @@
+<form id="app_management_add_new_app_form" class="mt-4 gasam app_management form add_new_app" autocomplete="off">
+    <label class='mt-2' for="app_management_add_new_app_title">App Title</label>
+    <input id='app_management_add_new_app_title' class="form-control" type="text" name="title" value="" placeholder="Title" required>
+    <label class='mt-2' for="app_management_add_new_app_subtitle">App Subtitle</label>
+    <input id='app_management_add_new_app_subtitle' class="form-control" type="text" name="subtitle" value="" placeholder="Subtitle" required>
+    <label class='mt-2' for="app_management_add_new_app_url">App URL</label>
+    <input id='app_management_add_new_app_url' class="form-control" type="text" name="app_url" value="" placeholder="URL" required>
+    <button type="submit" class="btn btn-secondary mt-2 gasam app_management add_new_app" id="app_management_add_new_app_bttn">Add App</button>
+</form>
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="app_management_add_new_app_toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
+        <div class="toast-header">
+            <strong class="me-auto">Notification</strong>
+            <small>Just now</small>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" id="app_management_add_new_app_toast_body">
+            App is registered.
+        </div>
+    </div>
+</div>

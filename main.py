@@ -9,7 +9,6 @@ import os
 import importlib
 from flask_wtf.csrf import CSRFProtect
 
-
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'M*=jhHtR8!c@:CE5#WZ.@@EBIDzR[Ic^<E]w({5D8#L5Q_Y>u4gH9'
 
@@ -28,6 +27,7 @@ class Base(DeclarativeBase):
 
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DB_URI", "sqlite:///users.db")
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
 
@@ -74,8 +74,6 @@ def load_user(user_id):
 
 with app.app_context():
     db.create_all()
-
-
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -149,7 +147,6 @@ def logout():
 @app.route('/profile', methods=["GET", "POST", "PUT"])
 @login_required
 def profile():
-
     if request.method == 'PUT':
         json_data = request.get_json()
 
@@ -164,17 +161,16 @@ def profile():
         return jsonify(json_data)
     else:
         return render_template("profile.html",
-                           user_approved=current_user.approved,
-                           user_apps=current_user.apps,
-                           user_name=current_user.name,
-                           user_role=current_user.role
-                           )
+                               user_approved=current_user.approved,
+                               user_apps=current_user.apps,
+                               user_name=current_user.name,
+                               user_role=current_user.role
+                               )
 
 
 @app.route('/settings', methods=["GET", "POST", "PUT"])
 @login_required
 def settings():
-
     if request.method == 'PUT':
         json_data = request.get_json()
 
@@ -183,7 +179,8 @@ def settings():
 
             current_user.email = json_data['user_email']
             if json_data['user_new_password'] != '':
-                hashed_password = generate_password_hash(json_data['user_new_password'], method='pbkdf2:sha256', salt_length=8)
+                hashed_password = generate_password_hash(json_data['user_new_password'], method='pbkdf2:sha256',
+                                                         salt_length=8)
                 current_user.password = hashed_password
 
             db.session.commit()  # Commit the changes to the database
@@ -193,10 +190,10 @@ def settings():
         return jsonify(json_data)
     else:
         return render_template("settings.html",
-                           user_approved=current_user.approved,
-                           user_apps=current_user.apps,
-                           user_email=current_user.email,
-                           )
+                               user_approved=current_user.approved,
+                               user_apps=current_user.apps,
+                               user_email=current_user.email,
+                               )
 
 
 @app.route('/home')
@@ -212,12 +209,14 @@ def home():
                            user_approved=current_user.approved,
                            user_apps=current_user.apps)
 
+
 @app.route('/<path:appname>/js/<path:filename>')
-def serve_app_js(appname,filename):
+def serve_app_js(appname, filename):
     return send_from_directory(f'apps/{appname}/js', filename)
 
+
 @app.route('/<path:appname>/css/<path:filename>')
-def serve_app_css(appname,filename):
+def serve_app_css(appname, filename):
     return send_from_directory(f'apps/{appname}/css', filename)
 
 
@@ -249,9 +248,14 @@ def access_app(app_name):
         return f"Error: No {app_name}.py found for {app_name}", 404
 
     if hasattr(app_manager, 'app_logic'):
-        send_data = app_manager.app_logic(current_user, db, User, GasamApp, return_data)
+        send_data = app_manager.app_logic(current_user, db, User, GasamApp, app_name, return_data)
     else:
         send_data = {}
+
+    if hasattr(app_manager, 'register_subpages'):
+        app_subpages = app_manager.register_subpages()
+    else:
+        app_subpages = {}
 
     if current_user.approved:
 
@@ -263,6 +267,23 @@ def access_app(app_name):
                 send_json_data = {}
 
             return jsonify(send_json_data)
+        # elif request.method == 'GET':
+        #     if request.args:
+        #         query_params = request.args.to_dict(flat=False)
+        #         print(query_params)
+        #         sub_html_file_path = os.path.join('apps', app_name, 'subpage', f'{query_params["sub_page"][0]}.html')
+        #         with open(sub_html_file_path, 'r') as file:
+        #             sub_html_content = file.read()
+        #             rendered_sub_html_content = render_template_string(sub_html_content, send_data=query_params)
+        #             rendered_js_content = render_template_string(js_html_content, send_data='')
+        #             rendered_css_content = render_template_string(css_html_content, send_data='')
+        #             return render_template("app.html",
+        #                                    app_html=rendered_sub_html_content,
+        #                                    user_apps=current_user.apps,
+        #                                    app_name=app_name,
+        #                                    app_js=rendered_js_content,
+        #                                    app_css=rendered_css_content
+        #                                    )
         else:
             rendered_html_content = render_template_string(html_content, send_data=send_data)
             rendered_js_content = render_template_string(js_html_content, send_data='')
@@ -272,8 +293,90 @@ def access_app(app_name):
                                    user_apps=current_user.apps,
                                    app_name=app_name,
                                    app_js=rendered_js_content,
-                                   app_css=rendered_css_content
+                                   app_css=rendered_css_content,
+                                   app_subpages=app_subpages
                                    )
+    else:
+        return redirect(url_for('home'))
+
+
+@app.route("/app/<app_name>/<subpage_name>", methods=["GET", "POST", "PUT"])
+@login_required
+def access_app_subpage(app_name, subpage_name):
+    if request.method == "POST":
+        return_data = request.form
+    else:
+        return_data = False
+
+    html_file_path = os.path.join('apps', app_name, 'subpage', f'{subpage_name}.html')
+    js_file_path = os.path.join('apps', app_name, 'js', '_registry.html')
+    css_file_path = os.path.join('apps', app_name, 'css', '_registry.html')
+
+    with open(html_file_path, 'r') as file:
+        html_content = file.read()
+
+    with open(js_file_path, 'r') as file:
+        js_html_content = file.read()
+
+    with open(css_file_path, 'r') as file:
+        css_html_content = file.read()
+
+    try:
+        module_name = f"apps.{app_name}.{app_name}"
+        app_manager = importlib.import_module(module_name)
+    except ImportError:
+        return f"Error: No {app_name}.py found for {app_name}", 404
+
+    if hasattr(app_manager, 'app_logic'):
+        send_data = app_manager.app_logic(current_user, db, User, GasamApp, subpage_name, return_data)
+    else:
+        send_data = {}
+
+    if hasattr(app_manager, 'register_subpages'):
+        app_subpages = app_manager.register_subpages()
+    else:
+        app_subpages = {}
+
+    if current_user.approved:
+
+        if request.method == 'PUT':
+            json_data = request.get_json()
+            if hasattr(app_manager, 'json_logic'):
+                send_json_data = app_manager.json_logic(current_user, db, User, GasamApp, json_data)
+            else:
+                send_json_data = {}
+
+            return jsonify(send_json_data)
+        elif request.method == 'GET':
+            if request.args:
+                query_params = request.args.to_dict(flat=False)
+                print(query_params)
+                sub_html_file_path = os.path.join('apps', app_name, 'subpage', f'{query_params["sub_page"][0]}.html')
+                with open(sub_html_file_path, 'r') as file:
+                    sub_html_content = file.read()
+                    rendered_sub_html_content = render_template_string(sub_html_content, send_data=query_params)
+                    rendered_js_content = render_template_string(js_html_content, send_data='')
+                    rendered_css_content = render_template_string(css_html_content, send_data='')
+                    return render_template("app.html",
+                                           app_html=rendered_sub_html_content,
+                                           user_apps=current_user.apps,
+                                           app_name=app_name,
+                                           app_js=rendered_js_content,
+                                           app_css=rendered_css_content,
+                                           app_subpages=app_subpages
+                                           )
+            else:
+                rendered_html_content = render_template_string(html_content, send_data=send_data)
+                rendered_js_content = render_template_string(js_html_content, send_data='')
+                rendered_css_content = render_template_string(css_html_content, send_data='')
+                return render_template("app.html",
+                                       app_html=rendered_html_content,
+                                       user_apps=current_user.apps,
+                                       app_name=app_name,
+                                       app_js=rendered_js_content,
+                                       app_css=rendered_css_content,
+                                       app_subpages=app_subpages
+                                       )
     else:
         return redirect(url_for('home'))
 

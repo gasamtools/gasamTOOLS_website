@@ -12,6 +12,11 @@
            id="{{ app.app_url }}">
           <p class="gasam app-name" title="{{ app.subtitle }}">{{ app.title }}</p>
         </a>
+        {% if app_name and app_name==app.app_url: %}
+          {% for sub_page in app_subpages %}
+          <a class="mt-2 gasam subpage-link" href="{{url_for('access_app_subpage', app_name=app.app_url, subpage_name=sub_page.html_name) }}">{{sub_page.title}}</a>
+         {% endfor %}
+        {% endif %}
       </li>
       {% endfor %}
     </ul>

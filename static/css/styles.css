@@ -93,5 +93,14 @@ body {
  margin: 0;
 }
 
-
+.gasam.subpage-link {
+  display: block;
+  color: #00e7ff;
+  text-decoration: none;
+  padding: 5px;
+  background-color: black;
+  border-radius: var(--bs-nav-pills-border-radius);
+  margin: 0 7px;
+  text-align: center;
+}
 

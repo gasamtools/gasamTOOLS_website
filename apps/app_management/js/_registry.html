@@ -1,0 +1,8 @@
+<script>
+    var GASAM_app_management_add_new_app_URL = "{{ url_for('access_app', app_name='app_management') }}";
+</script>
+
+<script src="{{ url_for('serve_app_js', appname='app_management', filename='add_new_app.js') }}"></script>
+<script src="{{ url_for('serve_app_js', appname='app_management', filename='change_app_data.js') }}"></script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

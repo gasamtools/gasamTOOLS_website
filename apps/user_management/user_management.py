@@ -4,46 +4,32 @@ from flask import render_template_string
 available_roles = ['admin', 'manager', 'contributor', 'subscriber', None]
 
 
-def app_logic(current_user, db, User, GasamApp, return_data):
+def register_subpages():
+    app_subpages = []
+    return app_subpages
+
+
+def app_logic(current_user, db, User, GasamApp, page, return_data):
     available_apps = GasamApp.query.all()
 
     if return_data:
-        user_to_update = User.query.get(int(return_data['user_id']))  # Get user with id=2
-        if user_to_update:
-            if return_data['target'] == 'approved':
-                if return_data['status'] == 'approve':
-                    user_to_update.approved = True
-                elif return_data['status'] == 'disapprove':
-                    user_to_update.approved = False
-            if return_data['target'] == 'name':
-                user_to_update.name = return_data['name']
-            if return_data['target'] == 'email':
-                user_to_update.email = return_data['email']
-            if return_data['target'] == 'role':
-                user_to_update.role = return_data['role']
-            if return_data['target'] == 'user_apps':
-                if 'user_apps_available' in return_data:
-                    if return_data['user_apps_available'] != '':
-                        app_to_update = GasamApp.query.get(int(return_data['user_apps_available']))
-                        user_to_update.apps.append(app_to_update)
-                if 'user_apps_added' in return_data:
-                    app_to_update = GasamApp.query.get(int(return_data['user_apps_added']))
-                    user_to_update.apps.remove(app_to_update)
+        pass
 
-            db.session.commit()  # Commit the changes to the database
-
-    users = User.query.all()
-    send_data = {'user_data': [{'id': user.id,
-                                'user_apps': user.apps,
-                                'email': user.email,
-                                'name': user.name,
-                                'role': user.role,
-                                'approved': user.approved,
-                                'delete_user': ''
-                                } for user in users],
-                 'user_roles': available_roles,
-                 'available_apps': available_apps,
-                 }
+    if page == 'user_management':
+        users = User.query.all()
+        send_data = {'user_data': [{'id': user.id,
+                                    'user_apps': user.apps,
+                                    'email': user.email,
+                                    'name': user.name,
+                                    'role': user.role,
+                                    'approved': user.approved,
+                                    'delete_user': ''
+                                    } for user in users],
+                     'user_roles': available_roles,
+                     'available_apps': available_apps,
+                     }
+    else:
+        send_data = {}
 
     return send_data
 
@@ -83,15 +69,16 @@ def js_function_update_form(current_user, db, User, GasamApp, json_data):
             if 'user_apps_added' in json_data:
                 app_to_update = GasamApp.query.get(int(json_data['user_apps_added']))
                 user_to_update.apps.remove(app_to_update)
-            json_data['user_apps'] = [{'id': app.id, 'app_url': app.app_url, 'app_title': app.title } for app in user_to_update.apps]
+            json_data['user_apps'] = [{'id': app.id, 'app_url': app.app_url, 'app_title': app.title} for app in
+                                      user_to_update.apps]
 
-            part_html_file_path = os.path.join('apps', 'user_management', 'parts', 'user_management__user_apps_list.html')
+            part_html_file_path = os.path.join('apps', 'user_management', 'parts',
+                                               'user_management__user_apps_list.html')
             with open(part_html_file_path, 'r') as file:
                 part_html_file = file.read()
 
             rendered_part_html_content = render_template_string(part_html_file, user_apps=json_data['user_apps'])
             json_data['user_apps_html'] = rendered_part_html_content
-
 
         db.session.commit()  # Commit the changes to the database
 
