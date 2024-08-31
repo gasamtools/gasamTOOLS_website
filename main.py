@@ -9,72 +9,54 @@ import os
 import importlib
 from flask_wtf.csrf import CSRFProtect
 
+db = SQLAlchemy()
+login_manager = LoginManager()
+csrf = CSRFProtect()
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'M*=jhHtR8!c@:CE5#WZ.@@EBIDzR[Ic^<E]w({5D8#L5Q_Y>u4gH9'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DB_URI", "sqlite:///users.db")
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Initialize CSRF protection
-csrf = CSRFProtect(app)
-
-login_manager = LoginManager()
+db.init_app(app)
+csrf.init_app(app)
 login_manager.init_app(app)
 
 
-# CREATE DATABASE
-
-
-class Base(DeclarativeBase):
-    pass
-
-
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DB_URI", "sqlite:///users.db")
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(model_class=Base)
-db.init_app(app)
-
-# CREATE TABLE IN DB
-# Association table for the many-to-many relationship
 user_app_association = db.Table(
     'user_app_association',
     db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
     db.Column('app_id', db.Integer, db.ForeignKey('gasam_apps.id'), primary_key=True)
 )
 
-
 class User(UserMixin, db.Model):
     __tablename__ = "users"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    email: Mapped[str] = mapped_column(String(100), unique=True)
-    password: Mapped[str] = mapped_column(String(100), nullable=False)
-    name: Mapped[str] = mapped_column(String(1000), nullable=False)
-    role: Mapped[str] = mapped_column(String(1000), nullable=True)
-    approved: Mapped[bool] = mapped_column(Boolean, nullable=False)
-
-    # Establish the many-to-many relationship with GasamApp
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(100), unique=True)
+    password = db.Column(db.String(100), nullable=False)
+    name = db.Column(db.String(1000), nullable=False)
+    role = db.Column(db.String(1000), nullable=True)
+    approved = db.Column(db.Boolean, nullable=False)
     apps = relationship("GasamApp", secondary=user_app_association, back_populates="users")
-
 
 class GasamApp(db.Model):
     __tablename__ = "gasam_apps"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    title: Mapped[str] = mapped_column(String(250), unique=True, nullable=False)
-    subtitle: Mapped[str] = mapped_column(String(250))
-    app_url: Mapped[str] = mapped_column(String(250), unique=True)
-
-    # Establish the many-to-many relationship with User
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(250), unique=True, nullable=False)
+    subtitle = db.Column(db.String(250))
+    app_url = db.Column(db.String(250), unique=True)
     users = relationship("User", secondary=user_app_association, back_populates="apps")
 
-
-session = db.session
-
-
-@login_manager.user_loader
-def load_user(user_id):
-    return session.get(User, int(user_id))
-
+from apps.morse_code_generator import init_app_morse_code_generator
+init_app_morse_code_generator(db, app)
 
 with app.app_context():
     db.create_all()
 
+
+@login_manager.user_loader
+def load_user(user_id):
+    return db.session.get(User, int(user_id))
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
