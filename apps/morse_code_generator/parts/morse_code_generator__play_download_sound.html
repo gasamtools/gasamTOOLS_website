@@ -1,0 +1,9 @@
+<h2 class="mt-4">Morse Code:</h2>
+<p class="mt-4" id="morse_code_generator_response">{{ send_data['morse_code_response'] }}</p>
+<h2 class="mt-4">Play Audio</h2>
+<audio controls>
+    <source src="{{ url_for('serve_audio', directory=send_data['download_file_directory'], filename=send_data['download_file_filename']) }}" type="audio/wav">
+    Your browser does not support the audio element.
+</audio>
+<h2 class="mt-4">Download WAV File</h2>
+<a href="{{ url_for('download_file', directory=send_data['download_file_directory'], filename=send_data['download_file_filename']) }}" class="btn btn-secondary ">Download Sound</a>

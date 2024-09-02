@@ -188,6 +188,18 @@ def home():
                            user_approved=current_user.approved,
                            user_apps=current_user.apps)
 
+@app.route('/audio/<path:directory>/<filename>')
+def serve_audio(directory,filename):
+    # Path to the directory containing your wav files
+    path = f"{directory}"
+    return send_from_directory(path, filename)
+
+@app.route('/download/<path:directory>/<filename>')
+def download_file(directory,filename):
+    # Path to the directory containing your wav files
+    path = f"{directory}"
+    return send_from_directory(path, filename, as_attachment=True)
+
 
 @app.route('/<path:appname>/js/<path:filename>')
 def serve_app_js(appname, filename):

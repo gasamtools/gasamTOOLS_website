@@ -1,0 +1,7 @@
+p#morse_code_generator_response {
+    white-space: pre-wrap;
+}
+
+div#morse_code_generator_div_response {
+    display: none;
+}
