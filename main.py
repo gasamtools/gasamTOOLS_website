@@ -192,6 +192,7 @@ def home():
     # current_user.role = 'admin'
     # db.session.commit()
 
+
     return render_template("home.html",
                            user_approved=current_user.approved,
                            user_apps=current_user.apps)
