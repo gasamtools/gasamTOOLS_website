@@ -43,26 +43,43 @@ def json_logic(current_user, db, User, GasamApp, json_data):
         return js_function_morse_code_generator(current_user, db, User, GasamApp, json_data)
 
 def js_function_morse_code_generator(current_user, db, User, GasamApp, json_data):
-    this_text = json_data['input_text'].upper().strip()
-    this_au_filename = f"{this_text.replace(' ', '_')}.wav"
-    morse_code = ''
-    for char in this_text:
-        morse_code += morse_data[char]
-        morse_code += '   '
+    try:
+        this_text = json_data['input_text'].upper().strip()
+        this_au_filename = f"{this_text.replace(' ', '_')}.wav"
+        morse_code = ''
 
-    json_data['morse_code_response'] = morse_code
+        for char in this_text:
+            if char in morse_data:
+                morse_code += morse_data[char]
+                morse_code += '   '
+            else:
+                morse_code += '   '  # Handle unexpected characters
 
-    play_dot_sound = SoundPlayer()
-    play_dot_sound.play_and_save_sound(morse_code=morse_code, output_file=this_au_filename)
+        json_data['morse_code_response'] = morse_code
 
-    part_html_file_path = os.path.join('apps', 'morse_code_generator', 'parts',
-                                       'morse_code_generator__play_download_sound.html')
-    with open(part_html_file_path, 'r') as file:
-        part_html_file = file.read()
-    file_path_output_wav = os.path.join('apps', 'morse_code_generator', 'generated_sound')
-    json_data['download_file_directory'] = file_path_output_wav
-    json_data['download_file_filename'] = this_au_filename
-    rendered_part_html_content = render_template_string(part_html_file, send_data=json_data)
-    json_data['user_apps_html'] = rendered_part_html_content
+        play_dot_sound = SoundPlayer()
+        play_dot_sound.play_and_save_sound(morse_code=morse_code, output_file=this_au_filename)
+
+        part_html_file_path = os.path.join('apps', 'morse_code_generator', 'parts', 'morse_code_generator__play_download_sound.html')
+
+        # Ensure the HTML file exists
+        if not os.path.isfile(part_html_file_path):
+            raise FileNotFoundError(f"HTML file not found: {part_html_file_path}")
+
+        with open(part_html_file_path, 'r') as file:
+            part_html_file = file.read()
+
+        file_path_output_wav = os.path.join('apps', 'morse_code_generator', 'generated_sound')
+
+        json_data['download_file_directory'] = file_path_output_wav
+        json_data['download_file_filename'] = this_au_filename
+        rendered_part_html_content = render_template_string(part_html_file, send_data=json_data)
+        json_data['user_apps_html'] = rendered_part_html_content
+
+    except Exception as e:
+        # Log the error and handle it
+        print(f"Error in js_function_morse_code_generator: {e}")
+        json_data['error'] = str(e)
 
     return json_data
+
