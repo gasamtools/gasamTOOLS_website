@@ -8,13 +8,14 @@ from flask_login import UserMixin, login_user, LoginManager, login_required, cur
 import os
 import importlib
 from flask_wtf.csrf import CSRFProtect
+from dotenv import load_dotenv
 
 db = SQLAlchemy()
 login_manager = LoginManager()
 csrf = CSRFProtect()
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'M*=jhHtR8!c@:CE5#WZ.@@EBIDzR[Ic^<E]w({5D8#L5Q_Y>u4gH9'
+app.config['SECRET_KEY'] = os.getenv('FLASK_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DB_URI", "sqlite:///users.db")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -178,7 +179,7 @@ def settings():
 @app.route('/home')
 @login_required
 def home():
-    # app1 = GasamApp(title="App Management", subtitle="For admin only", app_url="app_management")
+    # app1 = GasamApp(title="User Management", subtitle="For admin only", app_url="user_management")
     # current_user.apps.append(app1)
     # current_user.approved = True
     # current_user.role = 'admin'
