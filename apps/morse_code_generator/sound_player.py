@@ -11,6 +11,9 @@ class SoundPlayer():
         file_path_silence_wav = os.path.join('apps', 'morse_code_generator', 'static', 'silence.wav')
         self.file_path_output_wav = os.path.join('apps', 'morse_code_generator', 'generated_sound')
 
+        # Delete previous wav files
+        self.delete_all_files(self.file_path_output_wav)
+
         # Load sounds using Pydub
         self.sound_dot = AudioSegment.from_wav(file_path_dot_wav)
         self.sound_dash = AudioSegment.from_wav(file_path_dash_wav)
@@ -31,3 +34,13 @@ class SoundPlayer():
         os.makedirs(self.file_path_output_wav, exist_ok=True)
 
         combined_sound.export(f'{self.file_path_output_wav}/{output_file}', format="wav")
+
+    def delete_all_files(self, directory):
+        # List all files in the directory
+        for filename in os.listdir(directory):
+            file_path = os.path.join(directory, filename)
+
+            # Check if it's a file (and not a directory)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+                # print(f"Deleted file: {file_path}")
