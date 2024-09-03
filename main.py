@@ -186,11 +186,11 @@ def settings():
 @app.route('/home')
 @login_required
 def home():
-    app1 = GasamApp(title="App Management", subtitle="For admin only", app_url="app_management")
-    current_user.apps.append(app1)
+    # app1 = GasamApp(title="App Management", subtitle="For admin only", app_url="app_management")
+    # current_user.apps.append(app1)
     # current_user.approved = True
     # current_user.role = 'admin'
-    db.session.commit()
+    # db.session.commit()
 
     return render_template("home.html",
                            user_approved=current_user.approved,
