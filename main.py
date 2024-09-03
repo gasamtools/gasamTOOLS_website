@@ -10,14 +10,21 @@ import importlib
 from flask_wtf.csrf import CSRFProtect
 from dotenv import load_dotenv
 
-db = SQLAlchemy()
-login_manager = LoginManager()
-csrf = CSRFProtect()
+
+
+load_dotenv()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('FLASK_KEY')
+
+print("SECRET_KEY:", app.config['SECRET_KEY'])
+
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DB_URI", "sqlite:///users.db")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy()
+login_manager = LoginManager()
+csrf = CSRFProtect()
 
 db.init_app(app)
 csrf.init_app(app)
