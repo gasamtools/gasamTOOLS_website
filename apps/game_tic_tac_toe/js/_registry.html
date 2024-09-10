@@ -1,0 +1,17 @@
+<script>
+    const GASAM_game_tic_tac_toe_URL = "{{ url_for('access_app', app_name='game_tic_tac_toe') }}";
+    var GASAM_game_tic_tac_toe_move = "cross";
+    const GASAM_game_tic_tac_toe_coin_choice_heads_URL = "{{ url_for('serve_app_static', app_url='game_tic_tac_toe', filename='choice_heads.gif') }}"
+    const GASAM_game_tic_tac_toe_coin_choice_tails_URL = "{{ url_for('serve_app_static', app_url='game_tic_tac_toe', filename='choice_tails.gif') }}"
+    const GASAM_game_tic_tac_toe_coin_heads_to_tails_URL = "{{ url_for('serve_app_static', app_url='game_tic_tac_toe', filename='heads_to_tails.gif') }}"
+    const GASAM_game_tic_tac_toe_coin_tails_to_heads_URL = "{{ url_for('serve_app_static', app_url='game_tic_tac_toe', filename='tails_to_heads.gif') }}"
+    const GASAM_game_tic_tac_toe_coin_choice_undecided_URL = "{{ url_for('serve_app_static', app_url='game_tic_tac_toe', filename='choice_undecided.gif') }}"
+    const GASAM_game_tic_tac_toe_coin_won_heads_URL = "{{ url_for('serve_app_static', app_url='game_tic_tac_toe', filename='won_heads.gif') }}"
+    const GASAM_game_tic_tac_toe_coin_won_tails_URL = "{{ url_for('serve_app_static', app_url='game_tic_tac_toe', filename='won_tails.gif') }}"
+</script>
+
+<script src="{{ url_for('serve_app_js', appname='game_tic_tac_toe', filename='game_tic_tac_toe_game_engine.js') }}"></script>
+<script src="{{ url_for('serve_app_js', appname='game_tic_tac_toe', filename='game_tic_tac_toe_set_field.js') }}"></script>
+<script src="{{ url_for('serve_app_js', appname='game_tic_tac_toe', filename='game_tic_tac_toe_choose_ai.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

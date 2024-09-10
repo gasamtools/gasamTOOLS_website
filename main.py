@@ -17,8 +17,6 @@ load_dotenv()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('FLASK_KEY')
 
-print("SECRET_KEY:", app.config['SECRET_KEY'])
-
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DB_URI", "sqlite:///users.db")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -219,6 +217,13 @@ def serve_app_js(appname, filename):
 def serve_app_css(appname, filename):
     return send_from_directory(f'apps/{appname}/css', filename)
 
+@app.route('/serve_app_static/<path:app_url>/<path:filename>')
+def serve_app_static(app_url, filename):
+    directory = os.path.join('apps', app_url, 'static')
+    # print(f"Serving from: {directory}, File: {filename}")  # For debugging
+    return send_from_directory(directory, filename)
+
+
 
 @app.route("/app/<app_name>", methods=["GET", "POST", "PUT"])
 @login_required
@@ -247,18 +252,6 @@ def access_app(app_name):
     except ImportError:
         return f"Error: No {app_name}.py found for {app_name}", 404
 
-    if hasattr(app_manager, 'app_logic'):
-        send_data = app_manager.app_logic(current_user, db, User, GasamApp, app_name, return_data)
-        if 'db_init' in send_data:
-            plugin_db_func = send_data['db_init']
-            plugin_db_func(db, app)
-    else:
-        send_data = {}
-
-    if hasattr(app_manager, 'register_subpages'):
-        app_subpages = app_manager.register_subpages()
-    else:
-        app_subpages = {}
 
     if current_user.approved:
 
@@ -270,24 +263,21 @@ def access_app(app_name):
                 send_json_data = {}
 
             return jsonify(send_json_data)
-        # elif request.method == 'GET':
-        #     if request.args:
-        #         query_params = request.args.to_dict(flat=False)
-        #         print(query_params)
-        #         sub_html_file_path = os.path.join('apps', app_name, 'subpage', f'{query_params["sub_page"][0]}.html')
-        #         with open(sub_html_file_path, 'r') as file:
-        #             sub_html_content = file.read()
-        #             rendered_sub_html_content = render_template_string(sub_html_content, send_data=query_params)
-        #             rendered_js_content = render_template_string(js_html_content, send_data='')
-        #             rendered_css_content = render_template_string(css_html_content, send_data='')
-        #             return render_template("app.html",
-        #                                    app_html=rendered_sub_html_content,
-        #                                    user_apps=current_user.apps,
-        #                                    app_name=app_name,
-        #                                    app_js=rendered_js_content,
-        #                                    app_css=rendered_css_content
-        #                                    )
+
         else:
+            if hasattr(app_manager, 'app_logic'):
+                send_data = app_manager.app_logic(current_user, db, User, GasamApp, app_name, return_data)
+                if 'db_init' in send_data:
+                    plugin_db_func = send_data['db_init']
+                    plugin_db_func(db, app)
+            else:
+                send_data = {}
+
+            if hasattr(app_manager, 'register_subpages'):
+                app_subpages = app_manager.register_subpages()
+            else:
+                app_subpages = {}
+
             rendered_html_content = render_template_string(html_content, send_data=send_data)
             rendered_js_content = render_template_string(js_html_content, send_data='')
             rendered_css_content = render_template_string(css_html_content, send_data='')

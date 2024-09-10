@@ -1,0 +1,152 @@
+.form-check-label {
+  margin-left: 10px;
+}
+
+.game_tic_tac_toe.switch-div {
+    margin-top: 150px;
+}
+
+@keyframes borderGradient {
+    0% {
+        border-image: linear-gradient(0deg, #fff, #999999, #777777, #555555) 1;
+    }
+    25% {
+        border-image: linear-gradient(90deg, #fff, #999999, #777777, #555555) 1;
+    }
+    50% {
+        border-image: linear-gradient(180deg, #fff, #999999, #777777, #555555) 1;
+    }
+    75% {
+        border-image: linear-gradient(270deg, #fff, #999999, #777777, #555555) 1;
+    }
+    100% {
+        border-image: linear-gradient(360deg, #fff, #999999, #777777, #555555) 1;
+    }
+}
+
+.game_tic_tac_toe.btn.player {
+    margin: 10px;
+    width: 200px;
+
+}
+
+#game_tic_tac_toeModalLabel {
+  color: #f7f7f7;
+}
+
+.game_tic_tac_toe.coin.btn {
+    border: 1px solid #f7f7f7;
+    margin: 5px;
+}
+
+.game_tic_tac_toe.btn.player.chosen {
+    animation: borderGradient 0.5s infinite linear; /* Animate over 5 seconds infinitely */
+}
+
+.game_tic_tac_toe.coin-announcement-container {
+  position: absolute;
+  width: 90%;
+  margin: 170px 5%;
+  background-color: #000;
+  padding: 5px;
+  justify-content: center;
+  display: flex;
+}
+
+#game_tic_tac_toeCoinAnnouncement {
+  color: #fff;
+}
+
+.game_tic_tac_toe.container {
+    position: relative;
+}
+
+.game_tic_tac_toe.box_size {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.game_tic_tac_toe.container,
+.game_tic_tac_toe.box_size {
+    width: 500px;
+    height: 500px;
+}
+
+.game_tic_tac_toe.box_size.svg-element {
+    z-index: 0;
+}
+
+.game_tic_tac_toe.box_size.crossing-element {
+    z-index: 2;
+}
+
+.game_tic_tac_toe.box_size.table-element {
+    z-index: 1;
+}
+
+
+table {
+    border-collapse: collapse;
+}
+td {
+
+    border: 1px solid #000;
+    text-align: center;
+    vertical-align: middle;
+}
+.hidden {
+    display: none !important;
+}
+
+.game_tic_tac_toe.path {
+    stroke: #fff;
+    stroke-width: 2;
+}
+
+.game_tic_tac_toe.path.cross {
+    stroke: #fff;
+    stroke-width:2;
+}
+
+.game_tic_tac_toe.path.circle {
+    stroke: #f2f5d3;
+    stroke-width:2;
+}
+
+/* Define the animation */
+@keyframes drawPathGrid {
+    0% {
+      stroke-dashoffset: 200; /* Start hidden */
+    }
+    100% {
+      stroke-dashoffset: 0; /* Fully drawn */
+    }
+}
+
+/* Define the animation */
+@keyframes drawPathElement {
+    0% {
+      stroke-dashoffset: 350; /* Start hidden */
+    }
+    100% {
+      stroke-dashoffset: 0; /* Fully drawn */
+    }
+}
+
+/* Set the initial properties and the animation on the path */
+.game_tic_tac_toe.path.grid {
+    stroke-dasharray: 200;  /* Set this to the length of the path */
+    stroke-dashoffset: 200; /* Initially hide the entire path */
+    animation: drawPathGrid 0.7s linear forwards; /* Animate over 2 seconds */
+}
+
+/* Set the initial properties and the animation on the path */
+.game_tic_tac_toe.path.cross,
+.game_tic_tac_toe.path.circle,
+ .game_tic_tac_toe.path.crossing {
+    stroke-dasharray: 350;  /* Set this to the length of the path */
+    stroke-dashoffset: 350; /* Initially hide the entire path */
+    animation: drawPathElement 0.4s linear forwards; /* Animate over 2 seconds */
+}
+

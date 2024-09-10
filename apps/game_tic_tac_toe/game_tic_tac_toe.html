@@ -1,0 +1,156 @@
+<div class="mb-4 game_tic_tac_toe switch-div d-flex justify-content-center form-check form-switch">
+  <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" autocomplete="off" data-bs-toggle="modal" data-bs-target="#game_tic_tac_toeModal">
+  <label class="form-check-label" for="flexSwitchCheckDefault">Play with AI ?</label>
+</div>
+<div class="mb-4 game_tic_tac_toe button-div d-flex justify-content-center" >
+    <button class="game_tic_tac_toe player btn cross btn-dark chosen">player X</button>
+    <button class="game_tic_tac_toe player btn circle">player O</button>
+</div>
+<div class="game_tic_tac_toe container d-flex justify-content-center" >
+    <svg id="game_tic_tac_toe_svg_element" class='game_tic_tac_toe box_size svg-element' xmlns="http://www.w3.org/2000/svg" >
+    </svg>
+    <table class='game_tic_tac_toe box_size table-element'>
+        <tbody>
+            <tr>
+                <td data-col="0" data-row="0" class="square-1 clickable game_tic_tac_toe td ">
+                    <svg aria-label="X" viewBox="0 0 128 128" class="game_tic_tac_toe square-1 cross hidden">
+                        <path d="M16,16L112,112" class="game_tic_tac_toe path cross" ></path>
+                        <path d="M112,16L16,112" class="game_tic_tac_toe path cross" ></path>
+                    </svg>
+                    <svg aria-label="O" viewBox="0 0 128 128" class="game_tic_tac_toe square-1 circle hidden">
+                        <path d="M64,16A48,48 0 1,0 64,112A48,48 0 1,0 64,16" class="game_tic_tac_toe path circle" ></path>
+                    </svg>
+                </td>
+                <td data-col="1" data-row="0" class="square-2 clickable game_tic_tac_toe td ">
+                    <svg aria-label="X" viewBox="0 0 128 128" class="game_tic_tac_toe square-2 cross hidden">
+                        <path d="M16,16L112,112" class="game_tic_tac_toe path cross"></path>
+                        <path d="M112,16L16,112" class="game_tic_tac_toe path cross"></path>
+                    </svg>
+                    <svg aria-label="O" viewBox="0 0 128 128" class="game_tic_tac_toe square-2 circle hidden">
+                        <path d="M64,16A48,48 0 1,0 64,112A48,48 0 1,0 64,16" class="game_tic_tac_toe path circle"></path>
+                    </svg>
+                </td>
+                <td data-col="2" data-row="0" class="square-3 clickable game_tic_tac_toe td ">
+                    <svg aria-label="X" viewBox="0 0 128 128" class="game_tic_tac_toe square-3 cross hidden">
+                        <path d="M16,16L112,112" class="game_tic_tac_toe path cross"></path>
+                        <path d="M112,16L16,112" class="game_tic_tac_toe path cross"></path>
+                    </svg>
+                    <svg aria-label="O" viewBox="0 0 128 128" class="game_tic_tac_toe square-3 circle hidden">
+                        <path d="M64,16A48,48 0 1,0 64,112A48,48 0 1,0 64,16" class="game_tic_tac_toe path circle"></path>
+                    </svg>
+                </td>
+            </tr>
+            <tr>
+                <td data-col="0" data-row="1" class="square-4 clickable game_tic_tac_toe td ">
+                    <svg aria-label="X" viewBox="0 0 128 128" class="game_tic_tac_toe square-4 cross hidden">
+                        <path d="M16,16L112,112" class="game_tic_tac_toe path cross"></path>
+                        <path d="M112,16L16,112" class="game_tic_tac_toe path cross"></path>
+                    </svg>
+                    <svg aria-label="O" viewBox="0 0 128 128" class="game_tic_tac_toe square-4 circle hidden">
+                        <path d="M64,16A48,48 0 1,0 64,112A48,48 0 1,0 64,16" class="game_tic_tac_toe path circle"></path>
+                    </svg>
+                </td>
+                <td data-col="1" data-row="1" class="square-5 clickable game_tic_tac_toe td ">
+                    <svg aria-label="X" viewBox="0 0 128 128" class="game_tic_tac_toe square-5 cross hidden">
+                        <path d="M16,16L112,112" class="game_tic_tac_toe path cross"></path>
+                        <path d="M112,16L16,112" class="game_tic_tac_toe path cross"></path>
+                    </svg>
+                    <svg aria-label="O" viewBox="0 0 128 128" class="game_tic_tac_toe square-5 circle hidden">
+                        <path d="M64,16A48,48 0 1,0 64,112A48,48 0 1,0 64,16" class="game_tic_tac_toe path circle"></path>
+                    </svg>
+                </td>
+                <td data-col="2" data-row="1" class="square-6 clickable game_tic_tac_toe td ">
+                    <svg aria-label="X" viewBox="0 0 128 128" class="game_tic_tac_toe square-6 cross hidden">
+                        <path d="M16,16L112,112" class="game_tic_tac_toe path cross"></path>
+                        <path d="M112,16L16,112" class="game_tic_tac_toe path cross"></path>
+                    </svg>
+                    <svg aria-label="O" viewBox="0 0 128 128" class="game_tic_tac_toe square-6 circle hidden">
+                        <path d="M64,16A48,48 0 1,0 64,112A48,48 0 1,0 64,16" class="game_tic_tac_toe path circle"></path>
+                    </svg>
+                </td>
+            </tr>
+            <tr>
+                <td data-col="0" data-row="2" class="square-7 clickable game_tic_tac_toe td ">
+                    <svg aria-label="X" viewBox="0 0 128 128" class="game_tic_tac_toe square-7 cross hidden">
+                        <path d="M16,16L112,112" class="game_tic_tac_toe path cross"></path>
+                        <path d="M112,16L16,112" class="game_tic_tac_toe path cross"></path>
+                    </svg>
+                    <svg aria-label="O" viewBox="0 0 128 128" class="game_tic_tac_toe square-7 circle hidden">
+                        <path d="M64,16A48,48 0 1,0 64,112A48,48 0 1,0 64,16" class="game_tic_tac_toe path circle"></path>
+                    </svg>
+                </td>
+                <td data-col="1" data-row="2" class="square-8 clickable game_tic_tac_toe td ">
+                    <svg aria-label="X" viewBox="0 0 128 128" class="game_tic_tac_toe square-8 cross hidden">
+                        <path d="M16,16L112,112" class="game_tic_tac_toe path cross"></path>
+                        <path d="M112,16L16,112" class="game_tic_tac_toe path cross"></path>
+                    </svg>
+                    <svg aria-label="O" viewBox="0 0 128 128" class="game_tic_tac_toe square-8 circle hidden">
+                        <path d="M64,16A48,48 0 1,0 64,112A48,48 0 1,0 64,16" class="game_tic_tac_toe path circle"></path>
+                    </svg>
+                </td>
+                <td data-col="2" data-row="2" class="square-9 clickable game_tic_tac_toe td ">
+                    <svg aria-label="X" viewBox="0 0 128 128" class="game_tic_tac_toe square-9 cross hidden">
+                        <path d="M16,16L112,112" class="game_tic_tac_toe path cross"></path>
+                        <path d="M112,16L16,112" class="game_tic_tac_toe path cross"></path>
+                    </svg>
+                    <svg aria-label="O" viewBox="0 0 128 128" class="game_tic_tac_toe square-9 circle hidden">
+                        <path d="M64,16A48,48 0 1,0 64,112A48,48 0 1,0 64,16" class="game_tic_tac_toe path circle"></path>
+                    </svg>
+                </td>
+            </tr>
+            <!-- More rows as needed -->
+        </tbody>
+    </table>
+
+    <div class='game_tic_tac_toe box_size crossing-element hidden'>
+        <svg aria-label="X" viewBox="0 0 120 120">
+            <path d="M0,20L120,20" class="game_tic_tac_toe path crossing crossing-1 hidden"></path>
+            <path d="M0,60L120,60" class="game_tic_tac_toe path crossing crossing-2 hidden"></path>
+            <path d="M0,100L120,100" class="game_tic_tac_toe path crossing crossing-3 hidden"></path>
+            <path d="M20,0L20,120" class="game_tic_tac_toe path crossing crossing-4 hidden"></path>
+            <path d="M60,0L60,120" class="game_tic_tac_toe path crossing crossing-5 hidden"></path>
+            <path d="M100,0L100,120" class="game_tic_tac_toe path crossing crossing-6 hidden"></path>
+            <path d="M00,0L120,120" class="game_tic_tac_toe path crossing crossing-7 hidden"></path>
+            <path d="M120,0L0,120" class="game_tic_tac_toe path crossing crossing-8 hidden"></path>
+        </svg>
+    </div>
+</div>
+<div class="modal fade" id="game_tic_tac_toeModal" tabindex="-1" aria-labelledby="game_tic_tac_toeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="game_tic_tac_toeModalLabel">How goes first? Choose 'heads' or 'tails'</h5>
+            </div>
+            <div class="d-flex justify-content-center game_tic_tac_toe coin-button-container">
+                <button class="heads game_tic_tac_toe coin btn">Heads</button>
+                <button class="tails game_tic_tac_toe coin btn ">Tails</button>
+            </div>
+            <div class="d-flex justify-content-center game_tic_tac_toe coin-image-container">
+                <img id="game_tic_tac_toeCoinImg" src="{{ url_for('serve_app_static', app_url='game_tic_tac_toe', filename='choice_undecided.gif') }}" alt="coin_flip" class="rounded-circle" width="200" height="200">
+            </div>
+            <form class="modal-footer" autocomplete="off">
+                <button type="button" class="btn btn-secondary" id="game_tic_tac_toeCloseModalButton"data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-light" id="game_tic_tac_toeFlipCoinModalBttn" disabled >Flip  Coin</button>
+            </form>
+            <div class="game_tic_tac_toe coin-announcement-container hidden">
+                <h3 id="game_tic_tac_toeCoinAnnouncement" >You Won! You go first!</h3>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="game_tic_tac_toePlayAgainModal" tabindex="-1" aria-labelledby="game_tic_tac_toePlayAgainModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="game_tic_tac_toePlayAgainModalLabel">Play Again?</h5>
+            </div>
+            <div class="d-flex justify-content-center game_tic_tac_toe play-again-announcement-container">
+                <h3 id="game_tic_tac_toePlayAgainAnnouncement" ></h3>
+            </div>
+            <form class="modal-footer" autocomplete="off">
+                <button type="button" class="btn btn-secondary" id="game_tic_tac_toePlayAgainCloseModalButton"data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-light" id="game_tic_tac_toeFlipPlayAgainModalBttn" >Play Again</button>
+            </form>
+        </div>
+    </div>
+</div>
