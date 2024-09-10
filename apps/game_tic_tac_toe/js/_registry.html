@@ -9,6 +9,7 @@
     const GASAM_game_tic_tac_toe_coin_won_tails_URL = "{{ url_for('serve_app_static', app_url='game_tic_tac_toe', filename='won_tails.gif') }}"
 </script>
 
+<script src="{{ url_for('serve_app_js', appname='game_tic_tac_toe', filename='game_tic_tac_toe_preload_static.js') }}"></script>
 <script src="{{ url_for('serve_app_js', appname='game_tic_tac_toe', filename='game_tic_tac_toe_game_engine.js') }}"></script>
 <script src="{{ url_for('serve_app_js', appname='game_tic_tac_toe', filename='game_tic_tac_toe_set_field.js') }}"></script>
 <script src="{{ url_for('serve_app_js', appname='game_tic_tac_toe', filename='game_tic_tac_toe_choose_ai.js') }}"></script>
