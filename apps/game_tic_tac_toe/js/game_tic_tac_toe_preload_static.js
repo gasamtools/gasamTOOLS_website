@@ -26,6 +26,8 @@ console.log('loading gifs');
         urls.forEach((url) => {
             const img = new Image();
             img.src = url;
+            loadedImages.push(img);  // Keep reference to avoid garbage collection
+            console.log(`Preloading: ${url}`);
         });
     };
 
