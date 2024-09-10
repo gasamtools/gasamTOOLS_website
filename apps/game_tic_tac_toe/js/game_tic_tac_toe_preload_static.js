@@ -15,6 +15,8 @@ console.log('loading gifs');
 
     // Preload images using Image object and store references to them
     const preloadedImages = [];
+    let loadedCount = 0; // Keep track of loaded GIFs
+    const failedImages = [];
 
     gifUrls.forEach((url) => {
         const img = new Image();
@@ -23,10 +25,19 @@ console.log('loading gifs');
         // Add an event listener to confirm when the image has been fully loaded
         img.onload = () => {
             console.log(`GIF ${url} fully loaded and cached.`);
+            loadedCount++;
+
+            // Check if this is the last image in the array
+            if (loadedCount === gifUrls.length) {
+                console.log('All GIFs have been preloaded.');
+                console.log('Failed to load: '+failedImages);
+            }
         };
 
         img.onerror = () => {
             console.error(`Failed to load GIF ${url}`);
+            failedImages.push(loadedCount);
+            loadedCount++;
         };
 
         preloadedImages.push(img); // Store the preloaded image
