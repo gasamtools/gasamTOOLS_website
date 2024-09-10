@@ -23,6 +23,7 @@ console.log('loading gifs');
     };
 
     const preloadImages = (urls) => {
+        const loadedImages = [];  // Store the preloaded images
         urls.forEach((url) => {
             const img = new Image();
             img.src = url;
