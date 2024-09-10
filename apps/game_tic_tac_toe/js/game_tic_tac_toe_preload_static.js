@@ -1,5 +1,17 @@
 window.addEventListener('load', () => {
 
+    const modalLoadingElement = document.getElementById('game_tic_tac_toeLoadingModal');
+    const this_modal = bootstrap.Modal.getOrCreateInstance(modalLoadingElement, {
+        backdrop: 'static',
+        keyboard: false // Set to true if you want to allow closing via the keyboard
+    });
+        if (this_modal) {
+            this_modal.show();
+            $('.modal-backdrop.fade.show').show();
+        } else {
+            console.error('Modal instance not found.');
+        }
+
 console.log('loading gifs');
     // List of GIF URLs to preload
     const gifUrls = [
@@ -31,6 +43,16 @@ console.log('loading gifs');
             if (loadedCount === gifUrls.length) {
                 console.log('All GIFs have been preloaded.');
                 console.log('Failed to load: '+failedImages);
+                setTimeout(() => {
+                    if (failedImages.length == 0) {
+                        if (this_modal) {
+                            this_modal.hide();
+                            $('.modal-backdrop.fade.show').hide();
+                        } else {
+                            console.error('Modal instance not found.');
+                        }
+                    }
+                }, 500)
             }
         };
 
