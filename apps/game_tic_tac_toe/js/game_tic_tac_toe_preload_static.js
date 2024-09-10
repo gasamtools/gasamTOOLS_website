@@ -13,28 +13,33 @@ console.log('loading gifs');
         // Add more URLs as needed
     ];
 
-    // Get the target div element where the images will be added
+    // Preload images using Image object and store references to them
+    const preloadedImages = [];
+
+    gifUrls.forEach((url) => {
+        const img = new Image();
+        img.src = url;
+
+        // Add an event listener to confirm when the image has been fully loaded
+        img.onload = () => {
+            console.log(`GIF ${url} fully loaded and cached.`);
+        };
+
+        img.onerror = () => {
+            console.error(`Failed to load GIF ${url}`);
+        };
+
+        preloadedImages.push(img); // Store the preloaded image
+    });
+
+    // Once the images are preloaded, they will be available from the cache for quick display
+    console.log('GIFs preloading initiated...');
+
+    // Example: Attach images to a hidden div when needed
     const loadImagesDiv = document.querySelector('.game_tic_tac_toe-load-images');
 
-    // Function to fetch each GIF and check the response status
-    const preloadGif = (url) => {
-        fetch(url, { method: 'GET' })
-            .then((response) => {
-                if (response.ok) {
-                    console.log(`GIF ${url} loaded successfully with status: ${response.status}`);
-                    const img = new Image();
-                    img.src = url;
-                    document.querySelector('.game_tic_tac_toe-load-images').appendChild(img);
-                } else {
-                    console.error(`Error loading GIF ${url}: ${response.status}`);
-                }
-            })
-            .catch((error) => {
-                console.error(`Network error loading GIF ${url}:`, error);
-            });
-    };
-
-    // Preload each GIF and check its status
-    gifUrls.forEach(preloadGif);
+    preloadedImages.forEach((img) => {
+        loadImagesDiv.appendChild(img);
+    });
 
 });
