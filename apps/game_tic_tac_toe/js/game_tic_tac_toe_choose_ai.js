@@ -88,6 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     // disable option turning OFF  AI
                     toggleSwitch.disabled = true;
+                    toggleSwitch.checked = true;
                 } else {
                     console.error('Modal instance not found.');
                 }

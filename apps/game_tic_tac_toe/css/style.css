@@ -150,3 +150,13 @@ td {
     animation: drawPathElement 0.4s linear forwards; /* Animate over 2 seconds */
 }
 
+
+/* Ensure the switch looks "on" */
+.switch:disabled + .slider {
+    background-color: #4CAF50; /* Green background when switch is "on" */
+}
+
+.switch:disabled + .slider:before {
+    transform: translateX(26px); /* Moves the knob to the right for "on" state */
+}
+
