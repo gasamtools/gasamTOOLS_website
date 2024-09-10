@@ -13,30 +13,19 @@ console.log('loading gifs');
         // Add more URLs as needed
     ];
 
-    // Function to create and append a <link rel="preload"> tag
-    const preloadGif = (url) => {
-        const link = document.createElement('link');
-        link.rel = 'preload';
-        link.href = url;
-        link.as = 'image';
-        document.head.appendChild(link);
-    };
+    // Get the target div element where the images will be added
+    const loadImagesDiv = document.querySelector('.game_tic_tac_toe-load-images');
 
-    const preloadImages = (urls) => {
-        const loadedImages = [];  // Store the preloaded images
-        urls.forEach((url) => {
-            const img = new Image();
-            img.src = url;
-            loadedImages.push(img);  // Keep reference to avoid garbage collection
-            console.log(`Preloading: ${url}`);
-        });
-    };
+    // Function to create and append <img> elements
+    gifUrls.forEach((url) => {
+        const img = document.createElement('img');
+        img.src = url;            // Set the image source
+        img.alt = 'Preloaded GIF'; // Set an alternative text
+        img.classList.add('hidden'); // Initially hide the images with a class (if needed)
 
-    // Preload each GIF
-    gifUrls.forEach(preloadGif);
-    preloadImages(gifUrls);
+        loadImagesDiv.appendChild(img); // Append the image to the div
+    });
 
-
-console.log('gifs loaded');
+    console.log('Images appended to the div');
 
 });
