@@ -13,11 +13,25 @@ console.log('loading gifs');
         // Add more URLs as needed
     ];
 
+    // Function to create and append a <link rel="preload"> tag
+    const preloadGif = (url) => {
+        const link = document.createElement('link');
+        link.rel = 'preload';
+        link.href = url;
+        link.as = 'image';
+        document.head.appendChild(link);
+    };
+
+    const preloadImages = (urls) => {
+        urls.forEach((url) => {
+            const img = new Image();
+            img.src = url;
+        });
+    };
+
     // Preload each GIF
-    gifUrls.forEach(url => {
-        const img = new Image();
-        img.src = url;
-    });
+    gifUrls.forEach(preloadGif);
+    preloadImages(gifUrls);
 
 console.log('gifs loaded');
 
