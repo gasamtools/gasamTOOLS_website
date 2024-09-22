@@ -119,7 +119,7 @@ def js_function_sign_or_watermark_merge_images(current_user, db, User, GasamApp,
                 #font = ImageFont.truetype(json_data[key]['fontFamily'], font_size)
 
 
-                font_path = os.path.join('apps', 'sign_or_watermark', 'static', 'fonts', f'{json_data[key]["fontFamily"]}.ttf')  # Adjust path as necessary
+                font_path = os.path.join('apps', 'sign_or_watermark', 'static', 'text_fonts', f'{json_data[key]["fontFamily"]}.ttf')  # Adjust path as necessary
                 try:
                     font = ImageFont.truetype(font_path, font_size)
                 except OSError:
