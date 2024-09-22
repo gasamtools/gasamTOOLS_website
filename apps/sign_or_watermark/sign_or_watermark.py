@@ -116,7 +116,13 @@ def js_function_sign_or_watermark_merge_images(current_user, db, User, GasamApp,
 
                 # Calculate font size and position
                 font_size = int(float(json_data[key]['fontSize']) * img_height)
-                font = ImageFont.truetype(json_data[key]['fontFamily'], font_size)
+                #font = ImageFont.truetype(json_data[key]['fontFamily'], font_size)
+
+                font_path = os.path.join('apps', 'sign_or_watermark', 'static', 'fonts', f'{json_data[key]["fontFamily"]}.ttf')  # Adjust path as necessary
+                try:
+                    font = ImageFont.truetype(font_path, font_size)
+                except OSError:
+                    font = ImageFont.load_default()  # Load a default font if the specified font fails
 
                 x = int(float(json_data[key]['x']) * img_width)
                 y = int(float(json_data[key]['y']) * img_height)
