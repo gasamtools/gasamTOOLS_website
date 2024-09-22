@@ -1,0 +1,236 @@
+.sign_or_watermark.step-container {
+    text-align: center;
+    display: none;
+}
+
+.sign_or_watermark.step-container.first {
+    display: block;
+}
+
+.sign_or_watermark.h1 {
+  margin: 100px 0 40px 0;
+}
+
+/* Hide the default file input text */
+.custom-file-input {
+    opacity: 0;
+    position: absolute;
+    z-index: -1;
+}
+
+/* Style the button */
+.file-upload-btn {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+}
+
+.file-upload-btn input[type="file"] {
+    position: absolute;
+    right: 0;
+    top: 0;
+    opacity: 0;
+    cursor: pointer;
+    height: 100%;
+    width: 100%;
+}
+
+        .sign_or_watermark.step-container.second {
+            height: 100vh; /* Full viewport height */
+        }
+
+
+
+        .watermark-editor-surface {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa; /* Light background for contrast */
+            overflow: hidden; /* Ensure SVG doesn't overflow */
+        }
+
+        .watermark-editor-surface svg {
+            width: 800px;
+        }
+
+        .side-panel {
+            width: 6rem;
+            background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+            height: 100vh; /* Full viewport height */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional shadow */
+        }
+
+        .side-panel .btn {
+            margin-bottom: 1rem;
+        }
+
+        .side-panel .nav-link {
+            padding: 1rem;
+            width: 100%;
+            text-align: center;
+        }
+
+
+
+.sign_or_watermark.svg-container {
+  height: 100vh;
+  overflow-y: scroll;
+  padding-top: 10px;
+  padding-bottom: 100px;
+}
+
+
+#watermarkCanvas,
+#watermarkCanvasFinal {
+  display: block;
+  background-color: #7e7e7e;
+
+}
+
+.selection-corner {
+  fill: red;
+  cursor: pointer;
+}
+
+
+.sign_or_watermark_editable-text {
+  color-scheme: normal;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.sign_or_watermark.elem_menu.font_size.container,
+.sign_or_watermark.elem_menu.font_color.container,
+.sign_or_watermark.elem_menu.font_family.container,
+.sign_or_watermark.elem_menu.delete_elem.container {
+    background-color: #000;
+    max-width: 78px;
+}
+
+.sign_or_watermark.elem_menu.font_color.container,
+ .sign_or_watermark.elem_menu.delete_elem.container {
+    height: 74px;
+}
+
+.sign_or_watermark.elem_menu.font_family.container {
+    height: 110px;
+}
+
+.sign_or_watermark.elem_menu.font_size.input {
+    background-color: #fff;
+    color: #000;
+}
+
+.sign_or_watermark.elem_menu.font_size.btn {
+    margin-bottom: 1px;
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
+.dropdown-toggle::after {
+    display: none !important; /* Removes the triangle */
+}
+
+.custom-dropdown-menu {
+  left: auto;
+  right: 0;
+  transform: translate(-90px, 0px) !important;
+  background-color: #000;
+}
+
+.color-cell {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+}
+#selected-color {
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+  padding: 5px;
+}
+
+.grid-layout {
+    display: grid !important;
+}
+
+#colorGrid,
+#fontDisplay,
+#sign_or_watermark_delete_elem {
+    border: 1px solid #fff;
+    border-radius: 5px;
+}
+
+#sign_or_watermark_delete_elem {
+  width: 100%;
+}
+
+
+#search-bar {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    background-color: #2d2d2d;
+    border: none;
+    color: #fff;
+    font-size: 16px;
+}
+
+#font-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+    padding: 5px;
+    height: 300px;
+    overflow-y: scroll;
+    width: 300px;
+}
+
+.font-item {
+    background-color: #2d2d2d;
+    padding: 15px;
+    text-align: center;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.font-preview {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+.font-name {
+    font-size: 14px;
+}
+
+#fontDisplay {
+    align-content: center;
+    background-color: transparent;
+}
+
+#fontDisplayholder {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  padding: 4px;
+  align-content: center;
+}
+
+.font-preview-display {
+    font-size: 22px;
+}
+.font-name-display {
+    font-size: 12px;
+    text-wrap: auto;
+}
+
+.bi.bi-trash3-fill {
+  font-size: 30px;
+}

@@ -34,7 +34,7 @@ def app_logic(current_user, db, User, GasamApp, page, return_data):
     return send_data
 
 
-def json_logic(current_user, db, User, GasamApp, json_data):
+def json_logic(current_user, db, User, GasamApp, json_data, files_data):
     if json_data['js_function'] == 'update_form':
         return js_function_update_form(current_user, db, User, GasamApp, json_data)
 

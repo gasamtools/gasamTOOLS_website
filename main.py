@@ -256,9 +256,20 @@ def access_app(app_name):
     if current_user.approved:
 
         if request.method == 'PUT':
-            json_data = request.get_json()
+
+            content_type = request.headers.get('Content-Type')
+
+            if content_type and 'application/json' in content_type:
+                # Handle JSON data
+                json_data = request.get_json() or {}
+            elif content_type and 'multipart/form-data' in content_type:
+                # Handle form data, which can include files
+                json_data = request.form.to_dict()
+
+            files_data = request.files if request.files else {}
+
             if hasattr(app_manager, 'json_logic'):
-                send_json_data = app_manager.json_logic(current_user, db, User, GasamApp, json_data)
+                send_json_data = app_manager.json_logic(current_user, db, User, GasamApp, json_data, files_data)
             else:
                 send_json_data = {}
 
@@ -375,4 +386,4 @@ def access_app_subpage(app_name, subpage_name):
 
 
 if __name__ == "__main__":
-    app.run(debug=False)
+    app.run(debug=True)

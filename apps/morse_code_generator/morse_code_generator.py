@@ -38,7 +38,7 @@ def app_logic(current_user, db, User, GasamApp, page, return_data):
     return send_data
 
 
-def json_logic(current_user, db, User, GasamApp, json_data):
+def json_logic(current_user, db, User, GasamApp, json_data, files_data):
     if json_data['js_function'] == 'morse_code_generator':
         return js_function_morse_code_generator(current_user, db, User, GasamApp, json_data)
 

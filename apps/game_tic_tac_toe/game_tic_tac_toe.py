@@ -51,7 +51,7 @@ def app_logic(current_user, db, User, GasamApp, page, return_data):
     return send_data
 
 
-def json_logic(current_user, db, User, GasamApp, json_data):
+def json_logic(current_user, db, User, GasamApp, json_data, files_data):
     if json_data['js_function'] == 'game_tic_tac_toe_choose_ai':
         return js_function_game_tic_tac_toe_choose_ai(current_user, db, User, GasamApp, json_data)
     if json_data['js_function'] == 'game_tic_tac_toe_game_engine':

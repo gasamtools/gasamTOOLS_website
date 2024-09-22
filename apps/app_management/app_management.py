@@ -32,7 +32,7 @@ def app_logic(current_user, db, User, GasamApp, page, return_data):
     return send_data
 
 
-def json_logic(current_user, db, User, GasamApp, json_data):
+def json_logic(current_user, db, User, GasamApp, json_data, files_data):
     if json_data['js_function'] == 'app_management_add_new_app':
         return js_function_app_management_add_new_app(current_user, db, User, GasamApp, json_data)
     if json_data['js_function'] == 'app_management_change_app_data':
