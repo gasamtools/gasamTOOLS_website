@@ -10,3 +10,4 @@ Pygame==2.5.2
 Pydub==0.25.1
 python-dotenv
 Pillow==10.4.0
+
