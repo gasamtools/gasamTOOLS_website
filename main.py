@@ -9,6 +9,13 @@ import os
 import importlib
 from flask_wtf.csrf import CSRFProtect
 from dotenv import load_dotenv
+import subprocess
+import sys
+try:
+    from importlib.metadata import distribution, PackageNotFoundError  # Python 3.8+
+except ImportError:
+    from importlib_metadata import distribution, PackageNotFoundError  # For older Python versions
+
 
 
 
@@ -383,6 +390,37 @@ def access_app_subpage(app_name, subpage_name):
                                        )
     else:
         return redirect(url_for('home'))
+
+
+
+def check_and_install_requirements(requirements_file):
+    """Check if the packages from the requirements file are installed, and install if necessary."""
+    with open(requirements_file, "r") as f:
+        required_packages = f.read().splitlines()
+
+    missing_packages = []
+
+    for pkg in required_packages:
+        pkg_name = pkg.split("==")[0]
+        try:
+            # Check if the package is installed
+            distribution(pkg_name)
+        except PackageNotFoundError:
+            # If not installed, add to missing packages
+            missing_packages.append(pkg)
+
+    if missing_packages:
+        print(f"Missing packages: {missing_packages}. Installing...")
+        try:
+            # Install missing packages
+            subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", requirements_file])
+            print(f"Successfully installed missing packages from {requirements_file}")
+        except subprocess.CalledProcessError as e:
+            print(f"Failed to install some packages. Error: {e}")
+    else:
+        print("All required packages are already installed.")
+
+
 
 
 if __name__ == "__main__":
