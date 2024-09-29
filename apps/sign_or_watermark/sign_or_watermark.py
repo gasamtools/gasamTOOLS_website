@@ -11,7 +11,7 @@ import base64
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'pdf'}
 
 
-def register_subpages():
+def register_subpages(current_user):
     app_subpages = [
     ]
 

@@ -1,6 +1,6 @@
 from sqlalchemy import text
 
-def register_subpages():
+def register_subpages(current_user):
     app_subpages = [
         {'html_name': 'register_app',
          'title': 'Register App'

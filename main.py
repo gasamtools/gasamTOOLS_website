@@ -11,13 +11,11 @@ from flask_wtf.csrf import CSRFProtect
 from dotenv import load_dotenv
 import subprocess
 import sys
+
 try:
     from importlib.metadata import distribution, PackageNotFoundError  # Python 3.8+
 except ImportError:
     from importlib_metadata import distribution, PackageNotFoundError  # For older Python versions
-
-
-
 
 load_dotenv()
 
@@ -35,12 +33,12 @@ db.init_app(app)
 csrf.init_app(app)
 login_manager.init_app(app)
 
-
 user_app_association = db.Table(
     'user_app_association',
     db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
     db.Column('app_id', db.Integer, db.ForeignKey('gasam_apps.id'), primary_key=True)
 )
+
 
 class User(UserMixin, db.Model):
     __tablename__ = "users"
@@ -52,6 +50,7 @@ class User(UserMixin, db.Model):
     approved = db.Column(db.Boolean, nullable=False)
     apps = relationship("GasamApp", secondary=user_app_association, back_populates="users")
 
+
 class GasamApp(db.Model):
     __tablename__ = "gasam_apps"
     id = db.Column(db.Integer, primary_key=True)
@@ -60,6 +59,7 @@ class GasamApp(db.Model):
     app_url = db.Column(db.String(250), unique=True)
     users = relationship("User", secondary=user_app_association, back_populates="apps")
 
+
 with app.app_context():
     db.create_all()
 
@@ -67,6 +67,7 @@ with app.app_context():
 @login_manager.user_loader
 def load_user(user_id):
     return db.session.get(User, int(user_id))
+
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -197,19 +198,20 @@ def home():
     # current_user.role = 'admin'
     # db.session.commit()
 
-
     return render_template("home.html",
                            user_approved=current_user.approved,
                            user_apps=current_user.apps)
 
+
 @app.route('/audio/<path:directory>/<filename>')
-def serve_audio(directory,filename):
+def serve_audio(directory, filename):
     # Path to the directory containing your wav files
     path = f"{directory}"
     return send_from_directory(path, filename)
 
+
 @app.route('/download/<path:directory>/<filename>')
-def download_file(directory,filename):
+def download_file(directory, filename):
     # Path to the directory containing your wav files
     path = f"{directory}"
     return send_from_directory(path, filename, as_attachment=True)
@@ -224,6 +226,7 @@ def serve_app_js(appname, filename):
 def serve_app_css(appname, filename):
     return send_from_directory(f'apps/{appname}/css', filename)
 
+
 @app.route('/serve_app_static/<path:app_url>/<path:filename>')
 def serve_app_static(app_url, filename):
     directory = os.path.join('apps', app_url, 'static')
@@ -231,10 +234,14 @@ def serve_app_static(app_url, filename):
     return send_from_directory(directory, filename)
 
 
-
 @app.route("/app/<app_name>", methods=["GET", "POST", "PUT"])
 @login_required
 def access_app(app_name):
+
+    allowed_user_apps = []
+    for this_app in current_user.apps:
+        allowed_user_apps.append(this_app.app_url)
+
     if request.method == "POST":
         return_data = request.form
     else:
@@ -259,8 +266,7 @@ def access_app(app_name):
     except ImportError:
         return f"Error: No {app_name}.py found for {app_name}", 404
 
-
-    if current_user.approved:
+    if current_user.approved and app_name in allowed_user_apps:
 
         if request.method == 'PUT':
 
@@ -292,7 +298,7 @@ def access_app(app_name):
                 send_data = {}
 
             if hasattr(app_manager, 'register_subpages'):
-                app_subpages = app_manager.register_subpages()
+                app_subpages = app_manager.register_subpages(current_user)
             else:
                 app_subpages = {}
 
@@ -314,6 +320,10 @@ def access_app(app_name):
 @app.route("/app/<app_name>/<subpage_name>", methods=["GET", "POST", "PUT"])
 @login_required
 def access_app_subpage(app_name, subpage_name):
+    allowed_user_apps = []
+    for this_app in current_user.apps:
+        allowed_user_apps.append(this_app.app_url)
+
     if request.method == "POST":
         return_data = request.form
     else:
@@ -344,11 +354,11 @@ def access_app_subpage(app_name, subpage_name):
         send_data = {}
 
     if hasattr(app_manager, 'register_subpages'):
-        app_subpages = app_manager.register_subpages()
+        app_subpages = app_manager.register_subpages(current_user)
     else:
         app_subpages = {}
 
-    if current_user.approved:
+    if current_user.approved and app_name in allowed_user_apps:
 
         if request.method == 'PUT':
             json_data = request.get_json()
@@ -392,7 +402,6 @@ def access_app_subpage(app_name, subpage_name):
         return redirect(url_for('home'))
 
 
-
 def check_and_install_requirements(requirements_file):
     """Check if the packages from the requirements file are installed, and install if necessary."""
     with open(requirements_file, "r") as f:
@@ -419,8 +428,6 @@ def check_and_install_requirements(requirements_file):
             print(f"Failed to install some packages. Error: {e}")
     else:
         print("All required packages are already installed.")
-
-
 
 
 if __name__ == "__main__":

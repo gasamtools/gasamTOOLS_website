@@ -3,7 +3,7 @@ from .sound_player import SoundPlayer
 import os
 from flask import render_template_string
 
-def register_subpages():
+def register_subpages(current_user):
     app_subpages = [
     ]
 

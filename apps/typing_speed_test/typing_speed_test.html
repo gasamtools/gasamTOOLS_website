@@ -1,4 +1,27 @@
-<p>typing_speed_test</p>
+<h1 class="gasam tst text-center">Typing Speed Test</h1>
+<div class="gasam tst container stats row  mb-5 mt-3">
+    <div class="gasam tst sub-container previous-record col-4">
+        <div class="d-flex justify-content-center align-items-center gasam tst previous-record lbl-hldr" ><label for='typing_speed_testPrevious' class="gasam tst label previous-record">Your previous record:</label></div>
+        <div class="d-flex justify-content-center align-items-center gasam tst previous-record spn-hldr" ><span id='typing_speed_testPrevious' class="gasam tst span previous-record"></span></div>
+    </div>
+    <div class="gasam tst sub-container current-record col-4">
+        <div class="d-flex justify-content-center align-items-center gasam tst current-record lbl-hldr" ><label for='typing_speed_testCurrent' class="gasam tst label current-record">Your current result:</label></div>
+        <div class="d-flex justify-content-center align-items-center gasam tst current-record spn-hldr" ><span id='typing_speed_testCurrent' class="gasam tst span current-record"></span></div>
+    </div>
+    <div class="gasam tst sub-container mistakes col-4">
+        <div class="d-flex justify-content-center align-items-center gasam tst mistakes lbl-hldr" ><label for='typing_speed_testMistakes' class="gasam tst label mistakes">Mistakes made:</label></div>
+        <div class="d-flex justify-content-center align-items-center gasam tst mistakes spn-hldr" ><span id='typing_speed_testMistakes' class="gasam tst span mistakes"></span></div>
+    </div>
+</div>
+<div class="gasam tst container text row">
+    <div class="gasam tst sub-container txt-holder col-12">
+        <p id="typing_speed_testMainText">...</p>
+    </div>
+    <div class="gasam tst sub-container msg-holder" id="typing_speed_testMSGcontainer">
+        <span id="typing_speed_testMSG">Loading...</span>
+        <button id="typing_speed_testMSGbttn" class="gasam tst btn-msg btn btn-light hidden">Test Again</button>
+    </div>
+</div>
 
 <div class="modal fade" id="typing_speed_testLoadingModal" tabindex="-1" aria-labelledby="typing_speed_testLoadingModal" aria-hidden="true">
     <div class="modal-dialog">

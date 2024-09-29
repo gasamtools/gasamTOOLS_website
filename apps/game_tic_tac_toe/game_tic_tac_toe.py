@@ -23,7 +23,7 @@ GAME_TIC_TAC_TOE_PLAYER_CROSS = []
 GAME_TIC_TAC_TOE_PLAYER_CIRCLE = []
 
 
-def register_subpages():
+def register_subpages(current_user):
     app_subpages = [
     ]
 

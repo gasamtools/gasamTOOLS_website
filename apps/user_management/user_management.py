@@ -4,7 +4,7 @@ from flask import render_template_string
 available_roles = ['admin', 'manager', 'contributor', 'subscriber', None]
 
 
-def register_subpages():
+def register_subpages(current_user):
     app_subpages = []
     return app_subpages
 

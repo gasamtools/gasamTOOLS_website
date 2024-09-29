@@ -1,0 +1,70 @@
+.gasam.tst.label {
+  font-size: large;
+  font-weight: bold;
+}
+
+.gasam.tst.previous-record.spn-hldr {
+    background: linear-gradient(to bottom, #FFD700, #D5D5D5);
+    color: #000;
+}
+
+.gasam.tst.current-record.spn-hldr {
+    background: linear-gradient(to bottom, #00FF1C, #D5D5D5);
+    color: #000;
+}
+
+.gasam.tst.mistakes.spn-hldr {
+    background: linear-gradient(to bottom, #F00, #CCA9A9);
+    color: #000;
+}
+
+.gasam.tst.container.text {
+    position: relative;
+    min-height: 100px;
+}
+
+.gasam.tst.sub-container.msg-holder {
+  position: absolute;
+  background-color: #000;
+  height: 96%;
+  text-align: center;
+  color: #fff;
+  opacity: 0.9;
+  top: 2%;
+  align-items: center;
+  display: grid;
+}
+
+.gasam.tst.sub-container.txt-holder {
+    border: 1px #fff solid;
+    padding: 10px;
+    background-color: #444;
+    color: #e3e3e3;
+    border-radius: 15px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.gasam.tst.btn-msg {
+    width: 50%;
+    margin: 0 25%;
+}
+.gasam.tst.chars {
+  padding-right: 1px;
+  padding-left: 1px;
+}
+
+.gasam.tst.chars.bad {
+  background-color: #a80707;
+}
+
+.gasam.tst.chars.good {
+  background-color: #157501;
+}
+
+.gasam.tst.chars.active {
+  background-color: #fff;
+  color: #000;
+}
