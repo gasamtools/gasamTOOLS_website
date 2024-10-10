@@ -1,5 +1,7 @@
+{% if current_user.role == 'admin' %}
 <form id="typing_speed_test_key_form" class="mt-4 gasam tst key form" autocomplete="off">
     <label class='mt-2' for="typing_speed_test_key_form_key">Bible API Key</label>
     <input id='typing_speed_test_key_form_key' class="form-control" type="text" name="api_key" value="" placeholder="API key" required>
     <button type="submit" class="btn btn-secondary mt-2 gasam tst key" id="typing_speed_test_key_form_key_bttn">Save Key</button>
 </form>
+{% endif %}

@@ -1,0 +1,45 @@
+#chart {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+
+}
+
+
+.gasam.ftlc.tt {
+    width: 100%;
+    height: 80px;
+    position: absolute;
+    display: block;
+    box-sizing: border-box;
+    font-size: 12px;
+    text-align: left;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    font-family: -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, Ubuntu, sans-serif;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.gasam.ftlc.tt div {
+  float: left;
+  margin: 10px;
+  font-size: medium;
+}
+
+.btn.gasam.ftlc.tbl {
+  width: 100%;
+}
+
+.btn.gasam.ftlc.tbl.bull {
+  background-color: green;
+}
+
+.btn.gasam.ftlc.tbl.bear {
+  background-color: red;
+}
+
+.form-floating:not(.form-control:disabled)::before {
+    background-color: transparent !important;
+}

@@ -1,0 +1,13 @@
+<script>
+    const GASAM_fi_tradingview_lightweight_charts_URL = "{{ url_for('access_app', app_name='fi_tradingview_lightweight_charts') }}";
+</script>
+
+<script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+<script src="{{ url_for('serve_app_js', appname='fi_tradingview_lightweight_charts', filename='fi_tradingview_lightweight_charts_ini.js') }}"></script>
+<script src="{{ url_for('serve_app_js', appname='fi_tradingview_lightweight_charts', filename='fi_tradingview_lightweight_charts_load.js') }}"></script>
+<script src="{{ url_for('serve_app_js', appname='fi_tradingview_lightweight_charts', filename='fi_tradingview_lightweight_indicators.js') }}"></script>
+<script src="{{ url_for('serve_app_js', appname='fi_tradingview_lightweight_charts', filename='fi_tradingview_lightweight_charts_update.js') }}"></script>
+<script src="{{ url_for('serve_app_js', appname='fi_tradingview_lightweight_charts', filename='fi_tradingview_lightweight_table_control.js') }}"></script>
+<script src="{{ url_for('serve_app_js', appname='fi_tradingview_lightweight_charts', filename='fi_tradingview_lightweight_api_keys.js') }}"></script>
+
+
