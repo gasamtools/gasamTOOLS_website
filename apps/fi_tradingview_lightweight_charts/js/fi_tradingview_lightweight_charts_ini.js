@@ -38,7 +38,7 @@ if (!$('#ftlc_key_form').length) {
                     // Initial data fetch
                     // Set up interval to fetch data periodically
                     const indicator_params = {}
-                    updateChartIni(1000, '1day', indicator_params);
+                    updateChartIni('BTC-USDT', 1000, '1day', indicator_params);
 
             } else {
                 console.error('Modal instance not found.');

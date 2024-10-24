@@ -2,7 +2,7 @@
 import os
 from datetime import datetime, timedelta
 from .functions_fetch_kucoin_data import fetch_kucoin_data
-from .functions_indicators import calculate_moving_average_series_data
+from .functions_indicators import calculate_moving_average_series_data, calculate_market_structure_series_data, calculate_time_mode_expansion_series_data
 from sqlalchemy import text
 
 
@@ -71,25 +71,44 @@ def fi_tradingview_lightweight_charts_load(current_user, db, User, GasamApp, jso
     end_time = datetime.now(pytz.UTC)
     start_time = end_time - timedelta(days=int(json_data['daysOfData']))  # Fetch last 7 days of data
 
-    candle_data = fetch_kucoin_data("BTC-USDT", start_time, end_time, json_data['chartResolution'], KC_API_KEY,
+    candle_data = fetch_kucoin_data(json_data['tradingPair'], start_time, end_time, json_data['chartResolution'], KC_API_KEY,
                                     KC_API_SECRET, KC_API_PASSPHRASE)
-    candle_data_1day = fetch_kucoin_data("BTC-USDT", start_time, end_time, '1day', KC_API_KEY, KC_API_SECRET,
+    candle_data_1day = fetch_kucoin_data(json_data['tradingPair'], start_time, end_time, '1day', KC_API_KEY, KC_API_SECRET,
                                          KC_API_PASSPHRASE)
-    candle_data_1week = fetch_kucoin_data("BTC-USDT", start_time, end_time, '1week', KC_API_KEY, KC_API_SECRET,
+    candle_data_1week = fetch_kucoin_data(json_data['tradingPair'], start_time, end_time, '1week', KC_API_KEY, KC_API_SECRET,
                                           KC_API_PASSPHRASE)
 
+# APPLYING INDICATORS
+    # 50SMA DATA
     ma_data_1day_last = calculate_moving_average_series_data(candle_data_1day, 50)[-1]
     ma_data_1week_last = calculate_moving_average_series_data(candle_data_1week, 50)[-1]
-
-    # APPLYING INDICATORS
     ma_data = calculate_moving_average_series_data(candle_data, 50)
+
+    # MS DATA
+    ms_1day_bull = calculate_market_structure_series_data(candle_data_1day, 'bull')
+    ms_1day_bear = calculate_market_structure_series_data(candle_data_1day, 'bear')
+    ms_1week_bull = calculate_market_structure_series_data(candle_data_1week, 'bull')
+    ms_1week_bear = calculate_market_structure_series_data(candle_data_1week, 'bear')
+
+    # TM DATA
+    tm_1day_exp = calculate_time_mode_expansion_series_data(candle_data_1day)
+    tm_1week_exp = calculate_time_mode_expansion_series_data(candle_data_1week)
+    tm_1day_mode = 'tbd'
+    tm_1week_mode = 'tbd'
 
     aggregate_data = {
         'candle_data': candle_data,
         'ma_data': ma_data,
         'ma_1day_last': ma_data_1day_last,
         'ma_1week_last': ma_data_1week_last,
-
+        'ms_1day_bull': ms_1day_bull,
+        'ms_1day_bear': ms_1day_bear,
+        'ms_1week_bull': ms_1week_bull,
+        'ms_1week_bear': ms_1week_bear,
+        'tm_1day_exp': tm_1day_exp,
+        'tm_1week_exp': tm_1week_exp,
+        'tm_1day_mode': tm_1day_mode,
+        'tm_1week_mode': tm_1week_mode,
     }
 
     return aggregate_data

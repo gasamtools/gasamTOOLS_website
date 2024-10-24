@@ -5,12 +5,11 @@ toolTip.classList.add('gasam', 'ftlc', 'tt');
 // Global variables to store chart and series
 let chart, candleSeries, maSeries, updateChart;
 
-function updateChartIni(daysOfDataInput, timeIntervalSelect, indicator_params) {
-    dataStream(parseInt(daysOfDataInput), timeIntervalSelect, indicator_params); // Fetch new data every interval
+function updateChartIni(tradingPairSelect, daysOfDataInput, timeIntervalSelect, indicator_params) {
+    dataStream(tradingPairSelect, parseInt(daysOfDataInput), timeIntervalSelect, indicator_params); // Fetch new data every interval
     const updateInterval = 5000; // Update every 6 seconds (adjust as needed)
     updateChart = setInterval(() => {
-        dataStream(parseInt(daysOfDataInput), timeIntervalSelect, indicator_params); // Fetch new data every interval
-        //console.log('update');
+        dataStream(tradingPairSelect, parseInt(daysOfDataInput), timeIntervalSelect, indicator_params); // Fetch new data every interval
     }, updateInterval);
 }
 
@@ -54,13 +53,14 @@ function initializeChart() {
 
 
 
-function dataStream(daysOfData, chartResolution, indicator_params) {
+function dataStream(tradingPair, daysOfData, chartResolution, indicator_params) {
 
     var csrfToken = $('meta[name="csrf-token"]').attr('content');
     const formObject = {
         'js_function': 'fi_tradingview_lightweight_charts_load',
         'daysOfData': daysOfData,
         'chartResolution': chartResolution,
+        'tradingPair': tradingPair,
 
     };
 
@@ -96,16 +96,71 @@ function dataStream(daysOfData, chartResolution, indicator_params) {
             candleSeries.setData(validateData(aggregate_data['candle_data']));
 
             // PRINT CANDLE OPEN/CLOSE/LOW/HIGH
-            chart.subscribeCrosshairMove(updateTooltip);
+            const tooltipHandler = createTooltipHandler(tradingPair);
+            chart.subscribeCrosshairMove(tooltipHandler);
 
             // SET TABLES VALUES
             setTableValueSMA(aggregate_data['ma_1day_last']['ma_marker'], '1day');
             setTableValueSMA(aggregate_data['ma_1week_last']['ma_marker'], '1week');
+            var ms_data = {
+                'ms_1day_bull': aggregate_data['ms_1day_bull'],
+                'ms_1day_bear': aggregate_data['ms_1day_bear'],
+                'ms_1week_bull': aggregate_data['ms_1week_bull'],
+                'ms_1week_bear': aggregate_data['ms_1week_bear'],
+            }
+            setTableValueMS(ms_data);
+
+            var tm_data = {
+                'tm_1day_exp': aggregate_data['tm_1day_exp'],
+                'tm_1week_exp': aggregate_data['tm_1week_exp'],
+                'tm_1day_mode': aggregate_data['tm_1day_mode'],
+                'tm_1week_mode': aggregate_data['tm_1week_mode'],
+            }
+            setTableValueTM(tm_data);
+
 
             if (indicator_params['indicator'] === 'sma') {
                 // PRINT MA indicator and MARKERS
                 maSeries.setData(aggregate_data['ma_data']);
                 printMAMarkers(aggregate_data['ma_data'], candleSeries);
+            } else if (indicator_params['indicator'] === 'ms') {
+                // PRINT MS indicator and MARKERS
+                maSeries.setData([]);
+
+                if (indicator_params['interval_indicator'] == '1day') {
+                    if (indicator_params['trend_indicator'] == 'bl') {
+                        printMSMarkers(aggregate_data['ms_1day_bull'], candleSeries);
+                    } else if (indicator_params['trend_indicator'] == 'br') {
+                        printMSMarkers(aggregate_data['ms_1day_bear'], candleSeries);
+                    }
+                } else if (indicator_params['interval_indicator'] == '1week') {
+                    if (indicator_params['trend_indicator'] == 'bl') {
+                        printMSMarkers(aggregate_data['ms_1week_bull'], candleSeries);
+                    } else if (indicator_params['trend_indicator'] == 'br') {
+                        printMSMarkers(aggregate_data['ms_1week_bear'], candleSeries);
+                    }
+                }
+            } else if (indicator_params['indicator'] === 'tm') {
+                // PRINT MS indicator and MARKERS
+                maSeries.setData([]);
+
+                if (indicator_params['interval_indicator'] == '1day') {
+                    if (indicator_params['sub_indicator'] == 'exp') {
+                        printTMMarkers(aggregate_data['tm_1day_exp'], candleSeries);
+//console.log(aggregate_data['tm_1day_exp']);
+                    } else if (indicator_params['sub_indicator'] == 'mode') {
+                        printTMMarkers(aggregate_data['tm_1day_mode'], candleSeries);
+//console.log(aggregate_data['tm_1day_mode']);
+                    }
+                } else if (indicator_params['interval_indicator'] == '1week') {
+                    if (indicator_params['sub_indicator'] == 'exp') {
+                        printTMMarkers(aggregate_data['tm_1week_exp'], candleSeries);
+//console.log(aggregate_data['tm_1week_exp']);
+                    } else if (indicator_params['sub_indicator'] == 'mode') {
+                        printTMMarkers(aggregate_data['tm_1week_mode'], candleSeries);
+//console.log(aggregate_data['tm_1week_mode']);
+                    }
+                }
             } else {
                 maSeries.setData([]);
                 candleSeries.setMarkers([]);
@@ -163,25 +218,30 @@ function validateData(data) {
 
 
 // Update tooltip content and position
-function updateTooltip(param) {
-//    if (!param.time || param.point.x < 0 || param.point.y < 0) {
-//        toolTip.style.display = 'none';
-//        return;
-//    }
+function createTooltipHandler(tradingPair) {
+    // Return a closure that has access to tradingPair
+    return function updateTooltip(param) {
+        // Return if no valid crosshair position
+        if (!param.time || param.point.x < 0 || param.point.y < 0) {
+            toolTip.style.display = 'none';
+            return;
+        }
 
-    const dateStr = new Date(param.time * 1000).toLocaleDateString();
-    //toolTip.style.display = 'block';
-    const dataPoint = param.seriesData.get(candleSeries);
-    if (typeof dataPoint != 'undefined') {
-        toolTip.innerHTML = `
-            <div style="color: ${'#2962FF'}">BTC-USDT</div>
-            <div>Open: ${Math.round(dataPoint.open * 100) / 100}</div>
-            <div>High: ${Math.round(dataPoint.high * 100) / 100}</div>
-            <div>Low: ${Math.round(dataPoint.low * 100) / 100}</div>
-            <div>Close: ${Math.round(dataPoint.close * 100) / 100}</div>
-            <div>${dateStr}</div>
-        `;
-    }
+        const dateStr = new Date(param.time * 1000).toLocaleDateString();
+        const dataPoint = param.seriesData.get(candleSeries);
+
+        if (dataPoint) {
+            toolTip.style.display = 'block';
+            toolTip.innerHTML = `
+                <div style="color: #2962FF">${tradingPair}</div>
+                <div>Open: ${(dataPoint.open).toFixed(2)}</div>
+                <div>High: ${(dataPoint.high).toFixed(2)}</div>
+                <div>Low: ${(dataPoint.low).toFixed(2)}</div>
+                <div>Close: ${(dataPoint.close).toFixed(2)}</div>
+                <div>${dateStr}</div>
+            `;
+        }
+    };
 }
 
 
@@ -190,6 +250,54 @@ function setTableValueSMA(data, interval) {
     $('.btn.gasam.ftlc.tbl.sma.'+interval).removeClass('bull');
     $('.btn.gasam.ftlc.tbl.sma.'+interval).html(data);
     $('.btn.gasam.ftlc.tbl.sma.'+interval).addClass(data);
+}
+
+function setTableValueMS(data) {
+
+    $('.btn.gasam.ftlc.tbl.ms').removeClass('bear');
+    $('.btn.gasam.ftlc.tbl.ms').removeClass('bull');
+
+    var interval, trend;
+
+    for (let key in data) {
+
+        if (key.includes('1week')) {
+            interval = '1week';
+        } else if (key.includes('1day')) {
+            interval = '1day';
+        }
+
+        if (key.includes('bull')) {
+            trend = 'bl';
+        } else if (key.includes('bear')) {
+            trend = 'br';
+        }
+
+        let fieldNames = ['ms_nsh_csh', 'ms_nsl_csl', 'ms_nsh_br', 'ms_mh_br', 'ms_ath_br'];
+
+        fieldNames.forEach(function(fieldName) {
+            let element = $('.' + fieldName + '.btn.gasam.ftlc.tbl.ms.' + interval + '.' + trend);
+
+            if (data[key][fieldName] != null) {
+                element.html('VALIDATED');
+                element.addClass('bull');
+            } else {
+                element.html('NOT VALIDATED');
+                element.addClass('bear');
+            }
+        });
+    }
+}
+
+function setTableValueTM(tm_data) {
+    $('.btn.gasam.ftlc.tbl.tm').removeClass('bear');
+    $('.btn.gasam.ftlc.tbl.tm').removeClass('bull');
+    $('.btn.gasam.ftlc.tbl.tm').removeClass('nope');
+
+    $('.btn.gasam.ftlc.tbl.tm.exp.1day').html(tm_data['tm_1day_exp']['status']);
+    $('.btn.gasam.ftlc.tbl.tm.exp.1day').addClass(tm_data['tm_1day_exp']['status']);
+    $('.btn.gasam.ftlc.tbl.tm.exp.1week').html(tm_data['tm_1week_exp']['status']);
+    $('.btn.gasam.ftlc.tbl.tm.exp.1week').addClass(tm_data['tm_1day_exp']['status']);
 }
 
 

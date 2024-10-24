@@ -1,3 +1,8 @@
+.gasam.ftlc.app-container {
+  overflow-y: scroll;
+  padding-right: 30px;
+}
+
 #chart {
     width: 100%;
     height: 100vh;
@@ -32,14 +37,35 @@
   width: 100%;
 }
 
-.btn.gasam.ftlc.tbl.bull {
-  background-color: green;
+.gasam.ftlc.bull {
+  background-color: #06dd06;
 }
 
-.btn.gasam.ftlc.tbl.bear {
+.gasam.ftlc.bear {
   background-color: red;
+}
+
+.gasam.ftlc.nope {
+  background-color: gray;
+}
+
+.gasam.ftlc.sbull {
+  background-color: #005300;
+}
+
+.gasam.ftlc.sbear {
+  background-color: #600000;
+}
+
+.gasam.ftlc.ms {
+  font-size: 0.7em;
 }
 
 .form-floating:not(.form-control:disabled)::before {
     background-color: transparent !important;
+}
+
+.gasam.ftlc.sma.div {
+    height: 100%;
+    display: block;
 }
