@@ -1,10 +1,10 @@
-<div class="gasam ftlc app-container">
-    <h1>TradingView LightWeight Chart</h1>
-    <div class="container">
+<h1>TradingView LightWeight Chart</h1>
+<div class="gasam ftlc app-container row">
+    <div class="gasam ftlc sub-app-container table-container container col-6">
         <table class="table table-bordered text-center">
             <thead class="thead-light">
                 <tr>
-                    <th >Time Interval</th>
+                    <th >Interval</th>
                     <th >50 SMA</th>
                     <th colspan="5">Market Structure</th>
                     <th colspan="2">Time @ Mode</th>
@@ -87,52 +87,58 @@
                 </tr>
             </tbody>
         </table>
-    </div>
-    <div class="container d-flex mb-2 p-0">
-        <div class="col-1 d-flex justify-content-start p-1">
-            <button type="button" id='updateChartButton' class="btn btn-light">Update Chart</button>
-        </div>
-        <div class="form-floating col-3 p-1">
-          <select class="gasam chartControl tradingPairSelect form-select" id="tradingPairSelect" aria-label="Floating label select example" autocomplete="off">
-            <option selected value="BTC-USDT">BTC-USDT</option>
-            <option value="ETH-USDT">ETH-USDT</option>
-            <option value="SOL-USDT">SOL-USDT</option>
-            <option value="KCS-USDT">KCS-USDT</option>
-            <option value="BNB-USDT">BNB-USDT</option>
-            <option value="INJ-USDT">INJ-USDT</option>
-            <option value="AVAX-USDT">AVAX-USDT</option>
-          </select>
-          <label for="timeIntervalSelect">Time Interval</label>
-        </div>
-        <div class="form-floating col-3 p-1">
-          <select class="gasam chartControl timeIntervalSelect form-select" id="timeIntervalSelect" aria-label="Floating label select example" autocomplete="off">
-            <option value="1min">1 minute</option>
-            <option value="3min">3 minutes</option>
-            <option value="5min">5 minutes</option>
-            <option value="15min">15 minutes</option>
-            <option value="30min">30 minutes</option>
-            <option value="1hour">1 hour</option>
-            <option value="2hour">2 hours</option>
-            <option value="4hour">4 hours</option>
-            <option value="6hour">6 hours</option>
-            <option value="8hour">8 hours</option>
-            <option value="12hour">12 hours</option>
-            <option selected value="1day">1 day</option>
-            <option value="1week">1 week</option>
-            <option value="1month">1 month</option>
-          </select>
-          <label for="timeIntervalSelect">Time Interval</label>
-        </div>
-        <div class="form-floating col-3 p-1">
-            <input type="number" class="gasam chartControl daysOfDataInput  form-control" id="daysOfDataInput" placeholder="type number" value="1000" autocomplete="off">
-          <label for="daysOfDataInput">Days Of Data Loaded</label>
-        </div>
-        <div class="form-floating col-2 p-1">
-            <input type="number" class="gasam chartControl chartRefreshInput form-control" id="chartRefreshInput" placeholder="type number" value="5" disabled autocomplete="off">
-          <label for="chartRefreshInput">Refresh rate, seconds</label>
+        <div class="text-center">
+            <h3>Postman Message</h3>
+            <div id="gasam_ftlc_postman"></div>
         </div>
     </div>
-    <div id="chart" ></div>
+    <div class="gasam ftlc sub-app-container chart-container container col-6">
+        <div class="container d-flex mb-2 p-0">
+            <div class="col-2 d-flex justify-content-start p-1">
+                <button type="button" id='updateChartButton' class="btn btn-light">Update Chart</button>
+            </div>
+            <div class="form-floating col-3 p-1">
+              <select class="gasam chartControl tradingPairSelect form-select" id="tradingPairSelect" aria-label="Floating label select example" autocomplete="off">
+                <option selected value="BTC-USDT">BTC-USDT</option>
+                <option value="ETH-USDT">ETH-USDT</option>
+                <option value="SOL-USDT">SOL-USDT</option>
+                <option value="KCS-USDT">KCS-USDT</option>
+                <option value="BNB-USDT">BNB-USDT</option>
+                <option value="INJ-USDT">INJ-USDT</option>
+                <option value="AVAX-USDT">AVAX-USDT</option>
+              </select>
+              <label for="timeIntervalSelect">Time Interval</label>
+            </div>
+            <div class="form-floating col-3 p-1">
+              <select class="gasam chartControl timeIntervalSelect form-select" id="timeIntervalSelect" aria-label="Floating label select example" autocomplete="off">
+                <option value="1min">1 minute</option>
+                <option value="3min">3 minutes</option>
+                <option value="5min">5 minutes</option>
+                <option value="15min">15 minutes</option>
+                <option value="30min">30 minutes</option>
+                <option value="1hour">1 hour</option>
+                <option value="2hour">2 hours</option>
+                <option value="4hour">4 hours</option>
+                <option value="6hour">6 hours</option>
+                <option value="8hour">8 hours</option>
+                <option value="12hour">12 hours</option>
+                <option selected value="1day">1 day</option>
+                <option value="1week">1 week</option>
+                <option value="1month">1 month</option>
+              </select>
+              <label for="timeIntervalSelect">Time Interval</label>
+            </div>
+            <div class="form-floating col-2 p-1">
+                <input type="number" class="gasam chartControl daysOfDataInput  form-control" id="daysOfDataInput" placeholder="type number" value="1000" autocomplete="off">
+              <label for="daysOfDataInput">Days Of Data Loaded</label>
+            </div>
+            <div class="form-floating col-2 p-1">
+                <input type="number" class="gasam chartControl chartRefreshInput form-control" id="chartRefreshInput" placeholder="type number" value="5" disabled autocomplete="off">
+              <label for="chartRefreshInput">Refresh rate, seconds</label>
+            </div>
+        </div>
+        <div id="chart" ></div>
+    </div>
 
 </div>
 <div class="modal fade" id="fi_tradingview_lightweight_chartsLoadingModal" tabindex="-1" aria-labelledby="fi_tradingview_lightweight_chartsLoadingModal" aria-hidden="true">

@@ -4,10 +4,11 @@ toolTip.classList.add('gasam', 'ftlc', 'tt');
 
 // Global variables to store chart and series
 let chart, candleSeries, maSeries, updateChart;
+let chartMainData;
 
 function updateChartIni(tradingPairSelect, daysOfDataInput, timeIntervalSelect, indicator_params) {
     dataStream(tradingPairSelect, parseInt(daysOfDataInput), timeIntervalSelect, indicator_params); // Fetch new data every interval
-    const updateInterval = 5000; // Update every 6 seconds (adjust as needed)
+    const updateInterval = 300000; // Update every 5 min
     updateChart = setInterval(() => {
         dataStream(tradingPairSelect, parseInt(daysOfDataInput), timeIntervalSelect, indicator_params); // Fetch new data every interval
     }, updateInterval);
@@ -89,15 +90,19 @@ function dataStream(tradingPair, daysOfData, chartResolution, indicator_params) 
         }
     })
     .then(aggregate_data => {
-        //console.log('Parsed data:', data);
+console.log(aggregate_data);
         if (Array.isArray(aggregate_data['candle_data']) && aggregate_data['candle_data'].length > 0) {
 
             // Update chart data
             candleSeries.setData(validateData(aggregate_data['candle_data']));
+            chartMainData = validateData(aggregate_data['candle_data']);
 
             // PRINT CANDLE OPEN/CLOSE/LOW/HIGH
             const tooltipHandler = createTooltipHandler(tradingPair);
             chart.subscribeCrosshairMove(tooltipHandler);
+
+            // PRINT POSTMAN MESSAGE
+            $('#gasam_ftlc_postman').html(aggregate_data['postman_crystal']);
 
             // SET TABLES VALUES
             setTableValueSMA(aggregate_data['ma_1day_last']['ma_marker'], '1day');
@@ -118,13 +123,17 @@ function dataStream(tradingPair, daysOfData, chartResolution, indicator_params) 
             }
             setTableValueTM(tm_data);
 
+console.log(tm_data);
 
             if (indicator_params['indicator'] === 'sma') {
                 // PRINT MA indicator and MARKERS
+                clearAllLines(chart);
+
                 maSeries.setData(aggregate_data['ma_data']);
                 printMAMarkers(aggregate_data['ma_data'], candleSeries);
             } else if (indicator_params['indicator'] === 'ms') {
                 // PRINT MS indicator and MARKERS
+                clearAllLines(chart);
                 maSeries.setData([]);
 
                 if (indicator_params['interval_indicator'] == '1day') {
@@ -143,25 +152,28 @@ function dataStream(tradingPair, daysOfData, chartResolution, indicator_params) 
             } else if (indicator_params['indicator'] === 'tm') {
                 // PRINT MS indicator and MARKERS
                 maSeries.setData([]);
+                clearAllLines(chart);
+                candleSeries.setMarkers([]);
 
                 if (indicator_params['interval_indicator'] == '1day') {
                     if (indicator_params['sub_indicator'] == 'exp') {
-                        printTMMarkers(aggregate_data['tm_1day_exp'], candleSeries);
+                        printTMMarkers(aggregate_data['tm_1day_exp'], candleSeries, '1day');
 //console.log(aggregate_data['tm_1day_exp']);
                     } else if (indicator_params['sub_indicator'] == 'mode') {
-                        printTMMarkers(aggregate_data['tm_1day_mode'], candleSeries);
+                        printTMMarkers(aggregate_data['tm_1day_mode'], candleSeries, '1day');
 //console.log(aggregate_data['tm_1day_mode']);
                     }
                 } else if (indicator_params['interval_indicator'] == '1week') {
                     if (indicator_params['sub_indicator'] == 'exp') {
-                        printTMMarkers(aggregate_data['tm_1week_exp'], candleSeries);
+                        printTMMarkers(aggregate_data['tm_1week_exp'], candleSeries, '1week');
 //console.log(aggregate_data['tm_1week_exp']);
                     } else if (indicator_params['sub_indicator'] == 'mode') {
-                        printTMMarkers(aggregate_data['tm_1week_mode'], candleSeries);
+                        printTMMarkers(aggregate_data['tm_1week_mode'], candleSeries, '1week');
 //console.log(aggregate_data['tm_1week_mode']);
                     }
                 }
             } else {
+                clearAllLines(chart);
                 maSeries.setData([]);
                 candleSeries.setMarkers([]);
             }
@@ -179,10 +191,10 @@ function dataStream(tradingPair, daysOfData, chartResolution, indicator_params) 
 
             // DrawLine
 //            var marker_data = [
-//                { time: '2024-08-01', value: 60000 },   //startPoint
-//                { time: '2024-08-12', value: 65000 },   //endPoint
+//                { time: '2024-11-01', value: 60000 },   //startPoint
+//                { time: '2024-11-12', value: 65000 },   //endPoint
 //            ];
-            //drawLine(chart,'blue',1, marker_data)
+//            drawLine(chart,'blue',1, marker_data)
 
             // DRAW PRICE LINE
 //            const priceLine = candleSeries.createPriceLine({
@@ -301,16 +313,23 @@ function setTableValueTM(tm_data) {
 }
 
 
+// Assuming you have a global array to store references to each line series
+const lineSeriesArray = [];
+
+// Function to add a line to the chart
 function drawLine(chart, color, lineWidth, data) {
     const lineSeries = chart.addLineSeries({
         color: color,
         lineWidth: lineWidth,
     });
-
-    // Set data
     lineSeries.setData(data);
+    lineSeriesArray.push(lineSeries); // Store the reference
+}
 
-
+// Function to clear all lines from the chart
+function clearAllLines(chart) {
+    lineSeriesArray.forEach(lineSeries => chart.removeSeries(lineSeries));
+    lineSeriesArray.length = 0; // Clear the array of references
 }
 
 

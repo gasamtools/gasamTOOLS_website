@@ -1,0 +1,78 @@
+.form-floating:not(.form-control:disabled)::before {
+    background-color: transparent !important;
+}
+
+#fz_alchemy_feed,
+#fz_crystal_feed {
+    height: 200px;
+    background-color: #454545;
+    color: #df9e50;
+    overflow-y: scroll;
+    scroll-behavior: smooth;
+}
+
+#FZAfeederPanel {
+    display: none;
+}
+
+#chart {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+}
+
+.gasam.fz.tt {
+    width: 100%;
+    height: 80px;
+    position: absolute;
+    display: block;
+    box-sizing: border-box;
+    font-size: 12px;
+    text-align: left;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    font-family: -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, Ubuntu, sans-serif;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.gasam.fz.tt div {
+  float: left;
+  margin: 10px;
+  font-size: medium;
+}
+
+.fz.bank-sub-container {
+    display: inline-flex;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.fz.bank-total {
+    width: 100px;
+    padding: 0;
+    text-align: left;
+}
+
+#FZbankTableTOTAL {
+  width: 100%;
+}
+
+.fz.bank-coins {
+    padding: 0;
+    overflow-x: scroll;
+}
+
+.fz.bank-header {
+    padding: 8px;
+    background-color: #f2f2f2;
+    text-align: center;
+    border: 1px solid;
+}
+
+.fz.bank-cell {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: center;
+}

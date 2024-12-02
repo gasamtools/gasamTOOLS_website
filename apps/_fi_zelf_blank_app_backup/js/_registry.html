@@ -1,0 +1,10 @@
+<script>
+    const GASAM_fi_zelf_URL = "{{ url_for('access_app', app_name='fi_zelf_alchemy') }}";
+    let GASAM_fi_zelf_ready = false;
+</script>
+
+<script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+<script src="{{ url_for('serve_app_js', appname='fi_zelf_alchemy', filename='app_ini.js') }}"></script>
+<script src="{{ url_for('serve_app_js', appname='fi_zelf_alchemy', filename='fz_fetcher_api.js') }}"></script>
+
+

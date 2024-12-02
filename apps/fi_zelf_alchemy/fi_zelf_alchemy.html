@@ -1,0 +1,106 @@
+<div class="gasam fz app-container row">
+    <div class="gasam fz sub-app-container bank-container container col-12">
+        <div class="gasam fz bank-sub-container">
+            <div class="gasam fz container bank-total">
+                <table id='FZbankTableTOTAL'>
+                    <thead>
+                        <tr>
+                            <th style="border: 1px solid black; padding: 8px; background-color: #f2f2f2;">TOTAL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="border: 1px solid black; padding: 8px;">$<span id="FZbankTotal">0,00</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="gasam fz container bank-coins" id="FZbankCoins">
+                <table >
+                    <thead>
+                        <tr id="FZbankTableHeader">
+                            <th class="gasam fz bank-header"><span id="FZbankHeaderUSDT">USDT</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="FZbankTableCell">
+                            <td class="gasam fz bank-cell"><span id="FZbankCellUSDT">0,00</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="gasam fz app-container row">
+    <div class="gasam fz sub-app-container table-container container col-6">
+        <div class="container d-flex mb-2 p-0">
+            <div class="col-6 d-flex justify-content-start p-1">
+                <button type="button" id='FZAupdateChartButton' class="btn btn-light w-100">
+                    Choose Pair
+                </button>
+            </div>
+            <div class="form-floating col-6 p-1 ">
+              <select class="gasam chartControl tradingPairSelect form-select" id="FZAtradingPairSelect" aria-label="Floating label select example" autocomplete="off">
+                <option selected value="BTC-USDT">BTC-USDT</option>
+                <option value="ETH-USDT">ETH-USDT</option>
+                <option value="SOL-USDT">SOL-USDT</option>
+                <option value="KCS-USDT">KCS-USDT</option>
+                <option value="BNB-USDT">BNB-USDT</option>
+                <option value="INJ-USDT">INJ-USDT</option>
+                <option value="AVAX-USDT">AVAX-USDT</option>
+              </select>
+            </div>
+        </div>
+        <div id="FZAfeederPanel" class="container mb-2 p-0">
+            <div class="col-6 d-flex justify-content-start p-1 w-25">
+                <button type="button" id='stepForward' class="FZAfeederPanelBtn btn btn-light w-100">
+                    <i class="bi bi-chevron-bar-right"></i>
+                </button>
+            </div>
+            <div class="col-6 d-flex justify-content-start p-1 w-25">
+                <button type="button" id='slowForward' class="FZAfeederPanelBtn btn btn-light w-100">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+            </div>
+            <div class="col-6 d-flex justify-content-start p-1 w-25">
+                <button type="button" id='fastForward' class="FZAfeederPanelBtn btn btn-light w-100">
+                    <i class="bi bi-chevron-double-right"></i>
+                </button>
+            </div>
+            <div class="col-6 d-flex justify-content-start p-1 w-25">
+                <button type="button" id='pauseForward' class="FZAfeederPanelBtn btn btn-light w-100">
+                    <i class="bi bi-pause"></i>
+                </button>
+            </div>
+        </div>
+        <div class="text-center">
+            <h3>Alchemy Feed</h3>
+            <div id="fz_alchemy_feed"></div>
+        </div>
+        <div class="text-center">
+            <h3>Crystal Feed</h3>
+            <div id="fz_crystal_feed"></div>
+        </div>
+    </div>
+    <div class="gasam fz sub-app-container chart-container container col-6">
+        <div id="chart" ></div>
+    </div>
+</div>
+
+
+
+
+
+<div class="modal fade" id="fzw_LoadingModal" tabindex="-1" aria-labelledby="fzw_LoadingModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content d-flex justify-content-center align-items-center">
+            <div class="modal-header">
+                <h5 class="modal-title">Loading...</h5>
+            </div>
+            <div class="spinner-border text-light m-3" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </div>
+</div>

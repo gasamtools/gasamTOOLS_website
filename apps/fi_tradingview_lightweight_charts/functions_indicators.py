@@ -1,3 +1,5 @@
+from .functions_indicators_tm import calculate_time_mode_mode_screener
+
 def calculate_moving_average_series_data(candle_data, ma_length):
     ma_data = []
 
@@ -22,7 +24,6 @@ def calculate_moving_average_series_data(candle_data, ma_length):
 
 
 def calculate_market_structure_series_data(candle_data, trend):
-
     if trend == 'bull':
         ms_ath = market_structure_sub_ms_ath(candle_data)
         ms_ll = market_structure_sub_ms_ll(candle_data, ms_ath)
@@ -79,9 +80,13 @@ def market_structure_sub_ms_ll(candle_data, ms_ath):
 
     return ms_ll
 
+
 def market_structure_sub_ms_mh(candle_data, ms_ll):
     # Filter data where 'time' is smaller than in 'lowest_low_after_highest'
-    filtered_data = [item for item in candle_data if item['time'] <= ms_ll['time']]
+    try:
+        filtered_data = [item for item in candle_data if item['time'] <= ms_ll['time']]
+    except TypeError:
+        filtered_data = []
 
     # Iterate over the filtered data in reverse to find the first candle/dictionary with a 'high'
     # that is higher than both the closest previous and next dictionaries in time
@@ -122,6 +127,7 @@ def market_structure_sub_ms_csl(candle_data):
     ms_csl = second_handle
     return ms_csl
 
+
 def market_structure_sub_ms_csh(candle_data, ms_csl):
     first_candle = None
 
@@ -143,8 +149,8 @@ def market_structure_sub_ms_csh(candle_data, ms_csl):
     ms_csh = first_candle
     return ms_csh
 
-def market_structure_sub_ms_nsh_csh(candle_data, ms_csh):
 
+def market_structure_sub_ms_nsh_csh(candle_data, ms_csh):
     filtered_data = [item for item in candle_data if item['time'] > ms_csh['time']]
 
     for i in range(0, len(filtered_data) - 1):  # Start from the second-last and go backward
@@ -193,7 +199,6 @@ def market_structure_sub_ms_nsl_csl(candle_data, ms_csl, ms_nsh_csh):
 
 
 def market_structure_sub_ms_nsh_br(candle_data, ms_nsl_csl):
-
     #FIND NSH
     try:
         nsh_data = [item for item in candle_data if item['time'] <= ms_nsl_csl['time']]
@@ -233,7 +238,6 @@ def market_structure_sub_ms_nsh_br(candle_data, ms_nsl_csl):
 
     ms_nsh_br = nsh_br
 
-
     return ms_nsh_br
 
 
@@ -250,44 +254,18 @@ def market_structure_sub_ms_mh_ath_br(candle_data, compared_h, ms_csh):
             current_candle = filtered_data[i]
             # Check if current 'high' is greater than both previous and next 'high'
 
-            if current_candle['high'] > compared_h['high']:
-                ms_compared_h_br = current_candle
+            try:
+                if current_candle['high'] > compared_h['high']:
+                    ms_compared_h_br = current_candle
+                    break
+            except TypeError:
                 break
 
     return ms_compared_h_br
 
 
-def calculate_time_mode_expansion_series_data(data):
-    status = 'nope'
-
-    currentTR = data[-1]['high'] - data[-1]['low']
-    prevClose = data[-2]['close']
-    prevHigh = data[-2]['high']
-    prevLow = data[-2]['low']
-    prevTR = prevHigh - prevLow
-
-    absHighDiff = abs(data[-1]['high'] - prevClose)
-    absLowDiff = abs(prevClose - data[-1]['low'])
-
-    potentialBullishExpansion = absHighDiff > prevTR
-    potentialBearishExpansion = absLowDiff > prevTR
-
-    isBullishExpansionBar = potentialBullishExpansion and (data[-1]['close'] > data[-1]['open'])
-    isBearishExpansionBar = potentialBearishExpansion and (data[-1]['close'] < data[-1]['open'])
-
-
-
-    if isBullishExpansionBar:
-        status = 'bull'
-    elif isBearishExpansionBar:
-        status = 'bear'
-
-    info = {
-        'status': status,
-        'prevTR': round(prevTR, 2),
-        'prevTime': data[-2]['time'],
-        'absHighDiff': round(absHighDiff, 2),
-        'absLowDiff': round(absLowDiff, 2),
-        'lastTime': data[-1]['time'],
-    }
+def calculate_time_mode_main(data):
+    info = {'mode_data': calculate_time_mode_mode_screener(data)}
+    # info = calculate_time_mode_expansion_screener(data)
     return info
+

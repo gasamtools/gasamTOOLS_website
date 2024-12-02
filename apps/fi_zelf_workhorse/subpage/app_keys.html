@@ -1,0 +1,11 @@
+{% if current_user.role == 'admin' %}
+<form id="fz_key_form" class="mt-4 gasam fzw key form" autocomplete="off">
+    <label class='mt-2' for="fz_key_form_kc_key">Kucoin API Key</label>
+    <input id='fz_key_form_kc_key' class="form-control" type="text" name="api_kc_key" value="" placeholder="KuCoin API key" required>
+    <label class='mt-2' for="fz_key_form_kc_secret">Kucoin API Secret</label>
+    <input id='fz_key_form_kc_secret' class="form-control" type="text" name="api_kc_secret" value="" placeholder="KuCoin API Secret" required>
+    <label class='mt-2' for="fz_key_form_kc_passphrase">Kucoin API Passphrase</label>
+    <input id='fz_key_form_kc_passphrase' class="form-control" type="text" name="api_kc_passphrase" value="" placeholder="KuCoin API Passphrase" required>
+    <button type="submit" class="btn btn-secondary mt-2 gasam fzw key" id="fz_key_form_key_bttn">Save</button>
+</form>
+{% endif %}

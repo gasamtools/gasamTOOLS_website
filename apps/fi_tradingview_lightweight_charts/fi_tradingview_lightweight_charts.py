@@ -2,7 +2,7 @@
 import os
 from datetime import datetime, timedelta
 from .functions_fetch_kucoin_data import fetch_kucoin_data
-from .functions_indicators import calculate_moving_average_series_data, calculate_market_structure_series_data, calculate_time_mode_expansion_series_data
+from .functions_indicators import calculate_moving_average_series_data, calculate_market_structure_series_data, calculate_time_mode_main
 from sqlalchemy import text
 
 
@@ -91,13 +91,25 @@ def fi_tradingview_lightweight_charts_load(current_user, db, User, GasamApp, jso
     ms_1week_bear = calculate_market_structure_series_data(candle_data_1week, 'bear')
 
     # TM DATA
-    tm_1day_exp = calculate_time_mode_expansion_series_data(candle_data_1day)
-    tm_1week_exp = calculate_time_mode_expansion_series_data(candle_data_1week)
-    tm_1day_mode = 'tbd'
-    tm_1week_mode = 'tbd'
+    tm_1day_exp = calculate_time_mode_main(candle_data_1day)
+    tm_1week_exp = calculate_time_mode_main(candle_data_1week)
+    tm_1day_mode = calculate_time_mode_main(candle_data_1day)
+    tm_1week_mode = calculate_time_mode_main(candle_data_1week)
+
+    # POSTMAN MESSAGE
+    postman = f'Pair: {json_data['tradingPair']}'
+
+    postman_crystal = (
+        f"<h4>Pair: {json_data['tradingPair']}</h4>"
+        f"<h6>SMA</h6>"
+        f"<div>DAY: {ma_data_1day_last}, WEEK: {ma_data_1week_last}</div"
+    )
+
 
     aggregate_data = {
         'candle_data': candle_data,
+        'postman': postman,
+        'postman_crystal': postman_crystal,
         'ma_data': ma_data,
         'ma_1day_last': ma_data_1day_last,
         'ma_1week_last': ma_data_1week_last,

@@ -7,4 +7,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
+  <component name="PackageRequirementsSettings">
+    <option name="requirementsPath" value="$MODULE_DIR$/apps/fi_tradingview_lightweight_charts/fi_tradingview_lightweight_charts_requirements.txt" />
+  </component>
 </module>

@@ -1,6 +1,9 @@
-.gasam.ftlc.app-container {
+.gasam.ftlc.sub-app-container {
+  padding: 1px;
+}
+
+.gasam.ftlc.sub-app-container.table-container {
   overflow-y: scroll;
-  padding-right: 30px;
 }
 
 #chart {
@@ -9,6 +12,16 @@
     position: relative;
 
 }
+
+.table.table-bordered.text-center {
+  width: 100%;
+  table-layout: fixed;
+}
+
+th, td {
+      word-wrap: break-word; /* Wraps words within cells */
+      overflow: hidden; /* Hides overflow if word-wrap doesn't break it */
+    }
 
 
 .gasam.ftlc.tt {
@@ -68,4 +81,8 @@
 .gasam.ftlc.sma.div {
     height: 100%;
     display: block;
+}
+
+#updateChartButton {
+    width: 100%;
 }
