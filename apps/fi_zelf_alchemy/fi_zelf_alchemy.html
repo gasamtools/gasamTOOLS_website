@@ -1,4 +1,4 @@
-<div class="gasam fz app-container row">
+<div class="gasam fz app-container row head">
     <div class="gasam fz sub-app-container bank-container container col-12">
         <div class="gasam fz bank-sub-container">
             <div class="gasam fz container bank-total">
@@ -32,9 +32,10 @@
         </div>
     </div>
 </div>
-<div class="gasam fz app-container row">
+<div class="gasam fz app-container row body">
     <div class="gasam fz sub-app-container table-container container col-6">
-        <div class="container d-flex mb-2 p-0">
+        <div id="FZAfeederPanelDiv">
+            <div class="container d-flex mb-2 p-0">
             <div class="col-6 d-flex justify-content-start p-1">
                 <button type="button" id='FZAupdateChartButton' class="btn btn-light w-100">
                     Choose Pair
@@ -52,27 +53,33 @@
               </select>
             </div>
         </div>
-        <div id="FZAfeederPanel" class="container mb-2 p-0">
-            <div class="col-6 d-flex justify-content-start p-1 w-25">
+            <div id="FZAfeederPanel" class="container mb-2 p-0">
+            <div class="col-6 d-flex justify-content-start p-1 w-20">
                 <button type="button" id='stepForward' class="FZAfeederPanelBtn btn btn-light w-100">
                     <i class="bi bi-chevron-bar-right"></i>
                 </button>
             </div>
-            <div class="col-6 d-flex justify-content-start p-1 w-25">
+            <div class="col-6 d-flex justify-content-start p-1 w-20">
                 <button type="button" id='slowForward' class="FZAfeederPanelBtn btn btn-light w-100">
                     <i class="bi bi-chevron-right"></i>
                 </button>
             </div>
-            <div class="col-6 d-flex justify-content-start p-1 w-25">
+            <div class="col-6 d-flex justify-content-start p-1 w-20">
                 <button type="button" id='fastForward' class="FZAfeederPanelBtn btn btn-light w-100">
                     <i class="bi bi-chevron-double-right"></i>
                 </button>
             </div>
-            <div class="col-6 d-flex justify-content-start p-1 w-25">
+            <div class="col-6 d-flex justify-content-start p-1 w-20">
                 <button type="button" id='pauseForward' class="FZAfeederPanelBtn btn btn-light w-100">
                     <i class="bi bi-pause"></i>
                 </button>
             </div>
+            <div class="col-6 d-flex justify-content-start p-1 w-20">
+                <button type="button" id='allForward' class="FZAfeederPanelBtn btn btn-light w-100">
+                    <i class="bi bi-arrow-through-heart-fill"></i>
+                </button>
+            </div>
+        </div>
         </div>
         <div class="text-center">
             <h3>Alchemy Feed</h3>

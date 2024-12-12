@@ -173,24 +173,51 @@ def fz_fetcher_send_placed_order(order_data):
 
     return True
 
-def fz_fetcher_update_orders(trade_data):
-    global keys_db
-    updated_trade_data = []
-    # FUNCTION WILL BE WRITTEN FOR THE WORKHORSE
-
+def fz_fetcher_update_orders(db, bank_db, trade_data): #ALCHEMY FUNCTION, can be dirty
+    from .fz_feeder import fz_feeder_cycle_timestamp
     import pytz
     from datetime import datetime
+    global keys_db
+
+    # FUNCTION WILL BE RE-WRITTEN FOR THE WORKHORSE
+    updated_trade_data = []
+
     now = datetime.now(pytz.UTC)
     date_filled = int(now.timestamp())
 
     for trade in trade_data:
-        updated_trade_data.append(
-            {
-                'id': trade['id'],
-                'trade_status': 'filled',
-                'is_flagged': True,
-                'date_filled': date_filled
-            })
+        # print(trade)
+        if trade['trade_entry'] == 'limit':
+
+            updated_trade_data.append(
+                {
+                    'id': trade['id'],
+                    'trade_status': 'filled',
+                    'is_flagged': True,
+                    'date_filled': date_filled,
+                    'currency_sell': trade['currency_sell'],
+                    'amount_sell': trade['amount_sell'],
+                    'currency_buy': trade['currency_buy'],
+                    'amount_buy': trade['amount_buy'],
+                    'tdp_1': fz_feeder_cycle_timestamp
+                })
+        elif trade['trade_entry'] == 'stop-limit':
+            scan_since = trade['tdp_0']
+            scan_until = fz_feeder_cycle_timestamp
+            trade_entry_stop = trade['trade_entry_stop']
+            if check_if_reached_stop_limit(db, scan_since, scan_until, trade_entry_stop, trade['trade_action']):
+                updated_trade_data.append(
+                    {
+                        'id': trade['id'],
+                        'trade_status': 'filled',
+                        'is_flagged': True,
+                        'date_filled': date_filled,
+                        'currency_sell': trade['currency_sell'],
+                        'amount_sell': trade['amount_sell'],
+                        'currency_buy': trade['currency_buy'],
+                        'amount_buy': trade['amount_buy'],
+                        'tdp_1': fz_feeder_cycle_timestamp
+                    })
 
     return updated_trade_data
 
@@ -276,5 +303,40 @@ def get_env_value_from_env_or_db(db, db_name, env_key):
         env_value = results.scalar()
 
     return env_value
+
+
+def check_if_reached_stop_limit(db, scan_since, scan_until, trade_entry_stop, trade_action):
+    from sqlalchemy.sql import text
+
+    # Define your query parameters
+    query_params = {
+        "scan_since": scan_since,  # Replace with your value for scan_since
+        "scan_until": scan_until  # Replace with your value for scan_until
+    }
+
+    # SQL query
+    query = text("""
+        SELECT high, low, time
+        FROM app_fi_zelf_alchemy_testPair_db
+        WHERE time > :scan_since AND time <= :scan_until
+    """)
+
+    # Execute the query
+    results = db.session.execute(query, query_params).fetchall()
+
+    # Process the results
+    for row in results:
+        # print(row)
+        high = row[0]
+        low = row[1]
+        if trade_action == 'sell':
+            if low <= trade_entry_stop:
+                print(f'TRUE low {low} <= trade_entry_stop {trade_entry_stop}')
+                return True
+        elif trade_action == 'buy':
+            if trade_entry_stop <= high:
+                print(f'TRUE trade_entry_stop {trade_entry_stop} <= high {high}')
+                return True
+    return False
 
 

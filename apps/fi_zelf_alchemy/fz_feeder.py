@@ -1,13 +1,19 @@
-def fz_feeder(current_user, db, User, GasamApp, json_data, files_data, testPair_db):
+fz_feeder_cycle_timestamp = 0
+fz_feeder_cycle_last_candle = []
+
+def fz_feeder(current_user, db, User, GasamApp, json_data, files_data, testPair_db, signal_db, trade_db, bank_db, signal_trade_db,):
     if json_data['js_function_sub'] == 'main':
-        return fz_feeder_main(current_user, db, User, GasamApp, json_data, files_data, testPair_db)
+        return fz_feeder_main(current_user, db, User, GasamApp, json_data, files_data, testPair_db, signal_db, trade_db, bank_db, signal_trade_db,)
 
 
-def fz_feeder_main(current_user, db, User, GasamApp, json_data, files_data, testPair_db):
+def fz_feeder_main(current_user, db, User, GasamApp, json_data, files_data, testPair_db, signal_db, trade_db, bank_db, signal_trade_db,):
     from sqlalchemy import text
     from datetime import datetime
     from .algo_engine.algo_engine import algo_engine
+    from .fz_crystal import printSignals
     import pytz
+    global fz_feeder_cycle_timestamp
+    global fz_feeder_cycle_last_candle
 
     def transform_candles(daily_data, interval):
         def get_period_start(timestamp, interval):
@@ -45,6 +51,10 @@ def fz_feeder_main(current_user, db, User, GasamApp, json_data, files_data, test
 
     feederCycle = int(json_data['feederCycle'])
 
+    total_candles = db.session.execute(
+        text(f"SELECT COUNT(*) FROM {testPair_db}")
+    ).scalar()  # Use .scalar() to get a single value
+
     fastForwardmultiplier = 100
     if json_data['command'] == 'fastForward':
         feederCycle += fastForwardmultiplier
@@ -54,10 +64,10 @@ def fz_feeder_main(current_user, db, User, GasamApp, json_data, files_data, test
     start_cycle_range_days = 250
     feeder_cycle_range_candles = (start_cycle_range_days * 24) + feederCycle
 
+    if json_data['command'] == 'allForward':
+        feeder_cycle_range_candles = total_candles
+        feederCycle = total_candles - (start_cycle_range_days * 24)
 
-    total_candles = db.session.execute(
-        text(f"SELECT COUNT(*) FROM {testPair_db}")
-    ).scalar()  # Use .scalar() to get a single value
 
     existing_records = db.session.execute(
         text(f"SELECT * FROM {testPair_db} ORDER BY record_id ASC LIMIT {feeder_cycle_range_candles}")
@@ -77,26 +87,79 @@ def fz_feeder_main(current_user, db, User, GasamApp, json_data, files_data, test
         })
 
     # FEEDING DATA TO ALGO ENGINE
-    if json_data['command'] == 'fastForward':
+    if json_data['command'] == 'allForward':
+        algo_engine_data = {
+            'to_postman': '',
+            'to_crystal': ''
+        }
+        for i in range(0, (total_candles-(start_cycle_range_days * 24))):
+            print(f'{i} of {total_candles-(start_cycle_range_days * 24)}')
+            candle_formats = {
+                '1day': transform_candles(hourly_candles[0:(-total_candles+(start_cycle_range_days * 24)+i)], '1day'),
+                '1week': transform_candles(hourly_candles[0:(-total_candles+(start_cycle_range_days * 24)+i)], '1week'),
+                '1month': transform_candles(hourly_candles[0:(-total_candles+(start_cycle_range_days * 24)+i)], '1month'),
+            }
+            
+            # ASSIGN CURRENT LATEST CANDLE TIMESTAMP
+            adjusted_hourly_candles = hourly_candles[0:(-total_candles+(start_cycle_range_days * 24)+i)]
+            fz_feeder_cycle_timestamp = adjusted_hourly_candles[-1]['time']
+            fz_feeder_cycle_last_candle = adjusted_hourly_candles[-1]
+
+
+            # SEND DATA TO ALGO ENGINE
+            algo_engine_data_cycle = algo_engine(db, signal_db, trade_db, bank_db, signal_trade_db, json_data, candle_formats, pair, 'run_engine')
+            algo_engine_data['to_postman'] += algo_engine_data_cycle['to_postman']
+            algo_engine_data['to_crystal'] += algo_engine_data_cycle['to_crystal']
+
+    elif json_data['command'] == 'fastForward':
+        algo_engine_data = {
+            'to_postman': '',
+            'to_crystal': ''
+        }
         for i in range(0, fastForwardmultiplier):
             candle_formats = {
                 '1day': transform_candles(hourly_candles[0:(-fastForwardmultiplier+i)], '1day'),
                 '1week': transform_candles(hourly_candles[0:(-fastForwardmultiplier+i)], '1week'),
                 '1month': transform_candles(hourly_candles[0:(-fastForwardmultiplier+i)], '1month'),
             }
-            algo_engine_data = algo_engine(db, json_data, candle_formats, pair, 'run_engine')
+
+            # ASSIGN CURRENT LATEST CANDLE TIMESTAMP
+            adjusted_hourly_candles = hourly_candles[0:(-fastForwardmultiplier+i)]
+            fz_feeder_cycle_timestamp = adjusted_hourly_candles[-1]['time']
+            fz_feeder_cycle_last_candle = adjusted_hourly_candles[-1]
+
+
+            # SEND DATA TO ALGO ENGINE
+            algo_engine_data_cycle = algo_engine(db, signal_db, trade_db, bank_db, signal_trade_db, json_data, candle_formats, pair, 'run_engine')
+            algo_engine_data['to_postman'] += algo_engine_data_cycle['to_postman']
+            algo_engine_data['to_crystal'] += algo_engine_data_cycle['to_crystal']
     else:
         candle_formats = {
             '1day': transform_candles(hourly_candles, '1day'),
             '1week': transform_candles(hourly_candles, '1week'),
             '1month': transform_candles(hourly_candles, '1month')
         }
-        algo_engine_data = algo_engine(db, json_data, candle_formats, pair, 'run_engine')
 
-    # SEND SATUS
+        # ASSIGN CURRENT LATEST CANDLE TIMESTAMP
+        fz_feeder_cycle_timestamp = hourly_candles[-1]['time']
+        fz_feeder_cycle_last_candle = hourly_candles[-1]
+
+        # SEND DATA TO ALGO ENGINE
+        algo_engine_data = algo_engine(db, signal_db, trade_db, bank_db, signal_trade_db, json_data, candle_formats, pair, 'run_engine')
+
+
+    # FETCHING DATA FROM CRYSTAL ENGINE
+    printSignals_data = printSignals(db, signal_db, trade_db, signal_trade_db, json_data)
+
+    # SEND STATUS
     status = ''
     utc_timezone = pytz.UTC
-    if json_data['command'] == 'fastForward':
+    if json_data['command'] == 'allForward':
+        for i in range(0, (total_candles-(start_cycle_range_days * 24))):
+            dt_utc = datetime.fromtimestamp(hourly_candles[-total_candles+(start_cycle_range_days * 24) + i]['time'], utc_timezone)
+            formatted_time = f"{dt_utc.strftime('%y-%m-%d %H')}:00 UTC"
+            status += f"<p>candles up to {formatted_time}</p>"
+    elif json_data['command'] == 'fastForward':
         for i in range(0, fastForwardmultiplier):
             dt_utc = datetime.fromtimestamp(hourly_candles[-fastForwardmultiplier + i]['time'], utc_timezone)
             formatted_time = f"{dt_utc.strftime('%y-%m-%d %H')}:00 UTC"
@@ -124,6 +187,7 @@ def fz_feeder_main(current_user, db, User, GasamApp, json_data, files_data, test
         'end_of_test': end_of_test,
         'to_postman': algo_engine_data['to_postman'],
         'to_crystal': algo_engine_data['to_crystal'],
+        'printSignals': printSignals_data
     }
 
     #print(return_data)

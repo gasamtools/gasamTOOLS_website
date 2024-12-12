@@ -97,9 +97,11 @@ def register_database(db, app):
         is_active = db.Column(db.Boolean, nullable=False)
         is_flagged = db.Column(db.Boolean, nullable=True)
         trade_status = db.Column(db.String(100), nullable=False)
-        trade_type = db.Column(db.String(100), nullable=False)
-        trade_position = db.Column(db.String(100), nullable=False)
-        trade_action = db.Column(db.String(100), nullable=False)
+        trade_type = db.Column(db.String(100), nullable=False)  # spot, futures
+        trade_position = db.Column(db.String(100), nullable=False) # long/short
+        trade_action = db.Column(db.String(100), nullable=False) # buy/sell
+        trade_entry = db.Column(db.String(100), nullable=False) # limit, market, stop limit
+        trade_entry_stop = db.Column(db.Float, nullable=True)  # stoploss trigger price
         date_placed = db.Column(db.Integer, nullable=False)
         date_filled = db.Column(db.Integer, nullable=True)
         currency_buy = db.Column(db.String(100), nullable=False)
@@ -107,6 +109,10 @@ def register_database(db, app):
         amount_buy = db.Column(db.Float, nullable=False)
         amount_sell = db.Column(db.Float, nullable=False)
         price = db.Column(db.Float, nullable=True)
+        tdp_0 = db.Column(db.Text, nullable=True)
+        tdp_1 = db.Column(db.Text, nullable=True)
+        tdp_2 = db.Column(db.Text, nullable=True)
+        tdp_3 = db.Column(db.Text, nullable=True)
         signals = relationship("fiZelfAlchemySignalDB", secondary=app_fi_zelf_association_signal_trade, back_populates="trades")
 
         __table_args__ = {'extend_existing': True}
@@ -133,6 +139,12 @@ def app_logic(current_user, db, User, GasamApp, page, return_data):
         return send_data
 
 def json_logic(current_user, db, User, GasamApp, json_data, files_data):
+    signal_db = 'app_fi_zelf_alchemy_signal_db'
+    trade_db = 'app_fi_zelf_alchemy_trade_db'
+    bank_db = 'app_fi_zelf_alchemy_bank_db'
+    signal_trade_db = 'app_fi_zelf_association_signal_trade'
+    testPair_db = 'app_fi_zelf_alchemy_testPair_db'
+
     from .fz_fetcher import fz_fetcher
     from .fz_feeder import fz_feeder
     from .algo_engine.algo_engine import algo_engine
@@ -141,23 +153,24 @@ def json_logic(current_user, db, User, GasamApp, json_data, files_data):
         return app_ini(current_user, db, User, GasamApp, json_data, files_data)
     if json_data['js_function'] == 'fz_fetcher':
         # RESET ALL DBs
-        algo_engine(db, json_data, {}, '', 'reset_db')
+        algo_engine(db, signal_db, trade_db, bank_db, signal_trade_db, json_data, {}, '', 'reset_db')
         # FETCH AND LOAD DATA TO TEST_DB
         fz_fetcher_status = fz_fetcher(current_user, db, User, GasamApp, json_data, files_data )
         # FUND BANK WITH TEST MONEY
-        bank_values_data = algo_engine(db, json_data, {}, '', 'fund_bank')
+        bank_values_data = algo_engine(db, signal_db, trade_db, bank_db, signal_trade_db, json_data, {}, '', 'fund_bank')
         # SEND DATA
         ini_data = fz_fetcher_status | {'bank_values_data': bank_values_data}
         return ini_data
 
     if json_data['js_function'] == 'fz_feeder':
         # FEED DATA TO algo_engine
-        fz_feeder_data = fz_feeder(current_user, db, User, GasamApp, json_data, files_data, 'app_fi_zelf_alchemy_testPair_db')
+        fz_feeder_data = fz_feeder(current_user, db, User, GasamApp, json_data, files_data, testPair_db, signal_db, trade_db, bank_db, signal_trade_db )
         # PRINT BANK RECORDS
-        bank_values_data = algo_engine(db, {}, fz_feeder_data['last_hour_timestamp'], {}, 'get_bank_values')
+        bank_values_data = algo_engine(db, signal_db, trade_db, bank_db, signal_trade_db,{}, fz_feeder_data['last_hour_timestamp'], {}, 'get_bank_values')
         # SEND DATA
         combined_data = fz_feeder_data | {'bank_values_data': bank_values_data}
         return combined_data
+
 
 
 def app_ini(current_user, db, User, GasamApp, json_data, files_data):

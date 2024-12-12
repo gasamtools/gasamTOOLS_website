@@ -33,6 +33,8 @@ db.init_app(app)
 csrf.init_app(app)
 login_manager.init_app(app)
 
+app.config['WTF_CSRF_TIME_LIMIT'] = None
+
 user_app_association = db.Table(
     'user_app_association',
     db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),

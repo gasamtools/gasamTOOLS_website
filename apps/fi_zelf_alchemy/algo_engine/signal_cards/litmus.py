@@ -7,7 +7,7 @@ def litmus(db, signal_db, candle_formats, pair):
 
     last_candle_of_cycle = candle_formats['1day'][-1]
 
-    existing_litmus = fetch_from_db(db, signal_db, pair, '1day', 'litmus')
+    existing_litmus = fetch_active_from_db(db, signal_db, pair, '1day', 'litmus')
     if not existing_litmus:
 
         new_proxy = {

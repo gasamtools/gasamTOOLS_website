@@ -1,10 +1,19 @@
-let chart, candleSeries, maSeries, toolTip;
+let chart, candleSeries, maSeries, toolTip, hideSignal;
+let lineSeriesArray = [];
+let markers = [];
+let FZcrystalSignalID, FZcrystalSignalcommand = false;
 
 document.addEventListener("DOMContentLoaded", () => {
     if ($('#chart').length) {
         FZcrystalInitializeChart();
     }
+    if ($('#FZhideSignal').length) {
+        $('.gasam.fz.app-container.row.body').on( 'click', '.fz.crystal.signal', function( event ) {
+            FZcrystalShowHideSignal($(this).attr('id'));
+        });
+    }
 });
+
 
 function FZcrystalInitializeChart() {
     // SETUP CHART
@@ -14,6 +23,12 @@ function FZcrystalInitializeChart() {
     toolTip = document.createElement('div');
     toolTip.classList.add('gasam', 'fz', 'tt');
     chartElement.appendChild(toolTip);
+
+    hideSignal = document.createElement('button');
+    hideSignal.classList.add('gasam', 'fz', 'crystal', 'signal', 'hideSignal');
+    hideSignal.id = 'FZhideSignal';
+    hideSignal.innerHTML = 'Hide Signals';
+    chartElement.appendChild(hideSignal);
 
     chart = LightweightCharts.createChart(chartElement, {
         width: chartElement.clientWidth,
@@ -80,7 +95,7 @@ function createTooltipHandler(tradingPair) {
             return;
         }
 
-        const dateStr = new Date(param.time * 1000).toLocaleDateString();
+        const dateStr = new Date(param.time * 1000).toLocaleDateString("en-US", { timeZone: "UTC" });
         const dataPoint = param.seriesData.get(candleSeries);
 
         if (dataPoint) {
@@ -98,9 +113,26 @@ function createTooltipHandler(tradingPair) {
 }
 
 function FZcrystalUpdateFeed(target, data) {
+    $(target).hover(
+        // Mouse enter
+        function() {
+            // Disable auto-scrolling when mouse is over the div
+            $(this).data('hover', true);
+        },
+        // Mouse leave
+        function() {
+            // Re-enable auto-scrolling when mouse leaves the div
+            $(this).data('hover', false);
+        }
+    );
+
     var feed = $(target).html();
     $(target).html(feed+data);
-    $(target).scrollTop($(target)[0].scrollHeight);
+
+    // Check if not hovering before scrolling
+    if (!$(target).data('hover')) {
+        $(target).scrollTop($(target)[0].scrollHeight);
+    }
 }
 
 function FZcrystalUpdateBank(data) {
@@ -131,4 +163,78 @@ function FZcrystalUpdateBank(data) {
     html += '</div>';
 
     $('#FZbankCoins').html(html);
+}
+
+function FZcrystalClearAllLines(chart) {
+    lineSeriesArray.forEach(lineSeries => chart.removeSeries(lineSeries));
+    lineSeriesArray.length = 0; // Clear the array of references
+}
+
+function FZcrystalShowHideSignal(id) {
+    if (id == 'FZhideSignal') {
+        FZcrystalSignalcommand = false;
+        maSeries.setData('');
+        candleSeries.setMarkers([]);
+    } else {
+        FZcrystalSignalcommand = true;
+        FZcrystalSignalID = id;
+        document.getElementById('stepForward').click();
+    }
+}
+
+function FZcrystalPrintSignals(signalData) {
+
+    markers = []
+    if (FZcrystalSignalcommand == false) {
+        maSeries.setData('');
+        FZcrystalClearAllLines(chart);
+        candleSeries.setMarkers([]);
+    } else if (signalData['signal_type'] == 'SMA50') {
+        //console.log(signalData);
+        maSeries.setData(signalData['ma_data']);
+
+        markers.push({
+            time: parseInt(signalData['sdp_0'], 10),
+            position: 'belowBar',
+            color: '#000',
+            shape: 'square',
+            text: 'Start '+ signalData['trend_type']
+        });
+
+        if (signalData['sdp_1'] !== null) {
+            markers.push({
+                time: parseInt(signalData['sdp_1'], 10),
+                position: 'aboveBar',
+                color: '#000',
+                shape: 'circle',
+                text: 'End '+ signalData['trend_type']
+            });
+        }
+
+        if (signalData['trades'].length) {
+            signalData['trades'].forEach(function(element) {
+                if (element['trade_action'] == 'sell') {
+                    var position = 'belowBar';
+                    var color = "#454545"
+                    var shape = 'arrowDown'
+                    var text = 'Sell @'+element['price']
+                } else if (element['trade_action'] == 'buy') {
+                    var position = 'aboveBar'
+                    var color = "#00bd9a"
+                    var shape = 'arrowUp'
+                    var text = 'Buy @'+element['price']
+                }
+                markers.push({
+                    time: parseInt(element['tdp_1'], 10),
+                    position: position,
+                    color: color,
+                    shape: shape,
+                    text: text
+                });
+            });
+        }
+
+
+        candleSeries.setMarkers(markers);
+    }
 }

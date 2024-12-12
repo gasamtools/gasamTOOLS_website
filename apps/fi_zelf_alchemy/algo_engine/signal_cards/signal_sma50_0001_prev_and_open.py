@@ -1,12 +1,11 @@
 from ._common_functions import *
 
-def sma50(db, signal_db, candle_formats, pair):
+def signal_sma50_0001_prev_and_open(db, signal_db, candle_formats, pair):
     to_postman, to_crystal = '', ''
 
     # ANALYZE NEW SIGNALS
     # GET SMA data
     new_1day = calculate_moving_average_series_data(candle_formats['1day'], 50)
-    # print(new_1day)
     new_1week = calculate_moving_average_series_data(candle_formats['1week'], 50)
     new_1month = calculate_moving_average_series_data(candle_formats['1month'], 50)
 
@@ -55,10 +54,12 @@ def calculate_moving_average_series_data(candle_data, ma_length):
             ma_value = sum_close / ma_length
             ma_data.append({'time': candle_data[i]['time'], 'value': ma_value})
 
-            if ma_value <= candle_data[i]['low']:
+            if ma_value < candle_data[i]['low']:
                 ma_data[i]['ma_marker'] = 'bull'
-            else:
+            elif ma_value > candle_data[i]['high']:
                 ma_data[i]['ma_marker'] = 'bear'
+            else:
+                ma_data[i]['ma_marker'] = 'between'
 
     # print(f'ma_data {ma_data} \n')
 
@@ -70,27 +71,49 @@ def convert_to_proxy(trading_pair: str, interval: str, signal_type: str, signal_
     reversed_signal_data = signal_data[::-1]
     reversed_candles_data = candles_data[::-1]
 
-    if 'ma_marker' in reversed_signal_data[0]:
-        trend_type = reversed_signal_data[0]['ma_marker']
-    else:
+    if 'ma_marker' not in reversed_signal_data[0]:
         return {'no_signal': True}
 
     trend_start = 0
+    trend_type = False
+    trend_confirmed = False
+    possible_trend_start = False
     for index, candle in enumerate(reversed_signal_data):
-        if 'ma_marker' in candle and candle['ma_marker'] != trend_type:
-            trend_start = reversed_signal_data[index-1]['time']
-            break
+        if 'ma_marker' in candle and candle['ma_marker'] != 'between':
+            if not trend_type:
+                trend_type = candle['ma_marker']
+                if 'ma_marker' in reversed_signal_data[index+1] and reversed_signal_data[index+1]['ma_marker'] == trend_type:
+                    trend_confirmed = True
+                if not trend_confirmed:
+                    trend_type = False
 
-    return {
-        'trading_pair': trading_pair,
-        'interval': interval,
-        'signal_type': signal_type,
-        'is_trend_valid': True,
-        'trend_type': trend_type,
-        'sdp_0': trend_start,
-        'tp_entrance_1': reversed_candles_data[0]['close']
+        if trend_type:
+            if 'ma_marker' in candle and candle['ma_marker'] != trend_type:
+                if candle['ma_marker'] == 'between':
+                    if not possible_trend_start:
+                        possible_trend_start = reversed_signal_data[index-1]['time']
+                else:
+                    if possible_trend_start:
+                        trend_start = possible_trend_start
+                    else:
+                        trend_start = reversed_signal_data[index-1]['time']
+                    break
+            else:
+                possible_trend_start = False
 
-    }
+    if trend_type:
+        return {
+            'trading_pair': trading_pair,
+            'interval': interval,
+            'signal_type': signal_type,
+            'is_trend_valid': True,
+            'trend_type': trend_type,
+            'sdp_0': trend_start,
+            'tp_entrance_1': reversed_candles_data[0]['close']
+
+        }
+    else:
+        return {'no_signal': True}
 
 
 def compare_and_update_db(db, signal_db, new_proxy, record_proxy):

@@ -1,3 +1,6 @@
+signal_data_for_crystal = {}
+
+
 def signal_engine(db, signal_db, trade_db, action, candle_formats, pair):
     if action == 'is_flagged_scan':
         return signal_is_flagged_scan(db, signal_db, trade_db, candle_formats, pair)
@@ -9,8 +12,7 @@ def signal_engine(db, signal_db, trade_db, action, candle_formats, pair):
 
 
 def signal_is_flagged_scan(db, signal_db, trade_db, candle_formats, pair):
-    to_postman = 'signal_is_flagged_scan | '
-    to_crystal = '<p>signal_is_flagged_scan |</p>'
+    to_postman, to_crystal = '', ''
     # UPDATE is_flagged SIGNALS
     # NOTE CHANGES
     # if needed, UPDATE TRADES VIA vault_engine
@@ -21,8 +23,7 @@ def signal_is_flagged_scan(db, signal_db, trade_db, candle_formats, pair):
     }
 
 def signal_is_active_scan(db, signal_db, trade_db, candle_formats, pair):
-    to_postman = 'signal_is_active_scan | '
-    to_crystal = '<p>signal_is_active_scan | </p>'
+    to_postman, to_crystal = '', ''
     # UPDATE is_active SIGNALS (move stop_loss, etc)
     # NOTE CHANGES
     # if needed, UPDATE TRADES VIA vault_engine
@@ -33,10 +34,10 @@ def signal_is_active_scan(db, signal_db, trade_db, candle_formats, pair):
     }
 
 def signal_new_scan(db, signal_db, trade_db, candle_formats, pair):
-    from .signal_cards.sma50 import sma50
+
     from .signal_cards.litmus import litmus
-    to_postman = 'signal_new_scan | '
-    to_crystal = '<p>signal_new_scan | </p>'
+    global signal_data_for_crystal
+    to_postman, to_crystal = '',''
 
     # CHECK NEW SIGNALS AGAINST RECORDED ONES SO THEY DON'T DUPLICATE
     # NOTE CHANGES
@@ -47,10 +48,27 @@ def signal_new_scan(db, signal_db, trade_db, candle_formats, pair):
     # to_postman += litmus_data['to_postman']
     # to_crystal += litmus_data['to_crystal']
 
-    #1 SMA50
-    sma50_data = sma50(db, signal_db, candle_formats, pair)
+    # 1 SMA50
+    # from .signal_cards.sma50 import sma50
+    # sma50_data = sma50(db, signal_db, candle_formats, pair)
+    # to_postman += sma50_data['to_postman']
+    # to_crystal += sma50_data['to_crystal']
+    # signal_data_for_crystal['SMA50'] = sma50_data['new_1day']
+
+    # 2 signal_sma50_0001_prev_and_open
+    # from .signal_cards.signal_sma50_0001_prev_and_open import signal_sma50_0001_prev_and_open
+    # sma50_data = signal_sma50_0001_prev_and_open(db, signal_db, candle_formats, pair)
+    # to_postman += sma50_data['to_postman']
+    # to_crystal += sma50_data['to_crystal']
+    # signal_data_for_crystal['SMA50'] = sma50_data['new_1day']
+
+    # 3 signal_sma50_0001_prev_and_open
+    from .signal_cards.signal_sma50_0002_prev_and_open_v2 import signal_sma50_0002_prev_and_open_v2
+    sma50_data = signal_sma50_0002_prev_and_open_v2(db, signal_db, candle_formats, pair)
     to_postman += sma50_data['to_postman']
     to_crystal += sma50_data['to_crystal']
+    signal_data_for_crystal['SMA50'] = sma50_data['new_1day']
+
 
 
 

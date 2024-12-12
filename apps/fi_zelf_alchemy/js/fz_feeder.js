@@ -1,4 +1,4 @@
-let feederTempo, feederTempoInterval, feederCycle, stopCycle;
+let feederCycle, stopCycle;
 feederCycle = 0; // start Cycle
 stopCycle = false;
 
@@ -21,10 +21,9 @@ function FZfeeder(bttn) {
         $(bttn).prop('disabled', true);
     }
 
-    clearInterval(feederTempo);
     if (elementId == 'pauseForward') {
         stopCycle = true;
-    } else if (elementId == 'fastForward' || elementId == 'slowForward') {
+    } else if (elementId == 'fastForward' || elementId == 'slowForward' || elementId == 'allForward') {
         stopCycle = false;
         FZfeederDataStream(elementId, feederCycle);
         FZcrystalUpdateFeed('#fz_alchemy_feed','<p>processing has begun...</p>');
@@ -45,6 +44,8 @@ function FZfeederDataStream(elementId, Cycle) {
     formData.append('js_function_sub', 'main');
     formData.append('command', elementId);
     formData.append('feederCycle', Cycle);
+    formData.append('crystalSignalID', FZcrystalSignalID);
+    formData.append('crystalSignalcommand', FZcrystalSignalcommand);
 
 
     fetch(GASAM_fi_zelf_URL, {
@@ -66,13 +67,20 @@ function FZfeederDataStream(elementId, Cycle) {
         // update bank
         FZcrystalUpdateBank(data['bank_values_data']);
 
+        // Print Candles
         FZcrystalPrintChartCandles(data['candles'], data['pair']);
+
+        // Show/Hide signals via Crystal
+        FZcrystalPrintSignals(data['printSignals']);
+
+
+        // updated feederCycle
         feederCycle = data['feederCycle']
 
         // STOP TEST WHEN END OF DATA
         if (data['end_of_test']) {
-            clearInterval(feederTempo);
             $('.FZAfeederPanelBtn').prop('disabled', true);
+            $('#stepForward').prop('disabled', false);
             stopCycle = true;
         }
         // Restart the interval after successful request
@@ -82,5 +90,6 @@ function FZfeederDataStream(elementId, Cycle) {
     })
     .catch(error => {
         console.error('Error:', error);
+        FZcrystalUpdateFeed('#fz_alchemy_feed', `<p>${error}</p>`);
     });
 }

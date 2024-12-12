@@ -1,35 +1,64 @@
 fund_bank_ini_usdt_value = 1000
 def vault_engine(db, signal_db, trade_db, bank_db,  signal_trade_db, action, pair):
-    if action == 'initial_update':
-        return vault_initial_update(db, signal_db, trade_db, bank_db, signal_trade_db, pair)
-    if action == 'take_trade':
-        return vault_take_trade(db, signal_db, trade_db, bank_db, signal_trade_db, pair)
+    if action == 'adjust_trades':
+        return vault_adjust_trades(db, signal_db, trade_db, bank_db, signal_trade_db, pair)
+    if action == 'take_trades':
+        return vault_take_trades(db, signal_db, trade_db, bank_db, signal_trade_db, pair)
 
-def  vault_initial_update(db, signal_db, trade_db, bank_db, signal_trade_db, pair):
-    from .trade_cards._common_functions import fetch_active_trades_from_trade_db
-    from .trade_cards._common_functions import update_trade_in_trade_db
+def  vault_adjust_trades(db, signal_db, trade_db, bank_db, signal_trade_db, pair):
+    from .trade_cards._common_functions import fetch_active_placed_trades_from_trade_db
+    from .trade_cards._common_functions import update_bank_balances_and_trade_db
     from ..fz_fetcher import fz_fetcher_update_orders
-    from sqlalchemy import text
 
     to_postman, to_crystal = '', ''
 
-    # FETCH active orders DATA FROM db
-    active_trades = fetch_active_trades_from_trade_db(db, trade_db)
-    placed_active_trades = [trade for trade in active_trades if trade['trade_status'] == 'placed']
+    # FETCH active placed orders DATA FROM db
+    placed_active_trades = fetch_active_placed_trades_from_trade_db(db, trade_db)
 
-    # FETCH TRADE DATA FROM KUCOIN
-    updated_trades = fz_fetcher_update_orders(placed_active_trades)
+    # FETCH flagged_trades DATA FROM KUCOIN - FLAGGED BECAUSE FILLED
+    flagged_filled_trades = fz_fetcher_update_orders(db, bank_db, placed_active_trades)
 
-    # UPDATE TRADE_DB AND NOTE CHANGES
-    for trade in updated_trades:
-        popped_id = trade.pop('id', None)
-        update_trade_in_trade_db_data = update_trade_in_trade_db(db=db, trade_db=trade_db, record_id=popped_id, update_data=trade)
+    # UPDATE BANK and TRADE_DB AND NOTE CHANGES
+    for trade in flagged_filled_trades:
+        update_bank_balances_and_trade_db_data = update_bank_balances_and_trade_db(db, bank_db, trade_db, trade)
+        to_postman += update_bank_balances_and_trade_db_data['to_postman']
+        to_crystal += update_bank_balances_and_trade_db_data['to_crystal']
 
-        # SEND NOTES TO POSTMAN / CRYSTAL
-        to_postman += update_trade_in_trade_db_data['to_postman']
-        to_crystal += update_trade_in_trade_db_data['to_crystal']
+    # 4 card_sma50_day_spot_sl2prcnt
+    # from .trade_cards.card_sma50_day_spot_sl2prcnt import card_sma50_day_spot_sl2prcnt
+    # card_data = card_sma50_day_spot_sl2prcnt(db, signal_db, trade_db, bank_db, signal_trade_db, pair, 'adjust_trades')
 
-    # IF STOP LOSS IS AVAILABLE, PLACE STOP LOSS ORDER
+    # 5 card_sma50_day_spot_sl3prcnt
+    # from .trade_cards.card_sma50_day_spot_sl3prcnt import card_sma50_day_spot_sl3prcnt
+    # card_data = card_sma50_day_spot_sl3prcnt(db, signal_db, trade_db, bank_db, signal_trade_db, pair, 'adjust_trades')
+
+    #6 card_sma50_day_spot_SLmoving2prcnt
+    # from .trade_cards.card_sma50_day_spot_SLmoving2prcnt import card_sma50_day_spot_SLmoving2prcnt
+    # card_data = card_sma50_day_spot_SLmoving2prcnt(db, signal_db, trade_db, bank_db, signal_trade_db, pair,
+    #                                                'adjust_trades')
+
+    #7 card_sma50_day_spot_movingSL_7dif_2move
+    # from .trade_cards.card_sma50_day_spot_SLmoving_7dif_2move import card_sma50_day_spot_SLmoving_7dif_2move
+    # card_data = card_sma50_day_spot_SLmoving_7dif_2move(db, signal_db, trade_db, bank_db, signal_trade_db, pair,
+    #                                                'adjust_trades')
+
+    # 8 card_sma50_day_spot_SL2_SB_4
+    # from .trade_cards.card_sma50_day_spot_SL2_SBuy4 import card_sma50_day_spot_SL2_SBuy4
+    # card_data = card_sma50_day_spot_SL2_SBuy4(db, signal_db, trade_db, bank_db, signal_trade_db, pair, 'adjust_trades')
+
+    # 9 card_sma50_day_spot_SL2_SB_4
+    # from .trade_cards.card_sma50_day_spot_0001_SL2_SB7 import card_sma50_day_spot_0001_SL2_SB7
+    # card_data = card_sma50_day_spot_0001_SL2_SB7(db, signal_db, trade_db, bank_db, signal_trade_db, pair, 'adjust_trades')
+
+    # 10 card_sma50_day_spot_0002_longSL2SB4_shortNOSL
+    from .trade_cards.card_sma50_day_spot_0002_longSL2SB4_shortNOSL import card_sma50_day_spot_0002_longSL2SB4_shortNOSL
+    card_data = card_sma50_day_spot_0002_longSL2SB4_shortNOSL(db, signal_db, trade_db, bank_db, signal_trade_db, pair,
+                                                 'adjust_trades')
+
+
+
+    to_postman += card_data['to_postman']
+    to_crystal += card_data['to_crystal']
 
     # UPDATE SIGNAL_DB AND NOTE CHANGES
         # ONLY CHECKS IF ORDERS ARE FILLED
@@ -41,7 +70,7 @@ def  vault_initial_update(db, signal_db, trade_db, bank_db, signal_trade_db, pai
         'to_crystal': to_crystal
     }
 
-def vault_take_trade(db, signal_db, trade_db, bank_db, signal_trade_db, pair):
+def vault_take_trades(db, signal_db, trade_db, bank_db, signal_trade_db, pair):
     to_postman, to_crystal = '', ''
 
 # TRADE STRATEGIES
@@ -54,8 +83,39 @@ def vault_take_trade(db, signal_db, trade_db, bank_db, signal_trade_db, pair):
     # card_info = card_litmus(db, signal_db, trade_db, bank_db, signal_trade_db, pair)
 
     #3 card_sma50_day_spot
-    from .trade_cards.card_sma50_day_spot import card_sma50_day_spot
-    card_info = card_sma50_day_spot(db, signal_db, trade_db, bank_db, signal_trade_db, pair)
+    # from .trade_cards.card_sma50_day_spot import card_sma50_day_spot
+    # card_info = card_sma50_day_spot(db, signal_db, trade_db, bank_db, signal_trade_db, pair)
+
+    #4 card_sma50_day_spot_sl2prcnt
+    # from .trade_cards.card_sma50_day_spot_sl2prcnt import card_sma50_day_spot_sl2prcnt
+    # card_info = card_sma50_day_spot_sl2prcnt(db, signal_db, trade_db, bank_db, signal_trade_db, pair, 'take_trades')
+
+    #5 card_sma50_day_spot_sl3prcnt
+    # from .trade_cards.card_sma50_day_spot_sl3prcnt import card_sma50_day_spot_sl3prcnt
+    # card_info = card_sma50_day_spot_sl3prcnt(db, signal_db, trade_db, bank_db, signal_trade_db, pair, 'take_trades')
+
+    #6 card_sma50_day_spot_SLmoving2prcnt
+    # from .trade_cards.card_sma50_day_spot_SLmoving2prcnt import card_sma50_day_spot_SLmoving2prcnt
+    # card_info = card_sma50_day_spot_SLmoving2prcnt(db, signal_db, trade_db, bank_db, signal_trade_db, pair, 'take_trades')
+
+    # 7 card_sma50_day_spot_movingSL_7dif_2move
+    # from .trade_cards.card_sma50_day_spot_SLmoving_7dif_2move import card_sma50_day_spot_SLmoving_7dif_2move
+    # card_info = card_sma50_day_spot_SLmoving_7dif_2move(db, signal_db, trade_db, bank_db, signal_trade_db, pair,'take_trades')
+
+    # 8 card_sma50_day_spot_SL2_SB_4
+    # from .trade_cards.card_sma50_day_spot_SL2_SBuy4 import card_sma50_day_spot_SL2_SBuy4
+    # card_info = card_sma50_day_spot_SL2_SBuy4(db, signal_db, trade_db, bank_db, signal_trade_db, pair, 'take_trades')
+
+    # 9 card_sma50_day_spot_0001_SL2_SB4
+    # from .trade_cards.card_sma50_day_spot_0001_SL2_SB7 import card_sma50_day_spot_0001_SL2_SB7
+    # card_info = card_sma50_day_spot_0001_SL2_SB7(db, signal_db, trade_db, bank_db, signal_trade_db, pair, 'take_trades')
+
+    # 10 card_sma50_day_spot_0001_SL2_SB4
+    from .trade_cards.card_sma50_day_spot_0002_longSL2SB4_shortNOSL import card_sma50_day_spot_0002_longSL2SB4_shortNOSL
+    card_info = card_sma50_day_spot_0002_longSL2SB4_shortNOSL(db, signal_db, trade_db, bank_db, signal_trade_db, pair, 'take_trades')
+
+
+
 
     to_postman += card_info['to_postman']
     to_crystal += card_info['to_crystal']

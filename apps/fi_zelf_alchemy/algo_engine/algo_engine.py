@@ -1,11 +1,8 @@
 from .vault_engine import vault_engine, get_bank_values, fund_bank
 from .signal_engine import signal_engine
 
-def algo_engine(db, json_data, candle_formats, pair, command):
-    signal_db = 'app_fi_zelf_alchemy_signal_db'
-    trade_db = 'app_fi_zelf_alchemy_trade_db'
-    bank_db = 'app_fi_zelf_alchemy_bank_db'
-    signal_trade_db = 'app_fi_zelf_association_signal_trade'
+def algo_engine(db, signal_db, trade_db, bank_db, signal_trade_db, json_data, candle_formats, pair, command):
+
     to_postman, to_crystal = '', ''
 
     if command == 'reset_db':
@@ -27,7 +24,7 @@ def algo_engine(db, json_data, candle_formats, pair, command):
             # SEND NOTES TO POSTMAN / CRYSTAL
         # ONLY CHECKS IF ORDERS ARE FILLED
         # ONLY TRIGGERS FLAGGING IF TARGET OR STOP_LOSS ARE FILLED or LIQUIDATION
-        vault_engine_initial_update = vault_engine(db, signal_db, trade_db, bank_db, signal_trade_db, 'initial_update', pair)
+        vault_engine_initial_update = vault_engine(db, signal_db, trade_db, bank_db, signal_trade_db, 'adjust_trades', pair)
         to_postman = vault_engine_initial_update['to_postman']
         to_crystal = vault_engine_initial_update['to_crystal']
 
@@ -57,7 +54,7 @@ def algo_engine(db, json_data, candle_formats, pair, command):
         to_crystal += signal_engine_data_new_scan['to_crystal']
 
         # STEP 5 vault_engine TAKE TRADES
-        vault_engine_data_take_trade = vault_engine(db, signal_db, trade_db, bank_db, signal_trade_db,'take_trade', pair)
+        vault_engine_data_take_trade = vault_engine(db, signal_db, trade_db, bank_db, signal_trade_db,'take_trades', pair)
         to_postman += vault_engine_data_take_trade['to_postman']
         to_crystal += vault_engine_data_take_trade['to_crystal']
 
