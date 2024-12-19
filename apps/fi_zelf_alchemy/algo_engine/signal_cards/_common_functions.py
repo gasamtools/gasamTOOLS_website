@@ -69,8 +69,8 @@ def insert_into_signal_db(db, signal_db, new_proxy):
 
         result = db.session.execute(
             text(
-                f"INSERT INTO {signal_db} (is_active, date_added, is_trend_valid, {keys_string}) "
-                f"VALUES (:is_active, :date_added, :is_trend_valid, :{keys_value_string})"
+                f"INSERT INTO {signal_db} (is_active, date_added,  {keys_string}) "
+                f"VALUES (:is_active, :date_added, :{keys_value_string})"
             ), data_values)
 
         # Commit the session
