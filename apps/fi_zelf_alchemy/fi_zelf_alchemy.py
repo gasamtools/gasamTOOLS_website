@@ -153,6 +153,15 @@ def register_subpages(current_user):
 #         db.create_all()
 
 def register_database(db, app):
+    # Define association table using Flask-SQLAlchemy syntax
+    app_fi_zelf_association_signal_trade = db.Table(
+        'app_fi_zelf_association_signal_trade',
+        db.Model.metadata,
+        db.Column('signal_id', db.Integer, db.ForeignKey('app_fi_zelf_alchemy_signal_db.id')),
+        db.Column('trade_id', db.Integer, db.ForeignKey('app_fi_zelf_alchemy_trade_db.id')),
+        extend_existing=True
+    )
+
     class fiZelfAlchemySignalDB(db.Model):
         __tablename__ = "app_fi_zelf_alchemy_signal_db"
 
@@ -189,6 +198,10 @@ def register_database(db, app):
         sdp_7 = db.Column(db.Text, nullable=True)
         sdp_8 = db.Column(db.Text, nullable=True)
         sdp_9 = db.Column(db.Text, nullable=True)
+        trades = db.relationship('fiZelfAlchemyTradeDB',
+                               secondary=app_fi_zelf_association_signal_trade,
+                               backref=db.backref('signals', lazy='dynamic'),
+                               lazy='dynamic')
 
         __table_args__ = {'extend_existing': True}
 
@@ -218,29 +231,6 @@ def register_database(db, app):
         tdp_3 = db.Column(db.Text, nullable=True)
 
         __table_args__ = {'extend_existing': True}
-
-    # Define the association table after the main tables
-    app_fi_zelf_association_signal_trade = Table(
-        'app_fi_zelf_association_signal_trade',
-        db.metadata,
-        db.Column('signal_id', db.Integer, db.ForeignKey(fiZelfAlchemySignalDB.id)),
-        db.Column('trade_id', db.Integer, db.ForeignKey(fiZelfAlchemyTradeDB.id)),
-        db.PrimaryKeyConstraint('signal_id', 'trade_id'),
-        extend_existing=True
-    )
-
-    # Add relationships after association table is defined
-    fiZelfAlchemySignalDB.trades = relationship(
-        "fiZelfAlchemyTradeDB",
-        secondary=app_fi_zelf_association_signal_trade,
-        back_populates="signals"
-    )
-
-    fiZelfAlchemyTradeDB.signals = relationship(
-        "fiZelfAlchemySignalDB",
-        secondary=app_fi_zelf_association_signal_trade,
-        back_populates="trades"
-    )
 
     class fiZelfAlchemyKeysDB(db.Model):
         __tablename__ = 'app_fi_zelf_alchemy_keys_db'
