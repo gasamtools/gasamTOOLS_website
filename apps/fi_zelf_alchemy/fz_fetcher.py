@@ -100,7 +100,7 @@ def fz_fetcher_fetch_pair(current_user, db, User, GasamApp, json_data, files_dat
             return {"status": "good"}
         except Exception as e:
             db.session.rollback()
-            return {"status": "error", "message": str(e)}
+            return {"status": f"error {str(e)}", "message": str(e)}
 
 
 
