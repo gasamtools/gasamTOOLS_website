@@ -71,8 +71,6 @@ def calculate_moving_average_series_data(candle_data, ma_length):
             else:
                 ma_data[i]['ma_marker'] = 'between'
 
-    # print(f'ma_data {ma_data} \n')
-
     return ma_data
 
 
@@ -131,7 +129,6 @@ def compare_and_update_db(db, signal_db, new_proxy, all_record_proxies, active_r
     to_postman, to_crystal = '', ''
 
     if 'no_signal' in new_proxy:
-        # print('no_signal')
         return {
             'to_postman': to_postman,
             'to_crystal': to_crystal
@@ -141,19 +138,16 @@ def compare_and_update_db(db, signal_db, new_proxy, all_record_proxies, active_r
         insert_into_db_data = insert_into_signal_db(db, signal_db, new_proxy)
         to_postman += insert_into_db_data['to_postman']
         to_crystal += insert_into_db_data['to_crystal']
-        # print('not record_proxy')
         return {
             'to_postman': to_postman,
             'to_crystal': to_crystal
         }
     else:
         records_dont_match = True
-        # print(all_record_proxies)
         for record in all_record_proxies:
             if int(new_proxy['sdp_0']) == int(record['sdp_0']) and new_proxy['trend_type'] == record['trend_type']:
                 records_dont_match = False
                 if record['id'] != active_record_proxy['id']:
-                    print(f're-activate {record['id']}')
                     reactivate_signal_data = reactivate_signal(db, signal_db, record)
                     to_postman += reactivate_signal_data['to_postman']
                     to_crystal += reactivate_signal_data['to_crystal']
@@ -163,10 +157,7 @@ def compare_and_update_db(db, signal_db, new_proxy, all_record_proxies, active_r
                     to_postman += flag_signal_data['to_postman']
                     to_crystal += flag_signal_data['to_crystal']
 
-
         if records_dont_match:
-            # print("recording new signal")
-            # print(f"{new_proxy['sdp_0']} VS {record_proxy['sdp_0']}")
             if int(new_proxy['sdp_0']) >= int(active_record_proxy['sdp_0']):
                 sdp_1 = new_proxy['sdp_0']
             else:

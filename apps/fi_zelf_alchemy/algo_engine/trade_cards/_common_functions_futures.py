@@ -390,7 +390,7 @@ def place_stop_lossProfit_futures(db, signal_db, trade_db, futures_db, signal_tr
                                                    price=stop_price,
                                                    trade_entry_stop=stop_price,
                                                    trade_type='futures',
-                                                   trade_position='short',
+                                                   trade_position=data['trade_position'],
                                                    trade_action='sell',
                                                    trade_entry='stop-limit',
                                                    currency_buy=data['currency_sell'],
