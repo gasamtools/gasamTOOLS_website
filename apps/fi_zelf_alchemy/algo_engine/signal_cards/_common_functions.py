@@ -57,7 +57,6 @@ def insert_into_signal_db(db, signal_db, new_proxy):
         data_values = {
             "is_active": True,
             "date_added": date_added,
-            "is_trend_valid": True,
         } | new_proxy
 
         keys_string = ', '.join(new_proxy.keys())
