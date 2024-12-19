@@ -133,7 +133,7 @@ def fz_fetcher_fetch_pair(current_user, db, User, GasamApp, json_data, files_dat
     status = insert_data_into_db(db, 'app_fi_zelf_alchemy_testPair_db', candle_data, json_data['pair'])
 
     if status['status'] == 'good':
-        status['status'] = (f'Old Data erased. New data {json_data['pair']} 1hour for {days_go_back} days inserted. {len(candle_data)} records are '
+        status['status'] = (f'Old Data erased. New data {json_data["pair"]} 1hour for {days_go_back} days inserted. {len(candle_data)} records are '
                   f'locked and loaded.')
         status['ready_to_feed'] = True
     else:
