@@ -17,10 +17,19 @@ def register_subpages(current_user):
 def register_database(db, app):
 
     # Recreate the association table
+    # app_fi_zelf_association_signal_trade = db.Table(
+    #     'app_fi_zelf_association_signal_trade',
+    #     db.Column('signal_id', db.Integer, db.ForeignKey('app_fi_zelf_alchemy_signal_db.id'), primary_key=True),
+    #     db.Column('trade_id', db.Integer, db.ForeignKey('app_fi_zelf_alchemy_trade_db.trade_id'), primary_key=True),
+    #     extend_existing=True
+    # )
+
+    # Recreate the association table with the primary key being both columns together
     app_fi_zelf_association_signal_trade = db.Table(
         'app_fi_zelf_association_signal_trade',
-        db.Column('signal_id', db.Integer, db.ForeignKey('app_fi_zelf_alchemy_signal_db.id'), primary_key=True),
-        db.Column('trade_id', db.Integer, db.ForeignKey('app_fi_zelf_alchemy_trade_db.trade_id'), primary_key=True),
+        db.Column('signal_id', db.Integer, db.ForeignKey('app_fi_zelf_alchemy_signal_db.id')),
+        db.Column('trade_id', db.Integer, db.ForeignKey('app_fi_zelf_alchemy_trade_db.id')),
+        db.PrimaryKeyConstraint('signal_id', 'trade_id'),  # Composite primary key
         extend_existing=True
     )
 
@@ -93,7 +102,7 @@ def register_database(db, app):
         __tablename__ = "app_fi_zelf_alchemy_trade_db"
 
         id = db.Column(db.Integer, primary_key=True)
-        trade_id = db.Column(db.Integer, nullable=False)
+        trade_id = db.Column(db.Integer, nullable=False, index=True)
         is_active = db.Column(db.Boolean, nullable=False)
         is_flagged = db.Column(db.Boolean, nullable=True)
         trade_status = db.Column(db.String(100), nullable=False)
