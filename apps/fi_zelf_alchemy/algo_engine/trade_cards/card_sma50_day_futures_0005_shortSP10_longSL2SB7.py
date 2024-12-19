@@ -36,14 +36,14 @@ def adjust_trades(db, signal_db, trade_db, futures_db, signal_trade_db, pair):
 
 
 # LONGSs SL/SB
-        if longs_buy_limit_flagged_trades_data:
-            for data in longs_buy_limit_flagged_trades_data:
-                print(longs_buy_limit_flagged_trades_data)
-        # PLACE STOP LOSS 2%  based on flagged-filled-buy order
-                place_SL_data = place_stop_lossProfit_futures(db, signal_db, trade_db, futures_db, signal_trade_db,
-                                                              data['price'], data, 2, 'loss')
-                to_postman += place_SL_data['to_postman']
-                to_crystal += place_SL_data['to_crystal']
+    if longs_buy_limit_flagged_trades_data:
+        for data in longs_buy_limit_flagged_trades_data:
+            print(longs_buy_limit_flagged_trades_data)
+    # PLACE STOP LOSS 2%  based on flagged-filled-buy order
+            place_SL_data = place_stop_lossProfit_futures(db, signal_db, trade_db, futures_db, signal_trade_db,
+                                                          data['price'], data, 2, 'loss')
+            to_postman += place_SL_data['to_postman']
+            to_crystal += place_SL_data['to_crystal']
 
 # PLACE BUY STOP-LIMIT
 # if the trend continues, but we got stopped out 7% from the stop-loss sell price
