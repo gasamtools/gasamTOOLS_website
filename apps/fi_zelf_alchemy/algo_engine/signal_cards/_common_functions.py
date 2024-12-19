@@ -129,11 +129,11 @@ def flag_signal(db, signal_db, record_proxy, trend_ended):
     db.session.commit()
 
     note_time = timestamp_to_time_UTC(fz_feeder_cycle_last_candle['time'])
-    to_postman += (f"{note_time} #{record_proxy['id']} INVALIDATED {record_proxy["signal_type"]} SIGNAL! {record_proxy["trading_pair"]} / {record_proxy["interval"]}. "
-                   f"Invalidated Trend: {record_proxy["trend_type"]}! Trend ended on: {date_utc}")
+    to_postman += (f"{note_time} #{record_proxy['id']} INVALIDATED {record_proxy['signal_type']} SIGNAL! {record_proxy['trading_pair']} / {record_proxy['interval']}. "
+                   f"Invalidated Trend: {record_proxy['trend_type']}! Trend ended on: {date_utc}")
     to_crystal += (
-        f"<p>{note_time} <a class='fz crystal signal' id='{record_proxy["id"]}' href='#'>#{record_proxy['id']} INVALIDATED {record_proxy["signal_type"]} SIGNAL!</a> {record_proxy["trading_pair"]} / {record_proxy["interval"]}.<br>"
-        f"Invalidated Trend: {record_proxy["trend_type"]}! Trend ended on: {date_utc}</p>")
+        f"<p>{note_time} <a class='fz crystal signal' id='{record_proxy['id']}' href='#'>#{record_proxy['id']} INVALIDATED {record_proxy['signal_type']} SIGNAL!</a> {record_proxy['trading_pair']} / {record_proxy['interval']}.<br>"
+        f"Invalidated Trend: {record_proxy['trend_type']}! Trend ended on: {date_utc}</p>")
 
     return {
         'to_postman': to_postman,
@@ -161,11 +161,11 @@ def reactivate_signal(db, signal_db, record_proxy):
 
     note_time = timestamp_to_time_UTC(fz_feeder_cycle_last_candle['time'])
     trend_started = timestamp_to_time_UTC(record_proxy["sdp_0"])
-    to_postman += (f"{note_time} #{record_proxy['id']} REVALIDATED {record_proxy["signal_type"]} SIGNAL! {record_proxy["trading_pair"]} / {record_proxy["interval"]}. "
-                   f"Trend: {record_proxy["trend_type"]}! Trend started on: {trend_started}")
+    to_postman += (f"{note_time} #{record_proxy['id']} REVALIDATED {record_proxy['signal_type']} SIGNAL! {record_proxy["trading_pair"]} / {record_proxy['interval']}. "
+                   f"Trend: {record_proxy['trend_type']}! Trend started on: {trend_started}")
     to_crystal += (
-        f"<p>{note_time} <a class='fz crystal signal' id='{record_proxy["id"]}' href='#'>#{record_proxy['id']} REVALIDATED {record_proxy["signal_type"]} SIGNAL!</a> {record_proxy["trading_pair"]} / {record_proxy["interval"]}.<br>"
-        f"Trend: {record_proxy["trend_type"]}! Trend started on: {trend_started}</p>")
+        f"<p>{note_time} <a class='fz crystal signal' id='{record_proxy['id']}' href='#'>#{record_proxy['id']} REVALIDATED {record_proxy['signal_type']} SIGNAL!</a> {record_proxy['trading_pair']} / {record_proxy['interval']}.<br>"
+        f"Trend: {record_proxy['trend_type']}! Trend started on: {trend_started}</p>")
 
     return {
         'to_postman': to_postman,

@@ -17,7 +17,7 @@ def adjust_trades(db, signal_db, trade_db, futures_db, signal_trade_db, pair):
     flagged_trades_data = fetch_flagged_trades(db, trade_db, pair)
     shorts_buy_limit_flagged_trades_data = [trade for trade in flagged_trades_data if trade['trade_position'] == 'short' and trade['trade_action'] == 'buy' and trade['trade_entry'] == 'limit']
     longs_buy_limit_flagged_trades_data = [trade for trade in flagged_trades_data if trade['trade_position'] == 'long' and trade['trade_action'] == 'buy' and trade['trade_entry'] == 'limit']
-    print(flagged_trades_data)
+
 # SHORTs SL/SP
     if shorts_buy_limit_flagged_trades_data:
         for data in shorts_buy_limit_flagged_trades_data:
@@ -38,7 +38,6 @@ def adjust_trades(db, signal_db, trade_db, futures_db, signal_trade_db, pair):
 # LONGSs SL/SB
         if longs_buy_limit_flagged_trades_data:
             for data in longs_buy_limit_flagged_trades_data:
-                pass
                 print(longs_buy_limit_flagged_trades_data)
         # PLACE STOP LOSS 2%  based on flagged-filled-buy order
                 place_SL_data = place_stop_lossProfit_futures(db, signal_db, trade_db, futures_db, signal_trade_db,

@@ -96,7 +96,7 @@ def fz_fetcher_fetch_pair(current_user, db, User, GasamApp, json_data, files_dat
                         "notes": '',
                     },
                 )
-                db.session.commit()
+            db.session.commit()
             return {"status": "good"}
         except Exception as e:
             db.session.rollback()
