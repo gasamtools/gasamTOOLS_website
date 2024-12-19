@@ -1,8 +1,9 @@
 <div class="gasam fz app-container row head">
     <div class="gasam fz sub-app-container bank-container container col-12">
-        <div class="gasam fz bank-sub-container">
-            <div class="gasam fz container bank-total">
-                <table id='FZbankTableTOTAL'>
+        <div class="gasam fz bank-sub-container spot">
+            <span class="gasam fz bank-span">SPOT</span>
+            <div class="gasam fz container bank bank-total">
+                <table id='FZbankTableSpotTOTAL'>
                     <thead>
                         <tr>
                             <th style="border: 1px solid black; padding: 8px; background-color: #f2f2f2;">TOTAL</th>
@@ -10,21 +11,52 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td style="border: 1px solid black; padding: 8px;">$<span id="FZbankTotal">0,00</span></td>
+                            <td style="border: 1px solid black; padding: 8px;">$<span id="FZbankSpotTotal">0,00</span></td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            <div class="gasam fz container bank-coins" id="FZbankCoins">
+            <div class="gasam fz container bank bank-coins" id="FZbankSpotCoins">
                 <table >
                     <thead>
-                        <tr id="FZbankTableHeader">
-                            <th class="gasam fz bank-header"><span id="FZbankHeaderUSDT">USDT</span></th>
+                        <tr id="FZbankTableSpotHeader">
+                            <th class="gasam fz bank-header"><span id="FZbankHeaderSpotUSDT">USDT</span></th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr id="FZbankTableCell">
-                            <td class="gasam fz bank-cell"><span id="FZbankCellUSDT">0,00</span></td>
+                        <tr id="FZbankTableSpotCell">
+                            <td class="gasam fz bank-cell"><span id="FZbankCellSpotUSDT">0,00</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="gasam fz bank-sub-container futures">
+            <span class="gasam fz bank-span">FUTURES</span>
+            <div class="gasam fz container bank bank-total">
+                <table id='FZbankTableFuturesTOTAL'>
+                    <thead>
+                        <tr>
+                            <th style="border: 1px solid black; padding: 8px; background-color: #f2f2f2;">TOTAL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="border: 1px solid black; padding: 8px;">$<span id="FZbankFuturesTotal">0,00</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="gasam fz container bank bank-coins" id="FZbankFuturesCoins">
+                <table >
+                    <thead>
+                        <tr id="FZbankTableFuturesHeader">
+                            <th class="gasam fz bank-header"><span id="FZbankHeaderFuturesUSDT">USDT</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="FZbankTableFuturesCell">
+                            <td class="gasam fz bank-cell"><span id="FZbankCellFuturesUSDT">0,00</span></td>
                         </tr>
                     </tbody>
                 </table>
@@ -81,11 +113,11 @@
             </div>
         </div>
         </div>
-        <div class="text-center">
+        <div class="gasam fz feed-div alchemy text-center">
             <h3>Alchemy Feed</h3>
             <div id="fz_alchemy_feed"></div>
         </div>
-        <div class="text-center">
+        <div class="gasam fz feed-div crystal text-center">
             <h3>Crystal Feed</h3>
             <div id="fz_crystal_feed"></div>
         </div>

@@ -1,4 +1,6 @@
 from ._common_functions import *
+from._common_functions_spot import *
+from._common_functions_futures import *
 
 def card_sma50_day_spot_SL2_SBuy4(db, signal_db, trade_db, bank_db, signal_trade_db, pair, command):
     if command == 'adjust_trades':
@@ -19,7 +21,8 @@ def adjust_trades(db, signal_db, trade_db, bank_db, signal_trade_db, pair):
 # PLACE STOP LOSS based on flagged-filled-buy order
             if data['trade_action'] == 'buy' and data['trade_status'] == 'filled':
                 # PLACE STOP LOSS 2 %
-                place_SL_data = place_stop_loss(db, signal_db, trade_db, bank_db, signal_trade_db, data['price'], data, 2)
+                place_SL_data = place_stop_loss_spot(db, signal_db, trade_db, bank_db, signal_trade_db, data['price'],
+                                                     data, 2)
                 to_postman += place_SL_data['to_postman']
                 to_crystal += place_SL_data['to_crystal']
 
@@ -76,29 +79,19 @@ def take_trades(db, signal_db, trade_db, bank_db, signal_trade_db, pair):
         currency_buy = pair.split('-')[0]
         currency_sell = pair.split('-')[1]
 
-        currency_sell_balance = fetch_bank_currency_balance(db, bank_db, currency_sell)
+        currency_sell_balance = fetch_bank_currency_balance_spot(db, bank_db, currency_sell)
 
         # ESTABLISH TRADE ID
         new_trade_id = get_new_trade_id(db, trade_db)
 
-        place_new_order_data = place_new_order(
-            db=db,
-            signal_db=signal_db,
-            trade_db=trade_db,
-            bank_db=bank_db,
-            signal_trade_db=signal_trade_db,
-            trade_id=new_trade_id,
-            signal=not_traded_sma50_bull_day_signals_of_pair[0],
-            price=not_traded_sma50_bull_day_signals_of_pair[0]['tp_entrance_1'],
-            amount_in=currency_sell_balance,
-            trade_type='spot',  # spot, futures
-            trade_position='long',  # long/short
-            trade_action='buy',  # buy/sell
-            trade_entry='limit',
-            currency_buy=currency_buy,
-            currency_sell=currency_sell,
-            tdp_0=fz_feeder_cycle_last_candle['time']
-        )
+        place_new_order_data = place_new_order_spot(db=db, signal_db=signal_db, trade_db=trade_db, bank_db=bank_db,
+                                                    signal_trade_db=signal_trade_db, trade_id=new_trade_id,
+                                                    signal=not_traded_sma50_bull_day_signals_of_pair[0],
+                                                    price=not_traded_sma50_bull_day_signals_of_pair[0]['tp_entrance_1'],
+                                                    amount_in=currency_sell_balance, trade_type='spot',
+                                                    trade_position='long', trade_action='buy', trade_entry='limit',
+                                                    currency_buy=currency_buy, currency_sell=currency_sell,
+                                                    tdp_0=fz_feeder_cycle_last_candle['time'])
         to_postman += place_new_order_data['to_postman']
         to_crystal += place_new_order_data['to_crystal']
 
@@ -119,29 +112,20 @@ def take_trades(db, signal_db, trade_db, bank_db, signal_trade_db, pair):
 
         currency_sell = flagged_bull_signal['trading_pair'].split('-')[0]
         currency_buy = flagged_bull_signal['trading_pair'].split('-')[1]
-        currency_sell_balance = fetch_bank_currency_balance(db, bank_db, currency_sell)
+        currency_sell_balance = fetch_bank_currency_balance_spot(db, bank_db, currency_sell)
 
         if currency_sell_balance > 0:
             # PLACE NEW SELL TRADE
             new_trade_id = get_new_trade_id(db, trade_db)
-            place_new_order_data = place_new_order(
-                db=db,
-                signal_db=signal_db,
-                trade_db=trade_db,
-                bank_db=bank_db,
-                signal_trade_db=signal_trade_db,
-                trade_id=new_trade_id,
-                signal=flagged_sma50_day_bull_signals[0],
-                price=not_traded_sma50_bear_day_signals_of_pair[0]['tp_entrance_1'],
-                amount_in=currency_sell_balance,
-                trade_type='spot',  # spot, futures
-                trade_position='long',  # long/short
-                trade_action='sell',  # buy/sell
-                trade_entry='limit',
-                currency_buy=currency_buy,
-                currency_sell=currency_sell,
-                tdp_0=fz_feeder_cycle_last_candle['time']
-            )
+            place_new_order_data = place_new_order_spot(db=db, signal_db=signal_db, trade_db=trade_db, bank_db=bank_db,
+                                                        signal_trade_db=signal_trade_db, trade_id=new_trade_id,
+                                                        signal=flagged_sma50_day_bull_signals[0],
+                                                        price=not_traded_sma50_bear_day_signals_of_pair[0][
+                                                            'tp_entrance_1'], amount_in=currency_sell_balance,
+                                                        trade_type='spot', trade_position='long', trade_action='sell',
+                                                        trade_entry='limit', currency_buy=currency_buy,
+                                                        currency_sell=currency_sell,
+                                                        tdp_0=fz_feeder_cycle_last_candle['time'])
             to_postman += place_new_order_data['to_postman']
             to_crystal += place_new_order_data['to_crystal']
 

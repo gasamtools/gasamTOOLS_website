@@ -37,8 +37,11 @@ function FZfetcherSelectPair() {
         // update feed
         FZcrystalUpdateFeed('#fz_alchemy_feed', data['status']);
 
-        // update bank
-        FZcrystalUpdateBank(data['bank_values_data']);
+        // update bank Spot
+        FZcrystalUpdateBankSpot(data['bank_spot_values_data']);
+
+        // update bank Futures
+        FZcrystalUpdateBankFutures(data['bank_futures_values_data']);
 
         if (data['ready_to_feed']) {
             $('#FZAfeederPanel').css('display', 'flex').hide().slideDown();

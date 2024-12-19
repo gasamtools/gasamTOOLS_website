@@ -59,13 +59,16 @@ function FZfeederDataStream(elementId, Cycle) {
     .then(data => {
 
         // update alchemy feed
-        FZcrystalUpdateFeed('#fz_alchemy_feed', data['status']);
+        FZcrystalUpdateFeed('#fz_alchemy_feed', data['alchemyFeed']);
 
         // update crystal feed
         FZcrystalUpdateFeed('#fz_crystal_feed', data['to_crystal']);
 
         // update bank
-        FZcrystalUpdateBank(data['bank_values_data']);
+        FZcrystalUpdateBankSpot(data['bank_spot_values_data']);
+
+        // update bank
+        FZcrystalUpdateBankFutures(data['bank_futures_values_data']);
 
         // Print Candles
         FZcrystalPrintChartCandles(data['candles'], data['pair']);

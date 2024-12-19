@@ -174,7 +174,7 @@ def fz_fetcher_send_placed_order(order_data):
     return True
 
 def fz_fetcher_update_orders(db, bank_db, trade_data): #ALCHEMY FUNCTION, can be dirty
-    from .fz_feeder import fz_feeder_cycle_timestamp
+    from .fz_feeder import fz_feeder_cycle_last_candle
     import pytz
     from datetime import datetime
     global keys_db
@@ -192,31 +192,39 @@ def fz_fetcher_update_orders(db, bank_db, trade_data): #ALCHEMY FUNCTION, can be
             updated_trade_data.append(
                 {
                     'id': trade['id'],
+                    'trade_id': trade['trade_id'],
                     'trade_status': 'filled',
+                    'trade_type': trade['trade_type'],
+                    'trade_position': trade['trade_position'],
                     'is_flagged': True,
                     'date_filled': date_filled,
                     'currency_sell': trade['currency_sell'],
                     'amount_sell': trade['amount_sell'],
                     'currency_buy': trade['currency_buy'],
                     'amount_buy': trade['amount_buy'],
-                    'tdp_1': fz_feeder_cycle_timestamp
+                    'price': trade['price'],
+                    'tdp_1': fz_feeder_cycle_last_candle['time']
                 })
         elif trade['trade_entry'] == 'stop-limit':
             scan_since = trade['tdp_0']
-            scan_until = fz_feeder_cycle_timestamp
+            scan_until = fz_feeder_cycle_last_candle['time']
             trade_entry_stop = trade['trade_entry_stop']
-            if check_if_reached_stop_limit(db, scan_since, scan_until, trade_entry_stop, trade['trade_action']):
+            if check_if_reached_stop_limit(db, scan_since, scan_until, trade_entry_stop, trade):
                 updated_trade_data.append(
                     {
                         'id': trade['id'],
+                        'trade_id': trade['trade_id'],
                         'trade_status': 'filled',
+                        'trade_type': trade['trade_type'],
+                        'trade_position': trade['trade_position'],
                         'is_flagged': True,
                         'date_filled': date_filled,
                         'currency_sell': trade['currency_sell'],
                         'amount_sell': trade['amount_sell'],
                         'currency_buy': trade['currency_buy'],
                         'amount_buy': trade['amount_buy'],
-                        'tdp_1': fz_feeder_cycle_timestamp
+                        'price': trade['price'],
+                        'tdp_1': fz_feeder_cycle_last_candle['time']
                     })
 
     return updated_trade_data
@@ -305,7 +313,7 @@ def get_env_value_from_env_or_db(db, db_name, env_key):
     return env_value
 
 
-def check_if_reached_stop_limit(db, scan_since, scan_until, trade_entry_stop, trade_action):
+def check_if_reached_stop_limit(db, scan_since, scan_until, trade_entry_stop, trade):
     from sqlalchemy.sql import text
 
     # Define your query parameters
@@ -329,13 +337,29 @@ def check_if_reached_stop_limit(db, scan_since, scan_until, trade_entry_stop, tr
         # print(row)
         high = row[0]
         low = row[1]
-        if trade_action == 'sell':
-            if low <= trade_entry_stop:
-                print(f'TRUE low {low} <= trade_entry_stop {trade_entry_stop}')
-                return True
-        elif trade_action == 'buy':
-            if trade_entry_stop <= high:
-                print(f'TRUE trade_entry_stop {trade_entry_stop} <= high {high}')
+        # trade_type = db.Column(db.String(100), nullable=False)  # spot, futures
+        # trade_position = db.Column(db.String(100), nullable=False) # long/short
+
+        # if trade['trade_position'] == 'short':
+        #     if trade['trade_action'] == 'buy':
+        #         if low <= trade_entry_stop:
+        #             print(f'TRUE low {low} <= trade_entry_stop {trade_entry_stop}')
+        #             return True
+        #     elif trade['trade_action'] == 'sell':
+        #         if trade_entry_stop <= high:
+        #             print(f'TRUE trade_entry_stop {trade_entry_stop} <= high {high}')
+        #             return True
+        # else:
+        #     if trade['trade_action'] == 'sell':
+        #         if low <= trade_entry_stop:
+        #             print(f'TRUE low {low} <= trade_entry_stop {trade_entry_stop}')
+        #             return True
+        #     elif trade['trade_action'] == 'buy':
+        #         if trade_entry_stop <= high:
+        #             print(f'TRUE trade_entry_stop {trade_entry_stop} <= high {high}')
+        #             return True
+        if low <= trade_entry_stop <= high:
+                print(f'TRUE low {low} <= trade_entry_stop {trade_entry_stop} <= high {high}')
                 return True
     return False
 

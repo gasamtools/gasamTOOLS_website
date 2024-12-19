@@ -1,4 +1,6 @@
 from ._common_functions import *
+from._common_functions_spot import *
+from._common_functions_futures import *
 
 def card_sma50_day_spot(db, signal_db, trade_db, bank_db, signal_trade_db, pair):
     to_postman, to_crystal = '', ''
@@ -16,28 +18,18 @@ def card_sma50_day_spot(db, signal_db, trade_db, bank_db, signal_trade_db, pair)
         currency_buy = pair.split('-')[0]
         currency_sell = pair.split('-')[1]
 
-        currency_sell_balance = fetch_bank_currency_balance(db, bank_db, currency_sell)
+        currency_sell_balance = fetch_bank_currency_balance_spot(db, bank_db, currency_sell)
 
         # ESTABLISH TRADE ID
         new_trade_id = get_new_trade_id(db, trade_db)
 
-        place_new_order_data = place_new_order(
-            db=db,
-            signal_db=signal_db,
-            trade_db=trade_db,
-            bank_db=bank_db,
-            signal_trade_db=signal_trade_db,
-            trade_id=new_trade_id,
-            signal=not_traded_sma50_bull_day_signals[0],
-            price=not_traded_sma50_bull_day_signals[0]['tp_entrance_1'],
-            amount_in=currency_sell_balance,
-            trade_type='spot',  # spot, futures
-            trade_position='long',  # long/short
-            trade_action='buy',  # buy/sell
-            trade_entry='limit',
-            currency_buy=currency_buy,
-            currency_sell=currency_sell
-        )
+        place_new_order_data = place_new_order_spot(db=db, signal_db=signal_db, trade_db=trade_db, bank_db=bank_db,
+                                                    signal_trade_db=signal_trade_db, trade_id=new_trade_id,
+                                                    signal=not_traded_sma50_bull_day_signals[0],
+                                                    price=not_traded_sma50_bull_day_signals[0]['tp_entrance_1'],
+                                                    amount_in=currency_sell_balance, trade_type='spot',
+                                                    trade_position='long', trade_action='buy', trade_entry='limit',
+                                                    currency_buy=currency_buy, currency_sell=currency_sell)
         to_postman += place_new_order_data['to_postman']
         to_crystal += place_new_order_data['to_crystal']
 
@@ -58,29 +50,19 @@ def card_sma50_day_spot(db, signal_db, trade_db, bank_db, signal_trade_db, pair)
         currency_sell = pair.split('-')[0]
         currency_buy = pair.split('-')[1]
 
-        currency_sell_balance = fetch_bank_currency_balance(db, bank_db, currency_sell)
+        currency_sell_balance = fetch_bank_currency_balance_spot(db, bank_db, currency_sell)
         print(currency_sell_balance)
 
         # ESTABLISH TRADE ID
         new_trade_id = get_new_trade_id(db, trade_db)
 
-        place_new_order_data = place_new_order(
-            db=db,
-            signal_db=signal_db,
-            trade_db=trade_db,
-            bank_db=bank_db,
-            signal_trade_db=signal_trade_db,
-            trade_id=new_trade_id,
-            signal=flagged_sma50_day_bull_signals[0],
-            price=not_traded_sma50_bear_day_signals[0]['tp_entrance_1'],
-            amount_in=currency_sell_balance,
-            trade_type='spot',  # spot, futures
-            trade_position='long',  # long/short
-            trade_action='sell',  # buy/sell
-            trade_entry='limit',
-            currency_buy=currency_buy,
-            currency_sell=currency_sell
-        )
+        place_new_order_data = place_new_order_spot(db=db, signal_db=signal_db, trade_db=trade_db, bank_db=bank_db,
+                                                    signal_trade_db=signal_trade_db, trade_id=new_trade_id,
+                                                    signal=flagged_sma50_day_bull_signals[0],
+                                                    price=not_traded_sma50_bear_day_signals[0]['tp_entrance_1'],
+                                                    amount_in=currency_sell_balance, trade_type='spot',
+                                                    trade_position='long', trade_action='sell', trade_entry='limit',
+                                                    currency_buy=currency_buy, currency_sell=currency_sell)
         to_postman += place_new_order_data['to_postman']
         to_crystal += place_new_order_data['to_crystal']
 

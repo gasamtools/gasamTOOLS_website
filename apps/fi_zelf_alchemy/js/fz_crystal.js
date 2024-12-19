@@ -126,8 +126,7 @@ function FZcrystalUpdateFeed(target, data) {
         }
     );
 
-    var feed = $(target).html();
-    $(target).html(feed+data);
+    $(target).append(data);
 
     // Check if not hovering before scrolling
     if (!$(target).data('hover')) {
@@ -135,35 +134,61 @@ function FZcrystalUpdateFeed(target, data) {
     }
 }
 
-function FZcrystalUpdateBank(data) {
+function FZcrystalUpdateBankSpot(data) {
 
     // print total html
-    $('#FZbankTotal').html(data['total']);
+    $('#FZbankSpotTotal').html(data['total']);
 
     // print coins html
     var html;
-    html = '<div class="gasam fz container bank-coins" id="FZbankCoins">';
-        html += '<table style="border-collapse: collapse; width: 50px;">';
-            html += '<thead>';
-                html += '<tr id="FZbankTableHeader">';
-                    for (let coin of data['coins_data']) {
-                        html +=`<th class="gasam fz bank-header"><span id="FZbankHeader${coin['currency']}">${coin['currency']}</span></th>`;
+    html = '<table style="border-collapse: collapse; width: 50px;">';
+        html += '<thead>';
+            html += '<tr id="FZbankTableSpotHeader">';
+                for (let coin of data['coins_data']) {
+                    html +=`<th class="gasam fz bank-header"><span id="FZbankHeaderSpot${coin['currency']}">${coin['currency']}</span></th>`;
 
-                    }
-                html += '</tr>';
-            html += '</thead>';
-            html += '<tbody>';
-                html += '<tr id="FZbankTableCell">';
-                    for (let coin of data['coins_data']) {
-                        html +=`<td class="gasam fz bank-cell"><span id="FZbankCell${coin['amount']}">${coin['amount']}</span></td>`;
-                    }
-                html += '</tr>';
-            html += '</tbody>';
-        html += '</table>';
-    html += '</div>';
+                }
+            html += '</tr>';
+        html += '</thead>';
+        html += '<tbody>';
+            html += '<tr id="FZbankTableSpotCell">';
+                for (let coin of data['coins_data']) {
+                    html +=`<td class="gasam fz bank-cell"><span id="FZbankSpotCell${coin['amount']}">${coin['amount']}</span></td>`;
+                }
+            html += '</tr>';
+        html += '</tbody>';
+    html += '</table>';
 
-    $('#FZbankCoins').html(html);
+    $('#FZbankSpotCoins').html(html);
 }
+
+function FZcrystalUpdateBankFutures(data) {
+
+    // print total html
+    $('#FZbankFuturesTotal').html(data['total']);
+
+    // print coins html
+    var html;
+    html = '<table style="border-collapse: collapse;">';
+        html += '<thead>';
+            html += '<tr id="FZbankTableFuturesHeader">';
+                for (let coin of data['coins_data']) {
+                    html +=`<th class="gasam fz bank-header"><span id="FZbankHeaderFutures${coin['currency']}">#${coin['trade_id']} ${coin['currency']}-${coin['trade_position']}</span></th>`;
+                }
+            html += '</tr>';
+        html += '</thead>';
+        html += '<tbody>';
+            html += '<tr id="FZbankTableFuturesCell">';
+                for (let coin of data['coins_data']) {
+                    html +=`<td class="gasam fz bank-cell"><span id="FZbankCellFutures${coin['amount']}">${coin['amount']}&nbsp;</span>|<span>&nbsp;${coin['pnl']}</span></td>`;
+                }
+            html += '</tr>';
+        html += '</tbody>';
+    html += '</table>';
+
+    $('#FZbankFuturesCoins').html(html);
+}
+
 
 function FZcrystalClearAllLines(chart) {
     lineSeriesArray.forEach(lineSeries => chart.removeSeries(lineSeries));

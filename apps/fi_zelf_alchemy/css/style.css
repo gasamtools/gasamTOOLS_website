@@ -6,6 +6,25 @@
     height: 100%;
 }
 
+.gasam.fz.sub-app-container.table-container.container {
+    display: flex;
+    flex-direction: column;
+    contain: size;
+}
+
+.gasam.fz.feed-div.crystal {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    min-height: 0;
+}
+#fz_crystal_feed {
+    flex: 1;
+    text-align: left;
+    min-height: 0;
+    height: 100%;
+}
+
 div#FZAfeederPanelDiv {
     height: 120px;
 }
@@ -16,15 +35,15 @@ div#FZAfeederPanelDiv {
 
 #fz_alchemy_feed,
 #fz_crystal_feed {
-    height: 200px;
     background-color: #454545;
     color: #df9e50;
     overflow-y: scroll;
     scroll-behavior: smooth;
 }
 
-#fz_crystal_feed {
-  text-align: left;
+#fz_alchemy_feed {
+    height: 200px;
+
 }
 
 #FZAfeederPanel {
@@ -71,7 +90,6 @@ button#FZhideSignal {
 .fz.bank-sub-container {
     display: inline-flex;
     width: 100%;
-    margin-bottom: 10px;
 }
 
 .fz.bank-total {
@@ -80,8 +98,18 @@ button#FZhideSignal {
     text-align: left;
 }
 
-#FZbankTableTOTAL {
+#FZbankTableSpotTOTAL,
+#FZbankTableFuturesTOTAL {
   width: 100%;
+}
+
+.gasam.fz.bank-span {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+}
+
+.gasam.fz.container.bank {
+    margin: 0;
 }
 
 .fz.bank-coins {
@@ -101,3 +129,4 @@ button#FZhideSignal {
     padding: 8px;
     text-align: center;
 }
+

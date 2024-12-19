@@ -46,3 +46,31 @@ def fetch_signal_by_id(db, signal_db, signal_id):
     else:
         return None
 
+def printAlchemyFeed(command, feederCycle, hourly_candles, total_candles, fastForwardmultiplier):
+    import pytz
+    from datetime import datetime
+
+    status = ''
+    if command == 'allForward':
+        for i in range(0, (feederCycle)):
+            dt_utc = datetime.fromtimestamp(hourly_candles[i - feederCycle]['time'], pytz.UTC)
+            status += f"<p>candles up to {dt_utc.strftime('%y-%m-%d %H')}:00 UTC</p>"
+    elif command == 'fastForward':
+        for i in range(0, fastForwardmultiplier):
+            dt_utc = datetime.fromtimestamp(hourly_candles[-fastForwardmultiplier + i]['time'], pytz.UTC)
+            status += f"<p>candles up to {dt_utc.strftime('%y-%m-%d %H')}:00 UTC</p>"
+    else:
+        dt_utc = datetime.fromtimestamp(hourly_candles[-1]['time'], pytz.UTC)
+        status += f"<p>candles up to {dt_utc.strftime('%y-%m-%d %H')}:00 UTC</p>"
+
+    # CHECK IF NO MORE CANDLES LEFT TO TEST
+    if len(hourly_candles) == total_candles:
+        end_of_test = True
+        status += f"<p>TEST COMPLETE</p>"
+    else:
+        end_of_test = False
+
+    return {'status': status,
+            'end_of_test': end_of_test
+            }
+

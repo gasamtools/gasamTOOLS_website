@@ -16,23 +16,13 @@ def card_litmus(db, signal_db, trade_db, bank_db, signal_trade_db, pair):
         # ESTABLISH TRADE ID
         new_trade_id = get_new_trade_id(db, trade_db)
 
-        place_new_order_data = place_new_order(
-            db=db,
-            signal_db=signal_db,
-            trade_db=trade_db,
-            bank_db=bank_db,
-            signal_trade_db=signal_trade_db,
-            trade_id=new_trade_id,
-            signal=not_traded_litmus_signals[0],
-            price=not_traded_litmus_signals[0]['tp_entrance_1'],
-            amount_in=1000,
-            trade_type='spot',  # spot, futures
-            trade_position='long',  # long/short
-            trade_action='buy',  # buy/sell
-            trade_entry='limit',
-            currency_buy=currency_buy,
-            currency_sell=currency_sell
-        )
+        place_new_order_data = place_new_order_spot(db=db, signal_db=signal_db, trade_db=trade_db, bank_db=bank_db,
+                                                    signal_trade_db=signal_trade_db, trade_id=new_trade_id,
+                                                    signal=not_traded_litmus_signals[0],
+                                                    price=not_traded_litmus_signals[0]['tp_entrance_1'], amount_in=1000,
+                                                    trade_type='spot', trade_position='long', trade_action='buy',
+                                                    trade_entry='limit', currency_buy=currency_buy,
+                                                    currency_sell=currency_sell)
         to_postman += place_new_order_data['to_postman']
         to_crystal += place_new_order_data['to_crystal']
 

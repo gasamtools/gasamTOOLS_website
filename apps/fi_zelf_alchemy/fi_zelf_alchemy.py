@@ -126,6 +126,19 @@ def register_database(db, app):
 
         __table_args__ = {'extend_existing': True}
 
+
+    class fiZelfAlchemyFuturesDB(db.Model):
+        __tablename__ = "app_fi_zelf_alchemy_futures_db"
+
+        id = db.Column(db.Integer, primary_key=True)
+        currency = db.Column(db.String(100), nullable=False)
+        amount = db.Column(db.Float, nullable=False)
+        pnl = db.Column(db.Float, nullable=True)
+        trade_id = db.Column(db.Integer, nullable=True)
+        trade_position = db.Column(db.String(100), nullable=True)
+
+        __table_args__ = {'extend_existing': True}
+
     with app.app_context():
         db.create_all()
 
@@ -142,6 +155,7 @@ def json_logic(current_user, db, User, GasamApp, json_data, files_data):
     signal_db = 'app_fi_zelf_alchemy_signal_db'
     trade_db = 'app_fi_zelf_alchemy_trade_db'
     bank_db = 'app_fi_zelf_alchemy_bank_db'
+    futures_db = 'app_fi_zelf_alchemy_futures_db'
     signal_trade_db = 'app_fi_zelf_association_signal_trade'
     testPair_db = 'app_fi_zelf_alchemy_testPair_db'
 
@@ -153,23 +167,25 @@ def json_logic(current_user, db, User, GasamApp, json_data, files_data):
         return app_ini(current_user, db, User, GasamApp, json_data, files_data)
     if json_data['js_function'] == 'fz_fetcher':
         # RESET ALL DBs
-        algo_engine(db, signal_db, trade_db, bank_db, signal_trade_db, json_data, {}, '', 'reset_db')
+        algo_engine(db, signal_db, trade_db, bank_db, futures_db, signal_trade_db, json_data, {}, '', 'reset_db')
         # FETCH AND LOAD DATA TO TEST_DB
         fz_fetcher_status = fz_fetcher(current_user, db, User, GasamApp, json_data, files_data )
-        # FUND BANK WITH TEST MONEY
-        bank_values_data = algo_engine(db, signal_db, trade_db, bank_db, signal_trade_db, json_data, {}, '', 'fund_bank')
+        # FUND SPOT BANK WITH TEST MONEY
+        bank_spot_values_data = algo_engine(db, signal_db, trade_db, bank_db, futures_db, signal_trade_db, json_data, {}, '', 'fund_spot')
+        # FUND FUTURES BANK WITH TEST MONEY
+        bank_futures_values_data = algo_engine(db, signal_db, trade_db, bank_db, futures_db, signal_trade_db, json_data, {}, '',
+                                       'fund_futures')
+
         # SEND DATA
-        ini_data = fz_fetcher_status | {'bank_values_data': bank_values_data}
+        ini_data = (fz_fetcher_status |
+                    {'bank_spot_values_data': bank_spot_values_data,
+                     'bank_futures_values_data': bank_futures_values_data,
+                     })
         return ini_data
 
     if json_data['js_function'] == 'fz_feeder':
         # FEED DATA TO algo_engine
-        fz_feeder_data = fz_feeder(current_user, db, User, GasamApp, json_data, files_data, testPair_db, signal_db, trade_db, bank_db, signal_trade_db )
-        # PRINT BANK RECORDS
-        bank_values_data = algo_engine(db, signal_db, trade_db, bank_db, signal_trade_db,{}, fz_feeder_data['last_hour_timestamp'], {}, 'get_bank_values')
-        # SEND DATA
-        combined_data = fz_feeder_data | {'bank_values_data': bank_values_data}
-        return combined_data
+        return fz_feeder(current_user, db, User, GasamApp, json_data, files_data, testPair_db, signal_db, trade_db, bank_db, futures_db, signal_trade_db )
 
 
 
