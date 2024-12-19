@@ -243,7 +243,7 @@ def register_database(db, app):
         __table_args__ = {'extend_existing': True}
 
     class fiZelfAlchemyTestPairDB(db.Model):
-        __tablename__ = 'app_fi_zelf_alchemy_testPair_db'
+        __tablename__ = 'app_fi_zelf_alchemy_testpair_db'
 
         record_id = db.Column(db.Integer, primary_key=True)
         pair_id = db.Column(db.String(200), nullable=False)
@@ -304,7 +304,7 @@ def json_logic(current_user, db, User, GasamApp, json_data, files_data):
     bank_db = 'app_fi_zelf_alchemy_bank_db'
     futures_db = 'app_fi_zelf_alchemy_futures_db'
     signal_trade_db = 'app_fi_zelf_association_signal_trade'
-    testPair_db = 'app_fi_zelf_alchemy_testPair_db'
+    testPair_db = 'app_fi_zelf_alchemy_testpair_db'
 
     from .fz_fetcher import fz_fetcher
     from .fz_feeder import fz_feeder
