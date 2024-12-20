@@ -215,7 +215,7 @@ function FZcrystalPrintSignals(signalData) {
         FZcrystalClearAllLines(chart);
         candleSeries.setMarkers([]);
     } else if (signalData['signal_type'] == 'SMA50') {
-console.log(signalData);
+//console.log(signalData);
         maSeries.setData(signalData['ma_data']);
 
         markers.push({

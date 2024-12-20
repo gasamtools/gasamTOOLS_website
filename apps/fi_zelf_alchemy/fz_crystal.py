@@ -3,7 +3,6 @@ from sqlalchemy.sql import text
 def printSignals(db, signal_db, trade_db, signal_trade_db, json_data):
     from .algo_engine.signal_engine import signal_data_for_crystal
     return_data = {}
-    print(json_data['crystalSignalcommand'])
     if json_data['crystalSignalcommand'] == 'false':
         return return_data
     else:
@@ -28,6 +27,7 @@ def printSignals(db, signal_db, trade_db, signal_trade_db, json_data):
                 return_data['sdp_1'] = signal_data['sdp_1']
                 return_data['trades'] = filled_trades_of_signal
 
+        print(f'return_data {return_data}')
         return return_data
 
 
