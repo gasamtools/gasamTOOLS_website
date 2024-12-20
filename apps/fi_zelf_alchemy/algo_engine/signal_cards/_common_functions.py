@@ -62,17 +62,27 @@ def insert_into_signal_db(db, signal_db, new_proxy):
         keys_string = ', '.join(new_proxy.keys())
         keys_value_string = ', :'.join(new_proxy.keys())
 
-        result = db.session.execute(
-            text(
-                f"INSERT INTO {signal_db} (is_active, date_added,  {keys_string}) "
-                f"VALUES (:is_active, :date_added, :{keys_value_string})"
-            ), data_values)
+        # DETERMINE WHICH SQL IS BEING USED AT THIS MOMENT
+        dialect = db.session.get_bind().dialect.name
+        if dialect == 'postgresql':
+            # PostgreSQL: Use RETURNING clause
+            result = db.session.execute(
+                text(
+                    f"INSERT INTO {signal_db} (is_active, date_added, {keys_string}) "
+                    f"VALUES (:is_active, :date_added, :{keys_value_string}) "
+                    f"RETURNING id"
+                ), data_values
+            )
+            inserted_id = result.scalar()
 
-        # Commit the session
-        db.session.commit()
-
-        # Get the last inserted ID
-        inserted_id = result.lastrowid
+        else:  # SQLite
+            result = db.session.execute(
+                text(
+                    f"INSERT INTO {signal_db} (is_active, date_added, {keys_string}) "
+                    f"VALUES (:is_active, :date_added, :{keys_value_string})"
+                ), data_values
+            )
+            inserted_id = result.lastrowid
 
         # Prepare the messages
         note_time = timestamp_to_time_UTC(fz_feeder_cycle_last_candle['time'])
