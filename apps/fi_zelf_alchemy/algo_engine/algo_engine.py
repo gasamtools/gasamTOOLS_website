@@ -7,11 +7,11 @@ def algo_engine(db, signal_db, trade_db, bank_db, futures_db, signal_trade_db, j
 
     if command == 'reset_db':
         from sqlalchemy import text
+        db.session.execute(text(f"DELETE FROM {signal_trade_db}"))
         db.session.execute(text(f"DELETE FROM {signal_db}"))
         db.session.execute(text(f"DELETE FROM {trade_db}"))
         db.session.execute(text(f"DELETE FROM {bank_db}"))
         db.session.execute(text(f"DELETE FROM {futures_db}"))
-        db.session.execute(text(f"DELETE FROM {signal_trade_db}"))
         db.session.commit()
     elif command == 'get_bank_spot_values':
         return get_bank_spot_values(db, bank_db, candle_formats)
