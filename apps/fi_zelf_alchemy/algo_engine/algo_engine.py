@@ -6,13 +6,8 @@ def algo_engine(db, signal_db, trade_db, bank_db, futures_db, signal_trade_db, j
     to_postman, to_crystal = '', ''
 
     if command == 'reset_db':
-        from sqlalchemy import text
-        db.session.execute(text(f"DELETE FROM {signal_trade_db}"))
-        db.session.execute(text(f"DELETE FROM {signal_db}"))
-        db.session.execute(text(f"DELETE FROM {trade_db}"))
-        db.session.execute(text(f"DELETE FROM {bank_db}"))
-        db.session.execute(text(f"DELETE FROM {futures_db}"))
-        db.session.commit()
+        tables = [signal_trade_db, signal_db, trade_db, bank_db, futures_db]
+        reset_tables_with_sequences(db, tables)
     elif command == 'get_bank_spot_values':
         return get_bank_spot_values(db, bank_db, candle_formats)
     elif command == 'get_bank_futures_values':
@@ -67,3 +62,48 @@ def algo_engine(db, signal_db, trade_db, bank_db, futures_db, signal_trade_db, j
             'to_postman': to_postman,
             'to_crystal': to_crystal
         }
+
+
+def reset_tables_with_sequences(db, table_names):
+    """
+    Delete all records and reset sequences for specified tables.
+
+    Args:
+        db: SQLAlchemy database session
+        table_names: List of table names to reset
+    """
+    from sqlalchemy import text
+    # Option 1: Using TRUNCATE with RESTART IDENTITY
+    # for table in table_names:
+    #     db.session.execute(text(f"TRUNCATE TABLE {table} RESTART IDENTITY CASCADE"))
+
+    # Option 2: If TRUNCATE isn't suitable, use DELETE and manually reset sequences
+    # def reset_sequence(table_name):
+    #     # Get the sequence name (assumes standard PostgreSQL naming convention)
+    #     sequence_name = f"{table_name}_id_seq"
+    #     db.session.execute(text(f"ALTER SEQUENCE {sequence_name} RESTART WITH 1"))
+    #
+    # # Example using DELETE and manual sequence reset
+    # for table in table_names:
+    #     db.session.execute(text(f"DELETE FROM {table}"))
+    #     reset_sequence(table)
+
+    # Detect database type
+    engine = db.session.get_bind()
+    dialect = engine.dialect.name
+
+    if dialect == 'sqlite':
+        # SQLite approach
+        for table in table_names:
+            db.session.execute(text(f"DELETE FROM {table}"))
+
+    elif dialect == 'postgresql':
+        # PostgreSQL approach
+        for table in table_names:
+            db.session.execute(text(f"TRUNCATE TABLE {table} RESTART IDENTITY CASCADE"))
+
+    else:
+        raise ValueError(f"Unsupported database dialect: {dialect}")
+
+    db.session.commit()
+
