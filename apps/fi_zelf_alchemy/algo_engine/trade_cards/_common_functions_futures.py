@@ -368,6 +368,113 @@ def place_sl_order_futures(
     }
 
 
+def place_sb_order_futures(
+        db=None,
+        signal_db=None,
+        trade_db=None,
+        futures_db=None,
+        signal_trade_db=None,
+        trade_id=None,
+        signal=None,
+        price=None,
+        trade_type=None,  #spot, futures
+        trade_position=None,  #long/short
+        trade_action=None,  #buy/sell
+        trade_entry=None,  # limit, market, stop limit
+        trade_entry_stop=None,  # stoploss trigger price
+        currency_buy=None,
+        currency_sell=None,
+        tdp_0=None
+):
+    from datetime import datetime
+    from ...fz_fetcher import fz_fetcher_send_placed_order
+    from ...fz_feeder import fz_feeder_cycle_last_candle
+
+    to_postman, to_crystal = '', ''
+
+# CALCULATE AMOUNT IN AND AMOUNT OUT
+    try:
+        # GET ORIGINAL AMOUNT_IN and PRICE FOR THIS CONTRACT
+        amount_in = fetch_bank_currency_balance_futures(db, futures_db, trade_db, currency_sell, 0)
+        amount_out = amount_in / float(price)
+        # original_amount_in = get_original_buy_in_parameter_of_position_futures(db, trade_db, trade_id, 'amount_sell')
+        # original_amount_out = get_original_buy_in_parameter_of_position_futures(db, trade_db, trade_id, 'amount_buy')
+        # original_price_in = get_original_buy_in_parameter_of_position_futures(db, trade_db, trade_id, 'price')
+        # projected_value_usdt = float(original_amount_out) * float(price)
+        #
+        #
+        # if trade_position == 'short':
+        #     projected_pnl_amount = float(original_amount_in) - projected_value_usdt
+        # elif trade_position == 'long':
+        #     projected_pnl_amount = projected_value_usdt - float(original_amount_in)
+        #
+        # # CALCULATE TOTAL AMOUNT OUT
+        # amount_out = float(original_amount_in) + float(projected_pnl_amount)
+        # amount_in = amount_out / float(price)
+
+
+        # #PREPARE TRADE DATA
+        trade_data = {
+            "trade_id": trade_id,
+            "is_active": True,
+            "trade_type": trade_type,
+            "trade_position": trade_position,
+            "trade_action": trade_action,
+            "trade_entry": trade_entry,
+            "trade_entry_stop": trade_entry_stop,
+            "trade_status": "placed",
+            "date_placed": int(datetime.now().timestamp()),
+            "currency_buy": currency_buy,
+            "currency_sell": currency_sell,
+            "amount_buy": amount_out,
+            "amount_sell": amount_in,
+            "price": price,
+            'tdp_0': tdp_0
+        }
+
+        # SEND placed order REQUEST TO EXCHANGE / return True/False
+        if fz_fetcher_send_placed_order(trade_data):
+
+            # INSERT TRADE RECORD
+            trade_query = text(f"""
+                    INSERT INTO {trade_db} (
+                        trade_id, is_active, trade_type, trade_position, trade_action,
+                        trade_entry, trade_entry_stop, trade_status, date_placed,
+                        currency_buy, currency_sell, amount_buy, amount_sell, price, tdp_0
+                    ) VALUES (
+                        :trade_id, :is_active, :trade_type, :trade_position, :trade_action,
+                        :trade_entry, :trade_entry_stop, :trade_status, :date_placed,
+                        :currency_buy, :currency_sell, :amount_buy, :amount_sell, :price, :tdp_0
+                    ) RETURNING trade_id, id
+                """)
+            trade_result = db.session.execute(trade_query, trade_data).fetchone()
+            trade_id = trade_result[0]
+            record_id = trade_result[1]
+
+            note_time = timestamp_to_time_UTC(fz_feeder_cycle_last_candle['time'])
+            to_postman += (
+                f'{note_time} TRADE: id#{record_id} NEW {trade_type} {trade_position} {trade_entry} {trade_action} ORDER PLACED! '
+                f'{amount_out} {currency_buy} with {amount_in} of {currency_sell} for {price}')
+
+            to_crystal += (
+                f'<p>{note_time} TRADE: id#{record_id} NEW {trade_type} {trade_position} {trade_entry} {trade_action} ORDER #{record_id} PLACED! '
+                f'{amount_out} {currency_buy} with {amount_in} of {currency_sell} for {price}</p>')
+
+
+        else:
+            print(f"Error sending data to exchange via fz_fetcher_send_placed_order")
+
+    except Exception as e:
+        db.session.rollback()  # Rollback if there is any error
+        print(f"Error inserting into DB: {e}")
+
+    return {
+        'to_postman': to_postman,
+        'to_crystal': to_crystal
+    }
+
+
+
 def place_stop_lossProfit_futures(db, signal_db, trade_db, futures_db, signal_trade_db, base_price, data, percent, type):
     from ...fz_feeder import fz_feeder_cycle_last_candle
 
@@ -403,6 +510,44 @@ def place_stop_lossProfit_futures(db, signal_db, trade_db, futures_db, signal_tr
         'to_postman': to_postman,
         'to_crystal': to_crystal
     }
+
+
+def place_stop_buy_futures(db, signal_db, trade_db, futures_db, signal_trade_db, base_price, data, percent, type):
+    from ...fz_feeder import fz_feeder_cycle_last_candle
+
+    to_postman, to_crystal = '', ''
+
+# CALCULATE STOP-LIMIT PRICE
+    if (data['trade_position'] == 'short' and type == 'loss') or (data['trade_position'] == 'long' and type == 'profit'):
+        stop_price = subtract_n_percent(base_price, percent)
+    elif (data['trade_position'] == 'short' and type == 'profit') or (data['trade_position'] == 'long' and type == 'loss'):
+        stop_price = add_n_percent(base_price, percent)
+
+
+    place_SB_order_data = place_sb_order_futures(db=db,
+                                                   signal_db=signal_db,
+                                                   trade_db=trade_db,
+                                                   futures_db=futures_db,
+                                                   signal_trade_db=signal_trade_db,
+                                                   trade_id=data['trade_id'],
+                                                   signal='',
+                                                   price=stop_price,
+                                                   trade_entry_stop=stop_price,
+                                                   trade_type='futures',
+                                                   trade_position=data['trade_position'],
+                                                   trade_action='buy',
+                                                   trade_entry='stop-limit',
+                                                   currency_buy=data['currency_sell'],
+                                                   currency_sell=data['currency_buy'],
+                                                   tdp_0=fz_feeder_cycle_last_candle['time'])
+    to_postman += place_SB_order_data['to_postman']
+    to_crystal += place_SB_order_data['to_crystal']
+
+    return {
+        'to_postman': to_postman,
+        'to_crystal': to_crystal
+    }
+
 
 
 def place_futures_order(db, signal_db, trade_db, futures_db, signal_trade_db, pair, signal, price, trade_position, trade_action, trade_entry):

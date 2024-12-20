@@ -17,6 +17,7 @@ def adjust_trades(db, signal_db, trade_db, futures_db, signal_trade_db, pair):
     flagged_trades_data = fetch_flagged_trades(db, trade_db, pair)
     shorts_buy_limit_flagged_trades_data = [trade for trade in flagged_trades_data if trade['trade_position'] == 'short' and trade['trade_action'] == 'buy' and trade['trade_entry'] == 'limit']
     longs_buy_limit_flagged_trades_data = [trade for trade in flagged_trades_data if trade['trade_position'] == 'long' and trade['trade_action'] == 'buy' and trade['trade_entry'] == 'limit']
+    longs_sell_stoplimit_flagged_trades_data = [trade for trade in flagged_trades_data if trade['trade_position'] == 'long' and trade['trade_action'] == 'sell' and trade['trade_entry'] == 'stop-limit']
 
 # SHORTs SL/SP
     if shorts_buy_limit_flagged_trades_data:
@@ -35,22 +36,23 @@ def adjust_trades(db, signal_db, trade_db, futures_db, signal_trade_db, pair):
             to_crystal += place_SL_data['to_crystal']
 
 
-# LONGSs SL/SB
+# LONGSs SL
     if longs_buy_limit_flagged_trades_data:
         for data in longs_buy_limit_flagged_trades_data:
-            print(longs_buy_limit_flagged_trades_data)
     # PLACE STOP LOSS 2%  based on flagged-filled-buy order
             place_SL_data = place_stop_lossProfit_futures(db, signal_db, trade_db, futures_db, signal_trade_db,
                                                           data['price'], data, 2, 'loss')
             to_postman += place_SL_data['to_postman']
             to_crystal += place_SL_data['to_crystal']
 
-# PLACE BUY STOP-LIMIT
+# LONGSs SB
 # if the trend continues, but we got stopped out 7% from the stop-loss sell price
-#             if data['trade_action'] == 'sell' and data['trade_status'] == 'filled' and data['trade_entry'] == 'stop-limit':
-#                 place_SB_data = place_buy_stop_limit(db, signal_db, trade_db, bank_db, signal_trade_db, data['price'], data, 7)
-#                 to_postman += place_SB_data['to_postman']
-#                 to_crystal += place_SB_data['to_crystal']
+    if longs_sell_stoplimit_flagged_trades_data:
+        for data in longs_sell_stoplimit_flagged_trades_data:
+            place_SB_data = place_stop_buy_futures(db, signal_db, trade_db, futures_db, signal_trade_db,
+                                                          data['price'], data, 7, 'loss')
+            to_postman += place_SB_data['to_postman']
+            to_crystal += place_SB_data['to_crystal']
 
 
 # MOVE STOP LOSS

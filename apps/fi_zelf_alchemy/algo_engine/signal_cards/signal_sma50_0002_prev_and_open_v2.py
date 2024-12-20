@@ -127,7 +127,6 @@ def convert_to_proxy(trading_pair: str, interval: str, signal_type: str, signal_
 def compare_and_update_db(db, signal_db, new_proxy, all_record_proxies, active_record_proxy):
     from ...fz_feeder import fz_feeder_cycle_last_candle
     to_postman, to_crystal = '', ''
-    print(new_proxy)
     if 'no_signal' in new_proxy:
         return {
             'to_postman': to_postman,
@@ -135,7 +134,6 @@ def compare_and_update_db(db, signal_db, new_proxy, all_record_proxies, active_r
         }
 
     elif not active_record_proxy:
-        print('went here')
         insert_into_db_data = insert_into_signal_db(db, signal_db, new_proxy)
         to_postman += insert_into_db_data['to_postman']
         to_crystal += insert_into_db_data['to_crystal']
