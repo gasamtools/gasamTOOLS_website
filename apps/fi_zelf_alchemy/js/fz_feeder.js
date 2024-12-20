@@ -75,7 +75,7 @@ function FZfeederDataStream(elementId, Cycle) {
 
         // Show/Hide signals via Crystal
         FZcrystalPrintSignals(data['printSignals']);
-
+console.log(data);
 
         // updated feederCycle
         feederCycle = data['feederCycle']
