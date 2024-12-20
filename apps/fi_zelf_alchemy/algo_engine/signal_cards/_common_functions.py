@@ -62,10 +62,6 @@ def insert_into_signal_db(db, signal_db, new_proxy):
         keys_string = ', '.join(new_proxy.keys())
         keys_value_string = ', :'.join(new_proxy.keys())
 
-        # print(f"data_values {data_values}")
-        # print(f'keys_string {keys_string}')
-        # print(f'keys_value_string {keys_value_string}')
-
         result = db.session.execute(
             text(
                 f"INSERT INTO {signal_db} (is_active, date_added,  {keys_string}) "

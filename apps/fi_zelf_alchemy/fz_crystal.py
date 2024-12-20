@@ -17,7 +17,7 @@ def printSignals(db, signal_db, trade_db, signal_trade_db, json_data):
         signal_data = fetch_signal_by_id(db, signal_db, json_data['crystalSignalID'])
 
         # SEND DATA
-        if 'signal_type' in signal_data:
+        if signal_data and 'signal_type' in signal_data:
             if signal_data['signal_type'] == 'SMA50':
                 sma50_1day_data = signal_data_for_crystal[signal_data['signal_type']]
                 return_data['signal_type'] = signal_data['signal_type']
