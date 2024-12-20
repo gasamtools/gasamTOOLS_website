@@ -28,6 +28,7 @@ def printSignals(db, signal_db, trade_db, signal_trade_db, json_data):
                 return_data['trades'] = filled_trades_of_signal
 
         print(f'return_data {return_data}')
+        print(f'signal_data {signal_data}')
         return return_data
 
 
