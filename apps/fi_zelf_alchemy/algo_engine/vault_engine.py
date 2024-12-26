@@ -66,9 +66,15 @@ def  vault_adjust_trades(db, signal_db, trade_db, bank_db, futures_db, signal_tr
     #                                                   'adjust_trades')
 
     # 13 card_sma50_day_futures_0005_shortSP10_longSL2SB7
-    from .trade_cards.card_sma50_day_futures_0005_shortSP10_longSL2SB7 import card_sma50_day_futures_0005_shortSP10_longSL2SB7
-    card_data = card_sma50_day_futures_0005_shortSP10_longSL2SB7(db, signal_db, trade_db, futures_db, signal_trade_db, pair,
-                                                      'adjust_trades')
+    # from .trade_cards.card_sma50_day_futures_0005_shortSP10_longSL2SB7 import card_sma50_day_futures_0005_shortSP10_longSL2SB7
+    # card_data = card_sma50_day_futures_0005_shortSP10_longSL2SB7(db, signal_db, trade_db, futures_db, signal_trade_db, pair,
+    #                                                   'adjust_trades')
+
+    # 14 card_sma50_day_futures_0005_shortSP10SL2_longSL2SB10
+    from .trade_cards.card_sma50_day_futures_0006_shortSP10SL2_longSL2SB10 import card_sma50_day_futures_0006_shortSP10SL2_longSL2SB10
+    card_data = card_sma50_day_futures_0006_shortSP10SL2_longSL2SB10(db, signal_db, trade_db, futures_db, signal_trade_db,
+                                                                 pair,
+                                                                 'adjust_trades')
 
 
     to_postman += card_data['to_postman']
@@ -139,9 +145,14 @@ def vault_take_trades(db, signal_db, trade_db, bank_db, futures_db, signal_trade
     #                                                   'take_trades')
 
     # 13 card_sma50_day_futures_0005_shortSP10_longSL2SB7
-    from .trade_cards.card_sma50_day_futures_0005_shortSP10_longSL2SB7 import card_sma50_day_futures_0005_shortSP10_longSL2SB7
-    card_info = card_sma50_day_futures_0005_shortSP10_longSL2SB7(db, signal_db, trade_db, futures_db, signal_trade_db, pair,
-                                                            'take_trades')
+    # from .trade_cards.card_sma50_day_futures_0005_shortSP10_longSL2SB7 import card_sma50_day_futures_0005_shortSP10_longSL2SB7
+    # card_info = card_sma50_day_futures_0005_shortSP10_longSL2SB7(db, signal_db, trade_db, futures_db, signal_trade_db, pair,
+    #                                                         'take_trades')
+
+    # 14 card_sma50_day_futures_0005_shortSP10SL2_longSL2SB10
+    from .trade_cards.card_sma50_day_futures_0006_shortSP10SL2_longSL2SB10 import card_sma50_day_futures_0006_shortSP10SL2_longSL2SB10
+    card_info = card_sma50_day_futures_0006_shortSP10SL2_longSL2SB10(db, signal_db, trade_db, futures_db, signal_trade_db,
+                                                                 pair,'take_trades')
 
 
     to_postman += card_info['to_postman']
