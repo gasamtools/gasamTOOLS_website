@@ -311,13 +311,16 @@ def app_logic(current_user, db, User, GasamApp, page, return_data):
         return send_data
 
 def json_logic(current_user, db, User, GasamApp, json_data, files_data):
-    signal_db = 'app_fi_zelf_alchemy_signal_db'
-    trade_db = 'app_fi_zelf_alchemy_trade_db'
-    bank_db = 'app_fi_zelf_alchemy_bank_db'
-    futures_db = 'app_fi_zelf_alchemy_futures_db'
-    signal_trade_db = 'app_fi_zelf_association_signal_trade'
-    testPair_db = 'app_fi_zelf_alchemy_testpair_db'
-    charts_1_db = 'app_fi_zelf_alchemy_charts_1_db'
+    db_names = {
+        'signal_db': 'app_fi_zelf_alchemy_signal_db',
+        'trade_db': 'app_fi_zelf_alchemy_trade_db',
+        'bank_db': 'app_fi_zelf_alchemy_bank_db',
+        'futures_db': 'app_fi_zelf_alchemy_futures_db',
+        'signal_trade_db': 'app_fi_zelf_association_signal_trade',
+        'testPair_db': 'app_fi_zelf_alchemy_testpair_db',
+        'charts_1_db': 'app_fi_zelf_alchemy_charts_1_db',
+    }
+
 
     from .fz_fetcher import fz_fetcher
     from .fz_feeder import fz_feeder
@@ -328,13 +331,13 @@ def json_logic(current_user, db, User, GasamApp, json_data, files_data):
         return app_ini(current_user, db, User, GasamApp, json_data, files_data)
     if json_data['js_function'] == 'fz_fetcher':
         # RESET ALL DBs
-        algo_engine(db, signal_db, trade_db, bank_db, futures_db, signal_trade_db, json_data, {}, '', 'reset_db')
+        algo_engine(db, db_names, json_data, {}, '', 'reset_db')
         # FETCH AND LOAD DATA TO TEST_DB
         fz_fetcher_status = fz_fetcher(current_user, db, User, GasamApp, json_data, files_data )
         # FUND SPOT BANK WITH TEST MONEY
-        bank_spot_values_data = algo_engine(db, signal_db, trade_db, bank_db, futures_db, signal_trade_db, json_data, {}, '', 'fund_spot')
+        bank_spot_values_data = algo_engine(db, db_names, json_data, {}, '', 'fund_spot')
         # FUND FUTURES BANK WITH TEST MONEY
-        bank_futures_values_data = algo_engine(db, signal_db, trade_db, bank_db, futures_db, signal_trade_db, json_data, {}, '',
+        bank_futures_values_data = algo_engine(db, db_names, json_data, {}, '',
                                        'fund_futures')
 
         # SEND DATA
@@ -346,7 +349,7 @@ def json_logic(current_user, db, User, GasamApp, json_data, files_data):
 
     if json_data['js_function'] == 'fz_feeder':
         # FEED DATA TO algo_engine
-        return fz_feeder(current_user, db, User, GasamApp, json_data, files_data, testPair_db, signal_db, trade_db, bank_db, futures_db, signal_trade_db )
+        return fz_feeder(current_user, db, db_names, User, GasamApp, json_data, files_data)
 
 
 

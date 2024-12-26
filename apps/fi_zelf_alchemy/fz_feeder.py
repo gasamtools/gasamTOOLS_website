@@ -1,11 +1,11 @@
 fz_feeder_cycle_last_candle = []
 
-def fz_feeder(current_user, db, User, GasamApp, json_data, files_data, testPair_db, signal_db, trade_db, bank_db, futures_db, signal_trade_db,):
+def fz_feeder(current_user, db, db_names, User, GasamApp, json_data, files_data):
     if json_data['js_function_sub'] == 'main':
-        return fz_feeder_main(current_user, db, User, GasamApp, json_data, files_data, testPair_db, signal_db, trade_db, bank_db, futures_db, signal_trade_db,)
+        return fz_feeder_main(current_user, db, db_names, User, GasamApp, json_data, files_data)
 
 
-def fz_feeder_main(current_user, db, User, GasamApp, json_data, files_data, testPair_db, signal_db, trade_db, bank_db, futures_db, signal_trade_db,):
+def fz_feeder_main(current_user, db, db_names, User, GasamApp, json_data, files_data):
     from sqlalchemy import text
     from .algo_engine.algo_engine import algo_engine
     from .fz_crystal import printSignals, printAlchemyFeed
@@ -14,7 +14,7 @@ def fz_feeder_main(current_user, db, User, GasamApp, json_data, files_data, test
 
     # GET TOTAL AMOUNT OF CANDLES FROM DB used for fastForward and to determine if test is complete
     total_candles = db.session.execute(
-        text(f"SELECT COUNT(*) FROM {testPair_db}")
+        text(f"SELECT COUNT(*) FROM {db_names['testPair_db']}")
     ).scalar()  # Use .scalar() to get a single value
 
     fastForwardmultiplier = 100 # USED FOR fastForward MODE
@@ -32,15 +32,15 @@ def fz_feeder_main(current_user, db, User, GasamApp, json_data, files_data, test
         feeder_cycle_range_candles = (start_cycle_range_days * 24) + feederCycle
 
     # FETCH DATA FROM testPair DB AND TRANSFORM TO HOURLY CANDLES
-    hourly_candles = get_hourly_candles_within_range_from_db(db, testPair_db, feeder_cycle_range_candles)[0]
-    pair = get_hourly_candles_within_range_from_db(db, testPair_db, feeder_cycle_range_candles)[1]
+    hourly_candles = get_hourly_candles_within_range_from_db(db, db_names['testPair_db'], feeder_cycle_range_candles)[0]
+    pair = get_hourly_candles_within_range_from_db(db, db_names['testPair_db'], feeder_cycle_range_candles)[1]
 
     # FEEDING DATA TO ALGO ENGINE
-    algo_engine_data, bank_spot_values_data, bank_futures_values_data = handle_algo_engine_command(db, signal_db, trade_db, bank_db, futures_db, signal_trade_db,
+    algo_engine_data, bank_spot_values_data, bank_futures_values_data = handle_algo_engine_command(db, db_names,
         json_data, hourly_candles, pair,feederCycle=feederCycle, fastForwardmultiplier=fastForwardmultiplier)
 
     # FETCHING DATA FROM CRYSTAL ENGINE
-    printSignals_data = printSignals(db, signal_db, trade_db, signal_trade_db, json_data)
+    printSignals_data = printSignals(db, db_names, json_data)
 
     # GENERATE STATUS FOR ALCHEMY FEED
     printAlchemyFeed_data = printAlchemyFeed(json_data['command'], feederCycle, hourly_candles, total_candles, fastForwardmultiplier)
@@ -130,11 +130,7 @@ def transform_candles(daily_data, interval):
     return list(aggregated_data.values())
 
 
-def process_algo_engine(
-        db, signal_db, trade_db, bank_db, futures_db, signal_trade_db,
-        json_data, hourly_candles, pair,
-        cycle_range=None
-):
+def process_algo_engine(db, db_names, json_data, hourly_candles, pair, cycle_range=None):
     """
     Process algorithm engine data based on command type and cycle range.
 
@@ -186,7 +182,7 @@ def process_algo_engine(
 
         # Process algo engine data
         algo_engine_data_cycle = algo_engine(
-            db, signal_db, trade_db, bank_db, futures_db, signal_trade_db,
+            db, db_names,
             json_data, candle_formats, pair, 'run_engine'
         )
 
@@ -198,13 +194,11 @@ def process_algo_engine(
             algo_engine_data = algo_engine_data_cycle
 
         # Get bank values
-        bank_spot_values_data = algo_engine(
-            db, signal_db, trade_db, bank_db, futures_db, signal_trade_db,
+        bank_spot_values_data = algo_engine(db, db_names,
             {}, fz_feeder_cycle_last_candle['time'], {}, 'get_bank_spot_values'
         )
 
-        bank_futures_values_data = algo_engine(
-            db, signal_db, trade_db, bank_db, futures_db, signal_trade_db,
+        bank_futures_values_data = algo_engine(db, db_names,
             {}, fz_feeder_cycle_last_candle['time'], {}, 'get_bank_futures_values'
         )
 
@@ -213,7 +207,7 @@ def process_algo_engine(
 
 # Usage example:
 def handle_algo_engine_command(
-        db, signal_db, trade_db, bank_db, futures_db, signal_trade_db,
+        db, db_names,
         json_data, hourly_candles, pair,
         feederCycle=None, fastForwardmultiplier=None
 ):
@@ -232,11 +226,7 @@ def handle_algo_engine_command(
     else:
         cycle_range = None
 
-    return process_algo_engine(
-        db, signal_db, trade_db, bank_db, futures_db, signal_trade_db,
-        json_data, hourly_candles, pair,
-        cycle_range
-    )
+    return process_algo_engine(db, db_names, json_data, hourly_candles, pair, cycle_range)
 
 
 

@@ -1,6 +1,6 @@
 from sqlalchemy.sql import text
 
-def printSignals(db, signal_db, trade_db, signal_trade_db, json_data):
+def printSignals(db, db_names, json_data):
     from .algo_engine.signal_engine import signal_data_for_crystal
     return_data = {}
     if json_data['crystalSignalcommand'] == 'false':
@@ -8,13 +8,13 @@ def printSignals(db, signal_db, trade_db, signal_trade_db, json_data):
     else:
         # GET TRADES OF SIGNAL DATA
         from .algo_engine.trade_cards._common_functions import get_trade_ids_by_signal, get_trades_by_trade_id
-        trade_ids_of_signal = get_trade_ids_by_signal(db, signal_trade_db, json_data['crystalSignalID'])
-        trades_of_signal = get_trades_by_trade_id(db, trade_db, trade_ids_of_signal)
+        trade_ids_of_signal = get_trade_ids_by_signal(db, db_names['signal_trade_db'], json_data['crystalSignalID'])
+        trades_of_signal = get_trades_by_trade_id(db, db_names['trade_db'], trade_ids_of_signal)
         filled_trades_of_signal = [dict(trade) for trade in trades_of_signal if trade['trade_status'] == 'filled']
         # print(filled_trades_of_signal)
 
         # GET SIGNAL DATA
-        signal_data = fetch_signal_by_id(db, signal_db, json_data['crystalSignalID'])
+        signal_data = fetch_signal_by_id(db, db_names['signal_db'], json_data['crystalSignalID'])
 
         # SEND DATA
         if signal_data and 'signal_type' in signal_data:

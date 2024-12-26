@@ -1,17 +1,17 @@
 signal_data_for_crystal = {}
 
 
-def signal_engine(db, signal_db, trade_db, action, candle_formats, pair):
+def signal_engine(db, db_names, action, candle_formats, pair):
     if action == 'is_flagged_scan':
-        return signal_is_flagged_scan(db, signal_db, trade_db, candle_formats, pair)
+        return signal_is_flagged_scan(db, db_names, candle_formats, pair)
     if action == 'is_active_scan':
-        return signal_is_active_scan(db, signal_db, trade_db, candle_formats, pair)
+        return signal_is_active_scan(db, db_names, candle_formats, pair)
     if action == 'new_scan':
-        return signal_new_scan(db, signal_db, trade_db, candle_formats, pair)
+        return signal_new_scan(db, db_names, candle_formats, pair)
 
 
 
-def signal_is_flagged_scan(db, signal_db, trade_db, candle_formats, pair):
+def signal_is_flagged_scan(db, db_names, candle_formats, pair):
     to_postman, to_crystal = '', ''
     # UPDATE is_flagged SIGNALS
     # NOTE CHANGES
@@ -22,7 +22,7 @@ def signal_is_flagged_scan(db, signal_db, trade_db, candle_formats, pair):
         'to_crystal': to_crystal
     }
 
-def signal_is_active_scan(db, signal_db, trade_db, candle_formats, pair):
+def signal_is_active_scan(db, db_names, candle_formats, pair):
     to_postman, to_crystal = '', ''
     # UPDATE is_active SIGNALS (move stop_loss, etc)
     # NOTE CHANGES
@@ -33,7 +33,7 @@ def signal_is_active_scan(db, signal_db, trade_db, candle_formats, pair):
         'to_crystal': to_crystal
     }
 
-def signal_new_scan(db, signal_db, trade_db, candle_formats, pair):
+def signal_new_scan(db, db_names, candle_formats, pair):
 
     from .signal_cards.litmus import litmus
     global signal_data_for_crystal
@@ -64,7 +64,7 @@ def signal_new_scan(db, signal_db, trade_db, candle_formats, pair):
 
     # 3 signal_sma50_0001_prev_and_open
     from .signal_cards.signal_sma50_0002_prev_and_open_v2 import signal_sma50_0002_prev_and_open_v2
-    sma50_data = signal_sma50_0002_prev_and_open_v2(db, signal_db, candle_formats, pair)
+    sma50_data = signal_sma50_0002_prev_and_open_v2(db, db_names['signal_db'], candle_formats, pair)
     to_postman += sma50_data['to_postman']
     to_crystal += sma50_data['to_crystal']
     signal_data_for_crystal['SMA50'] = sma50_data['new_1day']

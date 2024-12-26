@@ -1,26 +1,26 @@
 fund_bank_ini_usdt_value = 1000
 fund_futures_ini_usdt_value = 1000
-def vault_engine(db, signal_db, trade_db, bank_db,  futures_db, signal_trade_db, action, pair):
+def vault_engine(db, db_names, action, pair):
     if action == 'adjust_trades':
-        return vault_adjust_trades(db, signal_db, trade_db, bank_db, futures_db, signal_trade_db, pair)
+        return vault_adjust_trades(db, db_names, pair)
     if action == 'take_trades':
-        return vault_take_trades(db, signal_db, trade_db, bank_db, futures_db, signal_trade_db, pair)
+        return vault_take_trades(db, db_names, pair)
 
-def  vault_adjust_trades(db, signal_db, trade_db, bank_db, futures_db, signal_trade_db, pair):
+def  vault_adjust_trades(db, db_names, pair):
     from .trade_cards._common_functions import fetch_active_placed_trades_from_trade_db, update_bank_balances_and_trade_db
     from ..fz_fetcher import fz_fetcher_update_orders
 
     to_postman, to_crystal = '', ''
 
     # FETCH active placed orders DATA FROM db
-    placed_active_trades = fetch_active_placed_trades_from_trade_db(db, trade_db)
+    placed_active_trades = fetch_active_placed_trades_from_trade_db(db, db_names['trade_db'])
 
     # FETCH flagged_trades DATA FROM KUCOIN - FLAGGED BECAUSE FILLED
-    flagged_filled_trades = fz_fetcher_update_orders(db, bank_db, placed_active_trades)
+    flagged_filled_trades = fz_fetcher_update_orders(db, db_names['bank_db'], placed_active_trades)
 
     # UPDATE BANK and TRADE_DB AND NOTE CHANGES
     for trade in flagged_filled_trades:
-        update_bank_balances_and_trade_db_data = update_bank_balances_and_trade_db(db, bank_db, futures_db, trade_db, trade)
+        update_bank_balances_and_trade_db_data = update_bank_balances_and_trade_db(db, db_names['bank_db'], db_names['futures_db'], db_names['trade_db'], trade)
         to_postman += update_bank_balances_and_trade_db_data['to_postman']
         to_crystal += update_bank_balances_and_trade_db_data['to_crystal']
 
@@ -72,9 +72,7 @@ def  vault_adjust_trades(db, signal_db, trade_db, bank_db, futures_db, signal_tr
 
     # 14 card_sma50_day_futures_0005_shortSP10SL2_longSL2SB10
     from .trade_cards.card_sma50_day_futures_0006_shortSP10SL2_longSL2SB10 import card_sma50_day_futures_0006_shortSP10SL2_longSL2SB10
-    card_data = card_sma50_day_futures_0006_shortSP10SL2_longSL2SB10(db, signal_db, trade_db, futures_db, signal_trade_db,
-                                                                 pair,
-                                                                 'adjust_trades')
+    card_data = card_sma50_day_futures_0006_shortSP10SL2_longSL2SB10(db, db_names, pair,'adjust_trades')
 
 
     to_postman += card_data['to_postman']
@@ -90,7 +88,7 @@ def  vault_adjust_trades(db, signal_db, trade_db, bank_db, futures_db, signal_tr
         'to_crystal': to_crystal
     }
 
-def vault_take_trades(db, signal_db, trade_db, bank_db, futures_db, signal_trade_db, pair):
+def vault_take_trades(db, db_names, pair):
     to_postman, to_crystal = '', ''
 
 # TRADE STRATEGIES
@@ -151,8 +149,7 @@ def vault_take_trades(db, signal_db, trade_db, bank_db, futures_db, signal_trade
 
     # 14 card_sma50_day_futures_0005_shortSP10SL2_longSL2SB10
     from .trade_cards.card_sma50_day_futures_0006_shortSP10SL2_longSL2SB10 import card_sma50_day_futures_0006_shortSP10SL2_longSL2SB10
-    card_info = card_sma50_day_futures_0006_shortSP10SL2_longSL2SB10(db, signal_db, trade_db, futures_db, signal_trade_db,
-                                                                 pair,'take_trades')
+    card_info = card_sma50_day_futures_0006_shortSP10SL2_longSL2SB10(db, db_names, pair,'take_trades')
 
 
     to_postman += card_info['to_postman']
