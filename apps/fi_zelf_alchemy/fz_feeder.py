@@ -9,6 +9,7 @@ def fz_feeder_main(current_user, db, User, GasamApp, json_data, files_data, test
     from sqlalchemy import text
     from .algo_engine.algo_engine import algo_engine
     from .fz_crystal import printSignals, printAlchemyFeed
+    from .fz_charts import gather_data_chart_1
     global fz_feeder_cycle_last_candle
 
     # GET TOTAL AMOUNT OF CANDLES FROM DB used for fastForward and to determine if test is complete
@@ -46,6 +47,14 @@ def fz_feeder_main(current_user, db, User, GasamApp, json_data, files_data, test
 
     # PRINT CANDLES ON TradingVIew CHART
     daily_candles = transform_candles(hourly_candles, '1day')
+
+    # GATHER DATA FOR CHART 1
+    charts_1_data = gather_data_chart_1(
+        timestamp=hourly_candles[-1]['time'],
+        candle=daily_candles[-1]['open'],
+        bank=bank_futures_values_data
+    )
+
 
     return_data = {
         'candles': daily_candles,
@@ -228,3 +237,8 @@ def handle_algo_engine_command(
         json_data, hourly_candles, pair,
         cycle_range
     )
+
+
+
+
+

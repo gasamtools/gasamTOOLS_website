@@ -278,6 +278,18 @@ def register_database(db, app):
 
         __table_args__ = {'extend_existing': True}
 
+    class fiZelfAlchemyCharts1DB(db.Model):
+        __tablename__ = "app_fi_zelf_alchemy_charts_1_db"
+
+        id = db.Column(db.Integer, primary_key=True)
+        timestamp = db.Column(db.Integer, nullable=False)
+        hodl = db.Column(db.Float, nullable=True)
+        bot = db.Column(db.Float, nullable=True)
+        sma = db.Column(db.Float, nullable=True)
+        candle = db.Column(db.Float, nullable=True)
+
+        __table_args__ = {'extend_existing': True}
+
     with app.app_context():
         db.create_all()
 
@@ -305,10 +317,12 @@ def json_logic(current_user, db, User, GasamApp, json_data, files_data):
     futures_db = 'app_fi_zelf_alchemy_futures_db'
     signal_trade_db = 'app_fi_zelf_association_signal_trade'
     testPair_db = 'app_fi_zelf_alchemy_testpair_db'
+    charts_1_db = 'app_fi_zelf_alchemy_charts_1_db'
 
     from .fz_fetcher import fz_fetcher
     from .fz_feeder import fz_feeder
     from .algo_engine.algo_engine import algo_engine
+    from .fz_charts import recordDataToDB
 
     if json_data['js_function'] == 'app_ini':
         return app_ini(current_user, db, User, GasamApp, json_data, files_data)
