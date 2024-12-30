@@ -126,17 +126,17 @@ class GoogleSheetsAPI:
         self.current_dir = os.path.dirname(os.path.abspath(__file__))
         self.log = '<p>GoogleSheetsAPI</p>'
         # Set up logging
-        # logging.basicConfig(level=logging.DEBUG)
-        # self.logger = logging.getLogger('GoogleSheetsAPI')
+        logging.basicConfig(level=logging.DEBUG)
+        self.logger = logging.getLogger('GoogleSheetsAPI')
 
     def authenticate(self):
         """Handle the authentication process with Google Sheets API."""
         token_path = os.path.join(self.current_dir, 'token.pickle')
         # credentials_path = os.path.join(self.current_dir, 'credentials.json')
 
-        # self.logger.debug(f"Looking for credentials at: {credentials_path}")
-        # self.logger.debug(f"Token path: {token_path}")
-        # self.log += f'<p>Looking for credentials at: {credentials_path}</p>'
+        #self.logger.debug(f"Looking for credentials at: {credentials_path}")
+        self.logger.debug(f"Token path: {token_path}")
+        #self.log += f'<p>Looking for credentials at: {credentials_path}</p>'
         self.log += f'<p>Token path: {token_path}</p>'
 
         # if not os.path.exists(credentials_path):
@@ -144,23 +144,23 @@ class GoogleSheetsAPI:
         #     raise FileNotFoundError(f"credentials.json not found at {credentials_path}")
 
         if os.path.exists(token_path):
-            # self.logger.debug("Found existing token, attempting to load...")
+            self.logger.debug("Found existing token, attempting to load...")
             with open(token_path, 'rb') as token:
                 self.creds = pickle.load(token)
 
         if not self.creds or not self.creds.valid:
             if self.creds and self.creds.expired and self.creds.refresh_token:
-                # self.logger.debug("Refreshing expired credentials...")
+                self.logger.debug("Refreshing expired credentials...")
                 self.log += f'<p>Refreshing expired credentials...</p>'
                 self.creds.refresh(Request())
             else:
-                # self.logger.debug("Starting new OAuth2 flow...")
+                self.logger.debug("Starting new OAuth2 flow...")
                 self.log += f'<p>Starting new OAuth2 flow...</p>'
                 # flow = InstalledAppFlow.from_client_secrets_file(
                 #     credentials_path, self.SCOPES)
                 load_dotenv()
 
-                flow = Flow.from_client_config(
+                flow = InstalledAppFlow.from_client_config(
                     {
                         "web": {
                             "client_id": os.getenv("GOOGLE_CLIENT_ID"),
@@ -175,22 +175,22 @@ class GoogleSheetsAPI:
                 )
 
                 try:
-                    self.creds = flow.run_local_server(port=0)
+                    self.creds = flow.run_local_server(port=8080)
                     # self.logger.debug(f"Successfully authenticated using port {port}")
                     self.log += f'<p>Successfully authenticated</p>'
                 except Exception as e:
-                    self.log += f'<p>Failed to authenticate with all ports</p>'
-                    raise Exception("Failed to authenticate with all ports")
+                    self.log += f'<p>Failed to authenticate with all ports {e}</p>'
+                    raise Exception(f"Failed to authenticate with all ports {e}")
 
             # self.logger.debug("Saving new token...")
             with open(token_path, 'wb') as token:
                 pickle.dump(self.creds, token)
 
-        # self.logger.debug("Building service...")
+        self.logger.debug("Building service...")
         self.log += f'<p>Building service...</p>'
         self.service = build('sheets', 'v4', credentials=self.creds)
         self.log += f'<p>Authentication complete!</p>'
-        # self.logger.debug("Authentication complete!")
+        self.logger.debug("Authentication complete!")
 
     def read_range(self, range_name):
         """Read data from specified range."""
@@ -242,7 +242,7 @@ class GoogleSheetsAPI:
             ).execute().get('sheets', [])
             return [sheet['properties']['title'] for sheet in sheets]
         except Exception as e:
-            #self.logger.error(f"Error getting sheets: {e}")
+            self.logger.error(f"Error getting sheets: {e}")
             self.log += f'<p>Error getting sheets: {e}</p>'
             return None
 
@@ -262,7 +262,7 @@ class GoogleSheetsAPI:
                 spreadsheetId=self.spreadsheet_id,
                 body=body
             ).execute()
-            #self.logger.debug(f"Created sheet: {sheet_name}")
+            self.logger.debug(f"Created sheet: {sheet_name}")
             self.log += f'<p>Created sheet: {sheet_name}</p>'
             return True
         except Exception as e:

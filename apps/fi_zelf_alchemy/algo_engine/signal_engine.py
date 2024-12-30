@@ -1,4 +1,5 @@
 signal_data_for_crystal = {}
+signal_id='0000'
 
 
 def signal_engine(db, db_names, action, candle_formats, pair):
@@ -34,9 +35,8 @@ def signal_is_active_scan(db, db_names, candle_formats, pair):
     }
 
 def signal_new_scan(db, db_names, candle_formats, pair):
+    global signal_data_for_crystal, signal_id
 
-    from .signal_cards.litmus import litmus
-    global signal_data_for_crystal
     to_postman, to_crystal = '',''
 
     # CHECK NEW SIGNALS AGAINST RECORDED ONES SO THEY DON'T DUPLICATE
@@ -44,6 +44,7 @@ def signal_new_scan(db, db_names, candle_formats, pair):
 
 # TYPES OF SIGNALS
     #0 LITMUS
+    #from .signal_cards.litmus import litmus
     # litmus_data = litmus(db, signal_db, candle_formats, pair)
     # to_postman += litmus_data['to_postman']
     # to_crystal += litmus_data['to_crystal']
@@ -62,7 +63,8 @@ def signal_new_scan(db, db_names, candle_formats, pair):
     # to_crystal += sma50_data['to_crystal']
     # signal_data_for_crystal['SMA50'] = sma50_data['new_1day']
 
-    # 3 signal_sma50_0001_prev_and_open
+    # 3 signal_sma50_0002_prev_and_open_v2
+    signal_id = '0002'
     from .signal_cards.signal_sma50_0002_prev_and_open_v2 import signal_sma50_0002_prev_and_open_v2
     sma50_data = signal_sma50_0002_prev_and_open_v2(db, db_names['signal_db'], candle_formats, pair)
     to_postman += sma50_data['to_postman']

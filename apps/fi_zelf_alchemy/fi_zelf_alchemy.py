@@ -325,7 +325,6 @@ def json_logic(current_user, db, User, GasamApp, json_data, files_data):
     from .fz_fetcher import fz_fetcher
     from .fz_feeder import fz_feeder
     from .algo_engine.algo_engine import algo_engine
-    from .fz_charts import recordDataToDB
 
     if json_data['js_function'] == 'app_ini':
         return app_ini(current_user, db, User, GasamApp, json_data, files_data)

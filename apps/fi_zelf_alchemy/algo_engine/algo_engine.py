@@ -6,7 +6,7 @@ def algo_engine(db, db_names, json_data, candle_formats, pair, command):
     to_postman, to_crystal = '', ''
 
     if command == 'reset_db':
-        tables = [db_names['signal_trade_db'], db_names['signal_db'], db_names['trade_db'], db_names['bank_db'], db_names['futures_db']]
+        tables = [db_names['signal_trade_db'], db_names['signal_db'], db_names['trade_db'], db_names['bank_db'], db_names['futures_db'], db_names['charts_1_db']]
         reset_tables_with_sequences(db, tables)
     elif command == 'get_bank_spot_values':
         return get_bank_spot_values(db, db_names['bank_db'], candle_formats)
