@@ -4,6 +4,8 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
 import pickle
+from dotenv import load_dotenv
+from google_auth_oauthlib.flow import Flow
 import logging
 
 hodl = False
@@ -130,16 +132,16 @@ class GoogleSheetsAPI:
     def authenticate(self):
         """Handle the authentication process with Google Sheets API."""
         token_path = os.path.join(self.current_dir, 'token.pickle')
-        credentials_path = os.path.join(self.current_dir, 'credentials.json')
+        # credentials_path = os.path.join(self.current_dir, 'credentials.json')
 
         # self.logger.debug(f"Looking for credentials at: {credentials_path}")
         # self.logger.debug(f"Token path: {token_path}")
-        self.log += f'<p>Looking for credentials at: {credentials_path}</p>'
+        # self.log += f'<p>Looking for credentials at: {credentials_path}</p>'
         self.log += f'<p>Token path: {token_path}</p>'
 
-        if not os.path.exists(credentials_path):
-            self.log += f'<p>credentials.json not found at {credentials_path}</p>'
-            raise FileNotFoundError(f"credentials.json not found at {credentials_path}")
+        # if not os.path.exists(credentials_path):
+        #     self.log += f'<p>credentials.json not found at {credentials_path}</p>'
+        #     raise FileNotFoundError(f"credentials.json not found at {credentials_path}")
 
         if os.path.exists(token_path):
             # self.logger.debug("Found existing token, attempting to load...")
@@ -154,8 +156,23 @@ class GoogleSheetsAPI:
             else:
                 # self.logger.debug("Starting new OAuth2 flow...")
                 self.log += f'<p>Starting new OAuth2 flow...</p>'
-                flow = InstalledAppFlow.from_client_secrets_file(
-                    credentials_path, self.SCOPES)
+                # flow = InstalledAppFlow.from_client_secrets_file(
+                #     credentials_path, self.SCOPES)
+                load_dotenv()
+
+                flow = Flow.from_client_config(
+                    {
+                        "web": {
+                            "client_id": os.getenv("GOOGLE_CLIENT_ID"),
+                            "project_id": os.getenv("GOOGLE_PROJECT_ID"),
+                            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                            "token_uri": "https://oauth2.googleapis.com/token",
+                            "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+                            "client_secret": os.getenv("GOOGLE_CLIENT_SECRET")
+                        }
+                    },
+                    scopes=self.SCOPES
+                )
 
                 try:
                     self.creds = flow.run_local_server(port=0)
