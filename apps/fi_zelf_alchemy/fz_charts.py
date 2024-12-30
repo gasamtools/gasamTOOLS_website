@@ -104,6 +104,8 @@ def export_data_chart_1(db, charts_db, trade_db, sheetName):
     sheets_api.authenticate()
     sheets_api.write_range_safe(f"{sheetName}!A1:F{len(db_data_ready)}", db_data_ready)
 
+    return sheets_api.log
+
 
 def is_midnight_utc(unix_timestamp):
     from datetime import datetime, time
@@ -120,7 +122,7 @@ class GoogleSheetsAPI:
         self.creds = None
         self.service = None
         self.current_dir = os.path.dirname(os.path.abspath(__file__))
-
+        self.log = '<p>GoogleSheetsAPI</p>'
         # Set up logging
         # logging.basicConfig(level=logging.DEBUG)
         # self.logger = logging.getLogger('GoogleSheetsAPI')
@@ -132,8 +134,11 @@ class GoogleSheetsAPI:
 
         # self.logger.debug(f"Looking for credentials at: {credentials_path}")
         # self.logger.debug(f"Token path: {token_path}")
+        self.log += f'<p>Looking for credentials at: {credentials_path}</p>'
+        self.log += f'<p>Token path: {token_path}</p>'
 
         if not os.path.exists(credentials_path):
+            self.log += f'<p>credentials.json not found at {credentials_path}</p>'
             raise FileNotFoundError(f"credentials.json not found at {credentials_path}")
 
         if os.path.exists(token_path):
@@ -144,16 +149,20 @@ class GoogleSheetsAPI:
         if not self.creds or not self.creds.valid:
             if self.creds and self.creds.expired and self.creds.refresh_token:
                 # self.logger.debug("Refreshing expired credentials...")
+                self.log += f'<p>Refreshing expired credentials...</p>'
                 self.creds.refresh(Request())
             else:
                 # self.logger.debug("Starting new OAuth2 flow...")
+                self.log += f'<p>Starting new OAuth2 flow...</p>'
                 flow = InstalledAppFlow.from_client_secrets_file(
                     credentials_path, self.SCOPES)
 
                 try:
                     self.creds = flow.run_local_server(port=0)
                     # self.logger.debug(f"Successfully authenticated using port {port}")
+                    self.log += f'<p>Successfully authenticated</p>'
                 except Exception as e:
+                    self.log += f'<p>Failed to authenticate with all ports</p>'
                     raise Exception("Failed to authenticate with all ports")
 
             # self.logger.debug("Saving new token...")
@@ -161,7 +170,9 @@ class GoogleSheetsAPI:
                 pickle.dump(self.creds, token)
 
         # self.logger.debug("Building service...")
+        self.log += f'<p>Building service...</p>'
         self.service = build('sheets', 'v4', credentials=self.creds)
+        self.log += f'<p>Authentication complete!</p>'
         # self.logger.debug("Authentication complete!")
 
     def read_range(self, range_name):
@@ -172,6 +183,7 @@ class GoogleSheetsAPI:
             return result.get('values', [])
         except Exception as e:
             print(f"Error reading range: {e}")
+            self.log += f'<p>Error reading range: {e}</p>'
             return None
 
     def write_range(self, range_name, values):
@@ -186,6 +198,7 @@ class GoogleSheetsAPI:
             return result
         except Exception as e:
             print(f"Error writing to range: {e}")
+            self.log += f'<p>Error writing  to range: {e}</p>'
             return None
 
     def append_values(self, range_name, values):
@@ -201,6 +214,7 @@ class GoogleSheetsAPI:
             return result
         except Exception as e:
             print(f"Error appending values: {e}")
+            self.log += f'<p>Error appending  to range: {e}</p>'
             return None
 
     def get_sheets(self):
@@ -212,6 +226,7 @@ class GoogleSheetsAPI:
             return [sheet['properties']['title'] for sheet in sheets]
         except Exception as e:
             #self.logger.error(f"Error getting sheets: {e}")
+            self.log += f'<p>Error getting sheets: {e}</p>'
             return None
 
     def create_sheet(self, sheet_name):
@@ -231,9 +246,11 @@ class GoogleSheetsAPI:
                 body=body
             ).execute()
             #self.logger.debug(f"Created sheet: {sheet_name}")
+            self.log += f'<p>Created sheet: {sheet_name}</p>'
             return True
         except Exception as e:
             #self.logger.error(f"Error creating sheet: {e}")
+            self.log += f'<p>Error creating sheet: {e}</p>'
             return False
 
     def write_range_safe(self, range_name, values):
@@ -245,6 +262,7 @@ class GoogleSheetsAPI:
         existing_sheets = self.get_sheets()
         if sheet_name not in existing_sheets:
             #self.logger.debug(f"Sheet {sheet_name} not found. Creating it...")
+            self.log += f'<p>Sheet {sheet_name} not found. Creating it...</p>'
             if not self.create_sheet(sheet_name):
                 return None
 
