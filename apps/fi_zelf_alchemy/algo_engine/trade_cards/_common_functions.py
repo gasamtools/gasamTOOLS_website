@@ -7,6 +7,13 @@ def fetch_flagged_signals(db, signal_db, pair):
     return flagged_signals
 
 
+def fetch_active_signals(db, signal_db, pair):
+    check_query = text(f"SELECT * FROM {signal_db} WHERE is_active = :is_active AND trading_pair = :trading_pair")
+    active_signals = db.session.execute(check_query, {"is_active": True, "trading_pair": pair}).mappings().fetchall()
+    return active_signals
+
+
+
 def fetch_flagged_trades(db, trade_db, pair):
     # SQL query to fetch flagged trades with specific currencies
     currencies = pair.split('-')

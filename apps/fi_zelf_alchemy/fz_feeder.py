@@ -1,4 +1,5 @@
 fz_feeder_cycle_last_candle = []
+sent_chart_data = False
 
 def fz_feeder(current_user, db, db_names, User, GasamApp, json_data, files_data):
     if json_data['js_function_sub'] == 'main':
@@ -7,10 +8,10 @@ def fz_feeder(current_user, db, db_names, User, GasamApp, json_data, files_data)
 
 def fz_feeder_main(current_user, db, db_names, User, GasamApp, json_data, files_data):
     from sqlalchemy import text
-    from .algo_engine.algo_engine import algo_engine
     from .fz_crystal import printSignals, printAlchemyFeed
-    from .fz_charts import gather_data_chart_1
-    global fz_feeder_cycle_last_candle
+    from .fz_charts import export_data_chart_1
+    from .algo_engine.signal_engine import signal_id
+    from .algo_engine.vault_engine import vault_id
 
     # GET TOTAL AMOUNT OF CANDLES FROM DB used for fastForward and to determine if test is complete
     total_candles = db.session.execute(
@@ -48,13 +49,12 @@ def fz_feeder_main(current_user, db, db_names, User, GasamApp, json_data, files_
     # PRINT CANDLES ON TradingVIew CHART
     daily_candles = transform_candles(hourly_candles, '1day')
 
-    # GATHER DATA FOR CHART 1
-    charts_1_data = gather_data_chart_1(
-        timestamp=hourly_candles[-1]['time'],
-        candle=daily_candles[-1]['open'],
-        bank=bank_futures_values_data
-    )
-
+    # SEND CHART DATA TO GOOGLE SHEET IF THE END OF TEST
+    global sent_chart_data
+    # export_data_chart_1(db, db_names['charts_1_db'], db_names['trade_db'], f'{signal_id}_{vault_id}_{pair}')
+    if printAlchemyFeed_data['end_of_test'] and not sent_chart_data:
+        export_data_chart_1(db, db_names['charts_1_db'], db_names['trade_db'], f'{signal_id}_{vault_id}_{pair}')
+        sent_chart_data = True
 
     return_data = {
         'candles': daily_candles,
@@ -150,6 +150,7 @@ def process_algo_engine(db, db_names, json_data, hourly_candles, pair, cycle_ran
         Dictionary containing algorithm engine data
     """
     from .algo_engine.algo_engine import algo_engine
+    from .fz_charts import gather_data_chart_1, record_data_chart_1
     global fz_feeder_cycle_last_candle
 
     algo_engine_data = {
@@ -201,6 +202,15 @@ def process_algo_engine(db, db_names, json_data, hourly_candles, pair, cycle_ran
         bank_futures_values_data = algo_engine(db, db_names,
             {}, fz_feeder_cycle_last_candle['time'], {}, 'get_bank_futures_values'
         )
+
+        # GATHER AND RECORD DATA FOR CHART 1
+        charts_1_data = gather_data_chart_1(
+            timestamp=fz_feeder_cycle_last_candle['time'],
+            candle=fz_feeder_cycle_last_candle['open'],
+            bank=bank_futures_values_data
+        )
+        record_data_chart_1(db, db_names, charts_1_data)
+
 
     return (algo_engine_data, bank_spot_values_data, bank_futures_values_data)
 

@@ -1,5 +1,6 @@
 fund_bank_ini_usdt_value = 1000
 fund_futures_ini_usdt_value = 1000
+vault_id = '0000'
 def vault_engine(db, db_names, action, pair):
     if action == 'adjust_trades':
         return vault_adjust_trades(db, db_names, pair)
@@ -9,6 +10,7 @@ def vault_engine(db, db_names, action, pair):
 def  vault_adjust_trades(db, db_names, pair):
     from .trade_cards._common_functions import fetch_active_placed_trades_from_trade_db, update_bank_balances_and_trade_db
     from ..fz_fetcher import fz_fetcher_update_orders
+    global vault_id
 
     to_postman, to_crystal = '', ''
 
@@ -70,9 +72,22 @@ def  vault_adjust_trades(db, db_names, pair):
     # card_data = card_sma50_day_futures_0005_shortSP10_longSL2SB7(db, signal_db, trade_db, futures_db, signal_trade_db, pair,
     #                                                   'adjust_trades')
 
-    # 14 card_sma50_day_futures_0005_shortSP10SL2_longSL2SB10
-    from .trade_cards.card_sma50_day_futures_0006_shortSP10SL2_longSL2SB10 import card_sma50_day_futures_0006_shortSP10SL2_longSL2SB10
-    card_data = card_sma50_day_futures_0006_shortSP10SL2_longSL2SB10(db, db_names, pair,'adjust_trades')
+    # 14 card_sma50_day_futures_0006_shortSP10SL2_longSL2SB10
+    # vault_id = '0006'
+    # from .trade_cards.card_sma50_day_futures_0006_shortSP10SL2_longSL2SB10 import card_sma50_day_futures_0006_shortSP10SL2_longSL2SB10
+    # card_data = card_sma50_day_futures_0006_shortSP10SL2_longSL2SB10(db, db_names, pair,'adjust_trades')
+
+    # 15 card_sma50_day_futures_0007_shortSP12_longSL2SB7
+    # vault_id = '0007b'
+    # from .trade_cards.card_sma50_day_futures_0007_shortSP12_longSL2SB7 import card_sma50_day_futures_0007_shortSP12_longSL2SB7
+    # card_data = card_sma50_day_futures_0007_shortSP12_longSL2SB7(db, db_names, pair, 'adjust_trades')
+
+    # 16 card_sma50_day_futures_0007_shortSP12_longSL2SB7
+    vault_id = '0008'
+    from .trade_cards.card_sma50_day_futures_0008_shortSP9_longSL2SB7 import card_sma50_day_futures_0008_shortSP9_longSL2SB7
+    card_data = card_sma50_day_futures_0008_shortSP9_longSL2SB7(db, db_names, pair, 'adjust_trades')
+
+
 
 
     to_postman += card_data['to_postman']
@@ -148,8 +163,18 @@ def vault_take_trades(db, db_names, pair):
     #                                                         'take_trades')
 
     # 14 card_sma50_day_futures_0005_shortSP10SL2_longSL2SB10
-    from .trade_cards.card_sma50_day_futures_0006_shortSP10SL2_longSL2SB10 import card_sma50_day_futures_0006_shortSP10SL2_longSL2SB10
-    card_info = card_sma50_day_futures_0006_shortSP10SL2_longSL2SB10(db, db_names, pair,'take_trades')
+    # from .trade_cards.card_sma50_day_futures_0006_shortSP10SL2_longSL2SB10 import card_sma50_day_futures_0006_shortSP10SL2_longSL2SB10
+    # card_info = card_sma50_day_futures_0006_shortSP10SL2_longSL2SB10(db, db_names, pair,'take_trades')
+
+    # 15 card_sma50_day_futures_0007_shortSP12_longSL2SB7
+    # from .trade_cards.card_sma50_day_futures_0007_shortSP12_longSL2SB7 import card_sma50_day_futures_0007_shortSP12_longSL2SB7
+    # card_info = card_sma50_day_futures_0007_shortSP12_longSL2SB7(db, db_names, pair, 'take_trades')
+    #
+    # 16 card_sma50_day_futures_0008_shortSP9_longSL2SB7
+    from .trade_cards.card_sma50_day_futures_0008_shortSP9_longSL2SB7 import card_sma50_day_futures_0008_shortSP9_longSL2SB7
+    card_info = card_sma50_day_futures_0008_shortSP9_longSL2SB7(db, db_names, pair, 'take_trades')
+
+
 
 
     to_postman += card_info['to_postman']
