@@ -50,6 +50,7 @@ def fz_feeder_main(current_user, db, db_names, User, GasamApp, json_data, files_
     daily_candles = transform_candles(hourly_candles, '1day')
 
     # SEND CHART DATA TO GOOGLE SHEET IF THE END OF TEST
+
     global sent_chart_data
     # to_feed = export_data_chart_1(db, db_names['charts_1_db'], db_names['trade_db'], f'{signal_id}_{vault_id}_{pair}')
     # printAlchemyFeed_data['status'] += to_feed
