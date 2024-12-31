@@ -131,65 +131,143 @@ class GoogleSheetsAPI:
     def authenticate(self):
         """Handle the authentication process with Google Sheets API."""
         token_path = os.path.join(self.current_dir, 'token.pickle')
-        # credentials_path = os.path.join(self.current_dir, 'credentials.json')
 
-        #self.logger.debug(f"Looking for credentials at: {credentials_path}")
         self.logger.debug(f"Token path: {token_path}")
-        #self.log += f'<p>Looking for credentials at: {credentials_path}</p>'
         self.log += f'<p>Token path: {token_path}</p>'
 
-        # if not os.path.exists(credentials_path):
-        #     self.log += f'<p>credentials.json not found at {credentials_path}</p>'
-        #     raise FileNotFoundError(f"credentials.json not found at {credentials_path}")
+        # For server environment (Render)
+        if os.getenv('RENDER') or os.getenv('PRODUCTION'):
+            self.logger.debug("Running on Render, using service account...")
+            self.log += f'<p>Running on Render, using service account...</p>'
 
-        if os.path.exists(token_path):
-            self.logger.debug("Found existing token, attempting to load...")
-            with open(token_path, 'rb') as token:
-                self.creds = pickle.load(token)
+            from google.oauth2 import service_account
 
-        if not self.creds or not self.creds.valid:
-            if self.creds and self.creds.expired and self.creds.refresh_token:
-                self.logger.debug("Refreshing expired credentials...")
-                self.log += f'<p>Refreshing expired credentials...</p>'
-                self.creds.refresh(Request())
-            else:
-                self.logger.debug("Starting new OAuth2 flow...")
-                self.log += f'<p>Starting new OAuth2 flow...</p>'
-                # flow = InstalledAppFlow.from_client_secrets_file(
-                #     credentials_path, self.SCOPES)
-                load_dotenv()
+            SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
+            credentials = service_account.Credentials.from_service_account_info(
+                {
+                    "type": "service_account",
+                    "project_id": os.getenv("GOOGLE_PROJECT_ID"),
+                    "private_key_id": os.getenv("GOOGLE_PRIVATE_KEY_ID"),
+                    "private_key": os.getenv("GOOGLE_PRIVATE_KEY").replace('\\n', '\n'),
+                    "client_email": os.getenv("GOOGLE_CLIENT_EMAIL"),
+                    "client_id": os.getenv("GOOGLE_CLIENT_ID"),
+                    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                    "token_uri": "https://oauth2.googleapis.com/token",
+                    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+                    "client_x509_cert_url": os.getenv("GOOGLE_CLIENT_X509_CERT_URL")
+                },
+                scopes=SCOPES
+            )
+            self.creds = credentials
 
-                flow = InstalledAppFlow.from_client_config(
-                    {
-                        "web": {
-                            "client_id": os.getenv("GOOGLE_CLIENT_ID"),
-                            "project_id": os.getenv("GOOGLE_PROJECT_ID"),
-                            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                            "token_uri": "https://oauth2.googleapis.com/token",
-                            "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-                            "client_secret": os.getenv("GOOGLE_CLIENT_SECRET")
-                        }
-                    },
-                    scopes=self.SCOPES
-                )
+        else:  # Local development
+            if os.path.exists(token_path):
+                self.logger.debug("Found existing token, attempting to load...")
+                with open(token_path, 'rb') as token:
+                    self.creds = pickle.load(token)
 
-                try:
-                    self.creds = flow.run_local_server(port=8080)
-                    # self.logger.debug(f"Successfully authenticated using port {port}")
-                    self.log += f'<p>Successfully authenticated</p>'
-                except Exception as e:
-                    self.log += f'<p>Failed to authenticate with all ports {e}</p>'
-                    raise Exception(f"Failed to authenticate with all ports {e}")
+            if not self.creds or not self.creds.valid:
+                if self.creds and self.creds.expired and self.creds.refresh_token:
+                    self.logger.debug("Refreshing expired credentials...")
+                    self.log += f'<p>Refreshing expired credentials...</p>'
+                    self.creds.refresh(Request())
+                else:
+                    self.logger.debug("Starting new OAuth2 flow...")
+                    self.log += f'<p>Starting new OAuth2 flow...</p>'
+                    load_dotenv()
 
-            # self.logger.debug("Saving new token...")
-            with open(token_path, 'wb') as token:
-                pickle.dump(self.creds, token)
+                    flow = InstalledAppFlow.from_client_config(
+                        {
+                            "web": {
+                                "client_id": os.getenv("GOOGLE_CLIENT_ID"),
+                                "project_id": os.getenv("GOOGLE_PROJECT_ID"),
+                                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                                "token_uri": "https://oauth2.googleapis.com/token",
+                                "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+                                "client_secret": os.getenv("GOOGLE_CLIENT_SECRET")
+                            }
+                        },
+                        scopes=self.SCOPES
+                    )
+
+                    try:
+                        self.creds = flow.run_local_server(port=8080)
+                        self.log += f'<p>Successfully authenticated</p>'
+                    except Exception as e:
+                        self.log += f'<p>Failed to authenticate with all ports {e}</p>'
+                        raise Exception(f"Failed to authenticate with all ports {e}")
+
+                with open(token_path, 'wb') as token:
+                    pickle.dump(self.creds, token)
 
         self.logger.debug("Building service...")
         self.log += f'<p>Building service...</p>'
         self.service = build('sheets', 'v4', credentials=self.creds)
         self.log += f'<p>Authentication complete!</p>'
         self.logger.debug("Authentication complete!")
+
+    # def authenticate(self):
+    #     """Handle the authentication process with Google Sheets API."""
+    #     token_path = os.path.join(self.current_dir, 'token.pickle')
+    #     # credentials_path = os.path.join(self.current_dir, 'credentials.json')
+    #
+    #     #self.logger.debug(f"Looking for credentials at: {credentials_path}")
+    #     self.logger.debug(f"Token path: {token_path}")
+    #     #self.log += f'<p>Looking for credentials at: {credentials_path}</p>'
+    #     self.log += f'<p>Token path: {token_path}</p>'
+    #
+    #     # if not os.path.exists(credentials_path):
+    #     #     self.log += f'<p>credentials.json not found at {credentials_path}</p>'
+    #     #     raise FileNotFoundError(f"credentials.json not found at {credentials_path}")
+    #
+    #     if os.path.exists(token_path):
+    #         self.logger.debug("Found existing token, attempting to load...")
+    #         with open(token_path, 'rb') as token:
+    #             self.creds = pickle.load(token)
+    #
+    #     if not self.creds or not self.creds.valid:
+    #         if self.creds and self.creds.expired and self.creds.refresh_token:
+    #             self.logger.debug("Refreshing expired credentials...")
+    #             self.log += f'<p>Refreshing expired credentials...</p>'
+    #             self.creds.refresh(Request())
+    #         else:
+    #             self.logger.debug("Starting new OAuth2 flow...")
+    #             self.log += f'<p>Starting new OAuth2 flow...</p>'
+    #             # flow = InstalledAppFlow.from_client_secrets_file(
+    #             #     credentials_path, self.SCOPES)
+    #             load_dotenv()
+    #
+    #             flow = InstalledAppFlow.from_client_config(
+    #                 {
+    #                     "web": {
+    #                         "client_id": os.getenv("GOOGLE_CLIENT_ID"),
+    #                         "project_id": os.getenv("GOOGLE_PROJECT_ID"),
+    #                         "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    #                         "token_uri": "https://oauth2.googleapis.com/token",
+    #                         "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    #                         "client_secret": os.getenv("GOOGLE_CLIENT_SECRET")
+    #                     }
+    #                 },
+    #                 scopes=self.SCOPES
+    #             )
+    #
+    #             try:
+    #                 self.creds = flow.run_local_server(port=8080)
+    #                 # self.logger.debug(f"Successfully authenticated using port {port}")
+    #                 self.log += f'<p>Successfully authenticated</p>'
+    #             except Exception as e:
+    #                 self.log += f'<p>Failed to authenticate with all ports {e}</p>'
+    #                 raise Exception(f"Failed to authenticate with all ports {e}")
+    #
+    #         # self.logger.debug("Saving new token...")
+    #         with open(token_path, 'wb') as token:
+    #             pickle.dump(self.creds, token)
+    #
+    #     self.logger.debug("Building service...")
+    #     self.log += f'<p>Building service...</p>'
+    #     self.service = build('sheets', 'v4', credentials=self.creds)
+    #     self.log += f'<p>Authentication complete!</p>'
+    #     self.logger.debug("Authentication complete!")
 
     def read_range(self, range_name):
         """Read data from specified range."""
