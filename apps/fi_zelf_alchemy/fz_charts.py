@@ -5,7 +5,6 @@ from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
 import pickle
 from dotenv import load_dotenv
-from google_auth_oauthlib.flow import Flow
 import logging
 
 hodl = False

@@ -154,7 +154,8 @@ def take_trades(db, db_names, pair):
         to_crystal += this_data['to_crystal']
 
 # BULL: IF NEW BULL signal
-    if flagged_sma50_day_bear_signals and not active_placed_short_sell_limit_trades:
+#     print(flagged_sma50_day_bear_signals)
+    if (flagged_sma50_day_bear_signals and not active_placed_short_sell_limit_trades) or (not_traded_sma50_bull_day_signals_of_pair and not active_placed_short_sell_limit_trades):
         this_data = place_futures_order(db, db_names['signal_db'], db_names['trade_db'], db_names['futures_db'], db_names['signal_trade_db'],
                                         pair,
                                         bull_active_signals[0],
@@ -166,7 +167,7 @@ def take_trades(db, db_names, pair):
         to_crystal += this_data['to_crystal']
 
 # BEAR: IF NEW BEAR signal
-    if flagged_sma50_day_bull_signals and not active_placed_long_sell_limit_trades:
+    if (flagged_sma50_day_bull_signals and not active_placed_long_sell_limit_trades) or (not_traded_sma50_bear_day_signals_of_pair and not active_placed_long_sell_limit_trades):
         this_data = place_futures_order(db, db_names['signal_db'], db_names['trade_db'], db_names['futures_db'], db_names['signal_trade_db'],
                                         pair=pair,
                                         signal=bear_active_signals[0],

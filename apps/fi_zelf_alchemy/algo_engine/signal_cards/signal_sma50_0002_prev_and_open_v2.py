@@ -5,6 +5,7 @@
 
 from ._common_functions import *
 
+
 def signal_sma50_0002_prev_and_open_v2(db, signal_db, candle_formats, pair):
     to_postman, to_crystal = '', ''
 
@@ -32,20 +33,23 @@ def signal_sma50_0002_prev_and_open_v2(db, signal_db, candle_formats, pair):
     # COMPARE NEW vs RECORDED SIGNALS AND RECORD NEW SIGNALS IF NOT RECORDED
     # UPDATE to_postman, to_crystal
 
-    data_1day = compare_and_update_db(db, signal_db, new_proxy_1day, all_record_proxies_1day, active_record_proxies_1day)
+    data_1day = compare_and_update_db(db, signal_db, new_proxy_1day, all_record_proxies_1day,
+                                      active_record_proxies_1day)
     to_postman += data_1day['to_postman']
     to_crystal += data_1day['to_crystal']
-    data_1week = compare_and_update_db(db, signal_db, new_proxy_1week, all_record_proxies_1week, active_record_proxies_1week)
+    data_1week = compare_and_update_db(db, signal_db, new_proxy_1week, all_record_proxies_1week,
+                                       active_record_proxies_1week)
     to_postman += data_1week['to_postman']
     to_crystal += data_1week['to_crystal']
-    data_1month = compare_and_update_db(db, signal_db, new_proxy_1month, all_record_proxies_1month, active_record_proxies_1month)
+    data_1month = compare_and_update_db(db, signal_db, new_proxy_1month, all_record_proxies_1month,
+                                        active_record_proxies_1month)
     to_postman += data_1month['to_postman']
     to_crystal += data_1month['to_crystal']
 
     return {
         'to_postman': to_postman,
         'to_crystal': to_crystal,
-        'new_1day': new_1day #send data to fz_crystal.py via signal_engine.py
+        'new_1day': new_1day  #send data to fz_crystal.py via signal_engine.py
     }
 
 
@@ -90,7 +94,8 @@ def convert_to_proxy(trading_pair: str, interval: str, signal_type: str, signal_
         if 'ma_marker' in candle and candle['ma_marker'] != 'between':
             if not trend_type:
                 trend_type = candle['ma_marker']
-                if 'ma_marker' in reversed_signal_data[index+1] and reversed_signal_data[index+1]['ma_marker'] == trend_type:
+                if 'ma_marker' in reversed_signal_data[index + 1] and reversed_signal_data[index + 1][
+                    'ma_marker'] == trend_type:
                     trend_confirmed = True
                 if not trend_confirmed:
                     trend_type = False
@@ -99,12 +104,12 @@ def convert_to_proxy(trading_pair: str, interval: str, signal_type: str, signal_
             if 'ma_marker' in candle and candle['ma_marker'] != trend_type:
                 if candle['ma_marker'] == 'between':
                     if not possible_trend_start:
-                        possible_trend_start = reversed_signal_data[index-1]['time']
+                        possible_trend_start = reversed_signal_data[index - 1]['time']
                 else:
                     if possible_trend_start:
                         trend_start = possible_trend_start
                     else:
-                        trend_start = reversed_signal_data[index-1]['time']
+                        trend_start = reversed_signal_data[index - 1]['time']
                     break
             else:
                 possible_trend_start = False
@@ -144,6 +149,7 @@ def compare_and_update_db(db, signal_db, new_proxy, all_record_proxies, active_r
     else:
         records_dont_match = True
         for record in all_record_proxies:
+            # print(record)
             if int(new_proxy['sdp_0']) == int(record['sdp_0']) and new_proxy['trend_type'] == record['trend_type']:
                 records_dont_match = False
                 if record['id'] != active_record_proxy['id']:
@@ -155,6 +161,10 @@ def compare_and_update_db(db, signal_db, new_proxy, all_record_proxies, active_r
                     flag_signal_data = flag_signal(db, signal_db, active_record_proxy, int(sdp_1))
                     to_postman += flag_signal_data['to_postman']
                     to_crystal += flag_signal_data['to_crystal']
+
+        if new_proxy['trend_type'] == active_record_proxy['trend_type']:
+            # print('here')
+            records_dont_match = False
 
         if records_dont_match:
             if int(new_proxy['sdp_0']) >= int(active_record_proxy['sdp_0']):
@@ -168,7 +178,6 @@ def compare_and_update_db(db, signal_db, new_proxy, all_record_proxies, active_r
             insert_into_db_data = insert_into_signal_db(db, signal_db, new_proxy)
             to_postman += insert_into_db_data['to_postman']
             to_crystal += insert_into_db_data['to_crystal']
-
 
         return {
             'to_postman': to_postman,

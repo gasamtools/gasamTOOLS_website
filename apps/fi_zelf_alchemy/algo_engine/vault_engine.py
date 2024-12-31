@@ -83,7 +83,7 @@ def  vault_adjust_trades(db, db_names, pair):
     # card_data = card_sma50_day_futures_0007_shortSP12_longSL2SB7(db, db_names, pair, 'adjust_trades')
 
     # 16 card_sma50_day_futures_0007_shortSP12_longSL2SB7
-    vault_id = '0008'
+    vault_id = '0008a'
     from .trade_cards.card_sma50_day_futures_0008_shortSP9_longSL2SB7 import card_sma50_day_futures_0008_shortSP9_longSL2SB7
     card_data = card_sma50_day_futures_0008_shortSP9_longSL2SB7(db, db_names, pair, 'adjust_trades')
 
