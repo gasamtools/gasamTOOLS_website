@@ -137,6 +137,31 @@ def fetch_not_traded_signals(db, signal_db, signal_trade_db, pair):
     return not_traded_signals
 
 
+def fetch_active_not_flagged_not_traded_signals(db, signal_db, pair):
+    check_query = text(f"""
+        SELECT s.*
+        FROM {signal_db} s
+        WHERE 
+            s.is_active = :is_active 
+            AND (s.is_flagged = :is_flagged OR s.is_flagged IS NULL)
+            AND (s.is_traded = :is_traded OR s.is_traded IS NULL)
+            AND s.trading_pair = :trading_pair
+    """)
+
+    query_params = {
+        "is_active": True,
+        "is_flagged": False,
+        "is_traded": False,
+        "trading_pair": pair
+    }
+    not_traded_signals = db.session.execute(check_query, query_params).mappings().fetchall()
+
+    if not not_traded_signals:
+        not_traded_signals = []
+
+    return not_traded_signals
+
+
 def get_new_trade_id(db, trade_db):
     max_trade_id_query = text(f"SELECT MAX(trade_id) FROM {trade_db}")
     max_trade_id = db.session.execute(max_trade_id_query).scalar()
@@ -227,6 +252,43 @@ def update_bank_balances_and_trade_db(db, bank_db, futures_db, trade_db, trade):
                                                              update_data=trade)
     to_postman += update_trade_in_trade_db_data['to_postman']
     to_crystal += update_trade_in_trade_db_data['to_crystal']
+
+    return {
+        'to_postman': to_postman,
+        'to_crystal': to_crystal
+    }
+
+
+def update_signal_is_traded(db, signal_trade_db, signal_db, trade):
+    from ...fz_feeder import fz_feeder_cycle_last_candle
+    to_postman, to_crystal = '', ''
+
+    if trade['trade_action'] == 'buy':
+        status = 'TRUE'
+    elif trade['trade_action'] == 'sell':
+        status = 'FALSE'
+
+    update_query = text(f"""
+        UPDATE {signal_db}
+        SET is_traded = {status}
+        WHERE id IN (
+            SELECT signal_id 
+            FROM {signal_trade_db}
+            WHERE trade_id = :trade_id
+            )
+        RETURNING id
+    """)
+
+    query_params = {
+        "trade_id": trade['trade_id']
+    }
+
+    signal_id = db.session.execute(update_query, query_params).scalar()
+    db.session.commit()
+
+    note_time = timestamp_to_time_UTC(fz_feeder_cycle_last_candle['time'])
+    to_postman += f'{note_time} SIGNAL: id#{signal_id} is_traded SET to: {status} '
+    to_crystal += f'<p>{note_time} <a class="fz crystal signal" id="{signal_id}" href="#"> SIGNAL: id#{signal_id}</a> is_traded SET to: {status} </p>'
 
     return {
         'to_postman': to_postman,

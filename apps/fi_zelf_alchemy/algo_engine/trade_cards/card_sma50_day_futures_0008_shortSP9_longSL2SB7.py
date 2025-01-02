@@ -91,16 +91,20 @@ def take_trades(db, db_names, pair):
 
 
     active_placed_trades = fetch_active_placed_trades_from_trade_db(db, db_names['trade_db'])
-    active_placed_long_sell_limit_trades = [trade for trade in active_placed_trades if trade['trade_position'] == 'long' and trade['trade_action'] == 'sell' and trade['trade_entry'] == 'limit']
-    active_placed_short_sell_limit_trades = [trade for trade in active_placed_trades if trade['trade_position'] == 'short' and trade['trade_action'] == 'sell' and trade['trade_entry'] == 'limit']
+    active_placed_long_buy_stoplimit_trades = [trade for trade in active_placed_trades if trade['trade_position'] == 'long' and trade['trade_action'] == 'buy' and trade['trade_entry'] == 'stop-limit']
+    active_placed_short_buy_stoplimit_trades = [trade for trade in active_placed_trades if trade['trade_position'] == 'short' and trade['trade_action'] == 'buy' and trade['trade_entry'] == 'stop-limit']
 
 
     # FETCH NEW SIGNALS
-    not_traded_signals = fetch_not_traded_signals(db, db_names['signal_db'], db_names['signal_trade_db'], pair)  # checks that it is active too
-    not_traded_sma50_bull_day_signals_of_pair = [signal for signal in not_traded_signals if signal['signal_type'] == 'SMA50' and signal['trend_type'] == 'bull' and signal['interval'] == '1day']
-    not_traded_sma50_bear_day_signals_of_pair = [signal for signal in not_traded_signals if signal['signal_type'] == 'SMA50' and signal['trend_type'] == 'bear' and signal['interval'] == '1day']
+    # not_traded_signals = fetch_not_traded_signals(db, db_names['signal_db'], db_names['signal_trade_db'], pair)  # checks that it is active too
+    # not_traded_sma50_bull_day_signals_of_pair = [signal for signal in not_traded_signals if signal['signal_type'] == 'SMA50' and signal['trend_type'] == 'bull' and signal['interval'] == '1day']
+    # not_traded_sma50_bear_day_signals_of_pair = [signal for signal in not_traded_signals if signal['signal_type'] == 'SMA50' and signal['trend_type'] == 'bear' and signal['interval'] == '1day']
 
-# BULL: IF BULL IS FLAGGED
+    active_not_flagged_not_traded_signals = fetch_active_not_flagged_not_traded_signals(db, db_names['signal_db'], pair)
+    active_not_flagged_not_traded_signals_bull = [signal for signal in active_not_flagged_not_traded_signals if signal['signal_type'] == 'SMA50' and signal['trend_type'] == 'bull' and signal['interval'] == '1day']
+    active_not_flagged_not_traded_signals_bear = [signal for signal in active_not_flagged_not_traded_signals if signal['signal_type'] == 'SMA50' and signal['trend_type'] == 'bear' and signal['interval'] == '1day']
+
+    # BULL: IF BULL IS FLAGGED
     flagged_sma50_day_bull_signals = [signal for signal in flagged_signals if
                                       signal['signal_type'] == 'SMA50' and
                                       signal['interval'] == '1day' and
@@ -154,11 +158,12 @@ def take_trades(db, db_names, pair):
         to_crystal += this_data['to_crystal']
 
 # BULL: IF NEW BULL signal
-#     print(flagged_sma50_day_bear_signals)
-    if (flagged_sma50_day_bear_signals and not active_placed_short_sell_limit_trades) or (not_traded_sma50_bull_day_signals_of_pair and not active_placed_short_sell_limit_trades):
+#     print(f'BULL active_not_flagged_not_traded_signals_bull {active_not_flagged_not_traded_signals_bull}')
+#     print(f'BULL active_placed_long_buy_stoplimit_trades {active_placed_long_buy_stoplimit_trades}')
+    if active_not_flagged_not_traded_signals_bull and not active_placed_long_buy_stoplimit_trades:
         this_data = place_futures_order(db, db_names['signal_db'], db_names['trade_db'], db_names['futures_db'], db_names['signal_trade_db'],
                                         pair,
-                                        bull_active_signals[0],
+                                        active_not_flagged_not_traded_signals_bull[0],
                                         fz_feeder_cycle_last_candle['close'],
                                         'long',
                                         'buy',
@@ -167,10 +172,12 @@ def take_trades(db, db_names, pair):
         to_crystal += this_data['to_crystal']
 
 # BEAR: IF NEW BEAR signal
-    if (flagged_sma50_day_bull_signals and not active_placed_long_sell_limit_trades) or (not_traded_sma50_bear_day_signals_of_pair and not active_placed_long_sell_limit_trades):
+#     print(f'BEAR active_not_flagged_not_traded_signals_bear {active_not_flagged_not_traded_signals_bear}')
+#     print(f'BEAR active_placed_short_buy_stoplimit_trades {active_placed_short_buy_stoplimit_trades}')
+    if active_not_flagged_not_traded_signals_bear and not active_placed_short_buy_stoplimit_trades:
         this_data = place_futures_order(db, db_names['signal_db'], db_names['trade_db'], db_names['futures_db'], db_names['signal_trade_db'],
                                         pair=pair,
-                                        signal=bear_active_signals[0],
+                                        signal=active_not_flagged_not_traded_signals_bear[0],
                                         price=fz_feeder_cycle_last_candle['close'],
                                         trade_position='short',
                                         trade_action='buy',
