@@ -1,6 +1,6 @@
 from sqlalchemy import text
 from._common_functions import *
-from._common_functions_spot import *
+# from._common_functions_spot import *
 
 
 def update_bank_balances_futures(db, futures_db, trade): # feeds filled trade
@@ -135,6 +135,7 @@ def place_new_order_futures(
         signal=None,
         price=None,
         amount_in=None,
+        trade_level=None,
         trade_type=None,  #spot, futures
         trade_position=None,  #long/short
         trade_action=None,  #buy/sell
@@ -180,6 +181,7 @@ def place_new_order_futures(
         trade_data = {
             "trade_id": trade_id,
             "is_active": True,
+            "trade_level": trade_level,
             "trade_type": trade_type,
             "trade_position": trade_position,
             "trade_action": trade_action,
@@ -201,11 +203,11 @@ def place_new_order_futures(
             # INSERT TRADE RECORD
             trade_query = text(f"""
                     INSERT INTO {trade_db} (
-                        trade_id, is_active, trade_type, trade_position, trade_action, 
+                        trade_id, is_active, trade_level, trade_type, trade_position, trade_action, 
                         trade_entry, trade_entry_stop, trade_status, date_placed,
                         currency_buy, currency_sell, amount_buy, amount_sell, price, tdp_0
                     ) VALUES (
-                        :trade_id, :is_active, :trade_type, :trade_position, :trade_action,
+                        :trade_id, :is_active, :trade_level, :trade_type, :trade_position, :trade_action,
                         :trade_entry, :trade_entry_stop, :trade_status, :date_placed,
                         :currency_buy, :currency_sell, :amount_buy, :amount_sell, :price, :tdp_0
                     ) RETURNING trade_id, id
@@ -268,6 +270,7 @@ def place_sl_order_futures(
         futures_db=None,
         signal_trade_db=None,
         trade_id=None,
+        trade_level=None,
         signal=None,
         price=None,
         trade_type=None,  #spot, futures
@@ -311,6 +314,7 @@ def place_sl_order_futures(
         trade_data = {
             "trade_id": trade_id,
             "is_active": True,
+            "trade_level": trade_level,
             "trade_type": trade_type,
             "trade_position": trade_position,
             "trade_action": trade_action,
@@ -332,11 +336,11 @@ def place_sl_order_futures(
             # INSERT TRADE RECORD
             trade_query = text(f"""
                     INSERT INTO {trade_db} (
-                        trade_id, is_active, trade_type, trade_position, trade_action,
+                        trade_id, is_active, trade_level, trade_type, trade_position, trade_action,
                         trade_entry, trade_entry_stop, trade_status, date_placed,
                         currency_buy, currency_sell, amount_buy, amount_sell, price, tdp_0
                     ) VALUES (
-                        :trade_id, :is_active, :trade_type, :trade_position, :trade_action,
+                        :trade_id, :is_active, :trade_level, :trade_type, :trade_position, :trade_action,
                         :trade_entry, :trade_entry_stop, :trade_status, :date_placed,
                         :currency_buy, :currency_sell, :amount_buy, :amount_sell, :price, :tdp_0
                     ) RETURNING trade_id, id
@@ -375,6 +379,7 @@ def place_sb_order_futures(
         futures_db=None,
         signal_trade_db=None,
         trade_id=None,
+        trade_level=None,
         signal=None,
         price=None,
         trade_type=None,  #spot, futures
@@ -417,6 +422,7 @@ def place_sb_order_futures(
         trade_data = {
             "trade_id": trade_id,
             "is_active": True,
+            "trade_level": trade_level,
             "trade_type": trade_type,
             "trade_position": trade_position,
             "trade_action": trade_action,
@@ -438,11 +444,11 @@ def place_sb_order_futures(
             # INSERT TRADE RECORD
             trade_query = text(f"""
                     INSERT INTO {trade_db} (
-                        trade_id, is_active, trade_type, trade_position, trade_action,
+                        trade_id, is_active, trade_level, trade_type, trade_position, trade_action,
                         trade_entry, trade_entry_stop, trade_status, date_placed,
                         currency_buy, currency_sell, amount_buy, amount_sell, price, tdp_0
                     ) VALUES (
-                        :trade_id, :is_active, :trade_type, :trade_position, :trade_action,
+                        :trade_id, :is_active, :trade_level, :trade_type, :trade_position, :trade_action,
                         :trade_entry, :trade_entry_stop, :trade_status, :date_placed,
                         :currency_buy, :currency_sell, :amount_buy, :amount_sell, :price, :tdp_0
                     ) RETURNING trade_id, id
@@ -475,7 +481,7 @@ def place_sb_order_futures(
 
 
 
-def place_stop_lossProfit_futures(db, signal_db, trade_db, futures_db, signal_trade_db, base_price, data, percent, type):
+def place_stop_lossProfit_futures(db, signal_db, trade_db, futures_db, signal_trade_db, trade_level, base_price, data, percent, type):
     from ...fz_feeder import fz_feeder_cycle_last_candle
 
     to_postman, to_crystal = '', ''
@@ -493,6 +499,7 @@ def place_stop_lossProfit_futures(db, signal_db, trade_db, futures_db, signal_tr
                                                    futures_db=futures_db,
                                                    signal_trade_db=signal_trade_db,
                                                    trade_id=data['trade_id'],
+                                                   trade_level=trade_level,
                                                    signal='',
                                                    price=stop_price,
                                                    trade_entry_stop=stop_price,
@@ -512,7 +519,7 @@ def place_stop_lossProfit_futures(db, signal_db, trade_db, futures_db, signal_tr
     }
 
 
-def place_stop_buy_futures(db, signal_db, trade_db, futures_db, signal_trade_db, base_price, data, percent, type):
+def place_stop_buy_futures(db, signal_db, trade_db, futures_db, signal_trade_db, trade_level, base_price, data, percent, type):
     from ...fz_feeder import fz_feeder_cycle_last_candle
 
     to_postman, to_crystal = '', ''
@@ -530,6 +537,7 @@ def place_stop_buy_futures(db, signal_db, trade_db, futures_db, signal_trade_db,
                                                    futures_db=futures_db,
                                                    signal_trade_db=signal_trade_db,
                                                    trade_id=data['trade_id'],
+                                                   trade_level=trade_level,
                                                    signal='',
                                                    price=stop_price,
                                                    trade_entry_stop=stop_price,
@@ -550,7 +558,7 @@ def place_stop_buy_futures(db, signal_db, trade_db, futures_db, signal_trade_db,
 
 
 
-def place_futures_order(db, signal_db, trade_db, futures_db, signal_trade_db, pair, signal, price, trade_position, trade_action, trade_entry):
+def place_futures_order(db, signal_db, trade_db, futures_db, signal_trade_db, pair, signal, price, trade_level, trade_position, trade_action, trade_entry):
     from ...fz_feeder import fz_feeder_cycle_last_candle
 
     to_postman, to_crystal = '', ''
@@ -582,6 +590,7 @@ def place_futures_order(db, signal_db, trade_db, futures_db, signal_trade_db, pa
                                                         signal=signal,
                                                         price=price,
                                                         amount_in=currency_sell_balance,
+                                                        trade_level=trade_level,
                                                         trade_type='futures',
                                                         trade_position=trade_position,
                                                         trade_action=trade_action,

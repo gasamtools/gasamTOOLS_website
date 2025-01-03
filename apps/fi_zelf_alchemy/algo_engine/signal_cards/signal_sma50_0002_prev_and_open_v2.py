@@ -120,7 +120,7 @@ def convert_to_proxy(trading_pair: str, interval: str, signal_type: str, signal_
             'interval': interval,
             'signal_type': signal_type,
             'is_trend_valid': True,
-            'is_traded': False,
+            'trade_level': 0,
             'trend_type': trend_type,
             'sdp_0': trend_start,
             'tp_entrance_1': reversed_candles_data[0]['close']

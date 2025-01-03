@@ -92,6 +92,10 @@ button#FZhideSignal {
     width: 100%;
 }
 
+.gasam.fz.bank-sub-container.spot {
+    display: none;
+}
+
 .fz.bank-total {
     width: 100px;
     padding: 0;

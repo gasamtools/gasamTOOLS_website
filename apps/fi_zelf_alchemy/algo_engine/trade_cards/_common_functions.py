@@ -64,11 +64,8 @@ def unflag_and_deactivate_signals(db, signal_db, pair, flagged_signals):
         rows_affected = result.rowcount
         db.session.commit()
 
-    #     to_postman += f"vault_take_trade | Found {len(flagged_signals)} flagged signals and updated {rows_affected} rows"
-    #     to_crystal += f"<p>vault_take_trade | Found {len(flagged_signals)} flagged signals and updated {rows_affected} rows</p>"
-    # else:
-    #     to_postman += "vault_take_trade | No flagged signals found"
-    #     to_crystal += "<p>vault_take_trade | No flagged signals found</p>"
+        #to_postman += f"SIGNAL {rows_affected} is unflagged"
+        #to_crystal += f"<p>SIGNAL {rows_affected} is unflagged</p>"
 
     return {
         'to_postman': to_postman,
@@ -230,7 +227,6 @@ def update_bank_balances_and_trade_db(db, bank_db, futures_db, trade_db, trade):
 
     to_postman, to_crystal = '', ''
 
-    # print(trade)
     # UPDATE BANK RECORDS
     if trade['trade_type'] == 'spot':
         try:
@@ -259,18 +255,13 @@ def update_bank_balances_and_trade_db(db, bank_db, futures_db, trade_db, trade):
     }
 
 
-def update_signal_is_traded(db, signal_trade_db, signal_db, trade):
+def update_signal_trade_level(db, signal_trade_db, signal_db, trade):
     from ...fz_feeder import fz_feeder_cycle_last_candle
     to_postman, to_crystal = '', ''
 
-    if trade['trade_action'] == 'buy':
-        status = 'TRUE'
-    elif trade['trade_action'] == 'sell':
-        status = 'FALSE'
-
     update_query = text(f"""
         UPDATE {signal_db}
-        SET is_traded = {status}
+        SET trade_level = {trade['trade_level']}
         WHERE id IN (
             SELECT signal_id 
             FROM {signal_trade_db}
@@ -287,8 +278,8 @@ def update_signal_is_traded(db, signal_trade_db, signal_db, trade):
     db.session.commit()
 
     note_time = timestamp_to_time_UTC(fz_feeder_cycle_last_candle['time'])
-    to_postman += f'{note_time} SIGNAL: id#{signal_id} is_traded SET to: {status} '
-    to_crystal += f'<p>{note_time} <a class="fz crystal signal" id="{signal_id}" href="#"> SIGNAL: id#{signal_id}</a> is_traded SET to: {status} </p>'
+    to_postman += f'{note_time} SIGNAL: id#{signal_id} trade_level SET to: {trade['trade_level']} '
+    to_crystal += f'<p>{note_time} <a class="fz crystal signal" id="{signal_id}" href="#"> SIGNAL: id#{signal_id}</a> trade_level SET to: {trade['trade_level']} </p>'
 
     return {
         'to_postman': to_postman,

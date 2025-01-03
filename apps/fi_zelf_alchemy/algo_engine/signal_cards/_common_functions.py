@@ -122,12 +122,13 @@ def flag_signal(db, signal_db, record_proxy, trend_ended):
 
     db.session.execute(
         text(
-            f"UPDATE {signal_db} SET is_flagged = :is_flagged, date_closed = :date_closed, is_trend_valid = :is_trend_valid, sdp_1 = :sdp_1  WHERE id = :record_id"
+            f"UPDATE {signal_db} SET is_flagged = :is_flagged, date_closed = :date_closed, is_trend_valid = :is_trend_valid, sdp_1 = :sdp_1, trade_level = :trade_level WHERE id = :record_id"
         ),
         {"is_flagged": True,
          "is_trend_valid": False,
          "date_closed": date_closed,
          "sdp_1": trend_ended,
+         "trade_level": 9,
          "record_id": record_proxy['id']
          }
     )
